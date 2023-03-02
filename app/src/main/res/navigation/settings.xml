@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/settings"
+    app:startDestination="@id/navigation_settings_fragment_start">
+
+    <fragment
+        android:id="@+id/navigation_settings_fragment_start"
+        android:name="com.icarus1.settings.SettingsFragment"
+        tools:layout="@layout/fragment_settings" >
+
+        <action
+            android:id="@+id/navigation_settings_action_start"
+            app:destination="@id/navigation_settings_fragment_settings" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_settings_fragment_settings"
+        android:name="com.icarus1.settings.SettingsFragment"
+        android:label="@string/page_settings"
+        tools:layout="@layout/fragment_settings" >
+
+        <action
+            android:id="@+id/navigation_settings_action_settings_to_about"
+            app:destination="@id/navigation_settings_fragment_about" />
+        <action
+            android:id="@+id/navigation_settings_action_settings_to_display"
+            app:destination="@id/navigation_settings_fragment_display" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_settings_fragment_about"
+        android:name="com.icarus1.settings.AboutFragment"
+        android:label="@string/page_about"
+        tools:layout="@layout/fragment_about" />
+
+    <fragment
+        android:id="@+id/navigation_settings_fragment_display"
+        android:name="com.icarus1.settings.SettingsDisplayFragment"
+        android:label="@string/page_display"
+        tools:layout="@layout/fragment_settings_display" />
+
+</navigation>

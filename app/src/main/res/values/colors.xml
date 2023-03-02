@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    <color name="sunset_0">#F6F54D</color>
+    <color name="sunset_1">#FEB139</color>
+    <color name="sunset_2">#F55353</color>
+    <color name="sunset_3">#000000</color><!--143F6B-->
+
+    <color name="sky_0">#FFFFFF</color><!--E8F9FD-->
+    <color name="sky_1">#0AA1DD</color>
+    <color name="sky_2">#2155CD</color>
+    <color name="sky_3">#1746A2</color>
+
+</resources>
