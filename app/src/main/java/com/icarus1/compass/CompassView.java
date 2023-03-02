@@ -9,13 +9,7 @@ import android.view.View;
 
 import androidx.annotation.Nullable;
 
-import java.util.Random;
-
-import io.github.cosinekitty.astronomy.Astronomy;
-import io.github.cosinekitty.astronomy.Body;
-import io.github.cosinekitty.astronomy.HourAngleInfo;
-import io.github.cosinekitty.astronomy.Observer;
-import io.github.cosinekitty.astronomy.Time;
+import com.icarus1.R;
 
 public class CompassView extends View {
 
@@ -30,7 +24,7 @@ public class CompassView extends View {
     private int textSize;
     private final Paint backgroundPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint backgroundTrackPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Paint textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint backgroundTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint trackPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
     private CompassModel compass = new CompassModel(0,0); //TODO remove ? should not depend directly on model ?
@@ -57,9 +51,12 @@ public class CompassView extends View {
 
     private void init() {
 
-        backgroundPaint.setColor(Color.argb(1f,0.5f,0.5f,0.5f));
-        backgroundTrackPaint.setColor(Color.argb(1f,0.75f,0.75f,0.75f));
-        trackPaint.setColor(Color.argb(225,255,0,255));
+        backgroundPaint.setColor(getResources().getColor(R.color.compass_background, getContext().getTheme()));
+
+        backgroundTrackPaint.setColor(getResources().getColor(R.color.compass_deg_tracks, getContext().getTheme()));
+        backgroundTextPaint.setColor(getResources().getColor(R.color.compass_NSEW, getContext().getTheme()));
+
+        trackPaint.setColor(getResources().getColor(R.color.compass_tracks, getContext().getTheme()));
 
     }
 
@@ -67,21 +64,6 @@ public class CompassView extends View {
         this.compass = compassModel;
         invalidate();
     }
-
-/*
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-
-//        int widthMode = View.MeasureSpec.getMode(widthMeasureSpec);
-//        int heightMode = View.MeasureSpec.getMode(heightMeasureSpec);
-
-        int width = View.MeasureSpec.getSize(widthMeasureSpec);
-        int height = View.MeasureSpec.getSize(heightMeasureSpec);
-
-        setMeasuredDimension(width, height);
-
-    }
-*/
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
@@ -98,7 +80,7 @@ public class CompassView extends View {
 
         textSize = maxLength / 10;
 
-        textPaint.setTextSize(textSize);
+        backgroundTextPaint.setTextSize(textSize);
 
     }
 
@@ -113,9 +95,9 @@ public class CompassView extends View {
 
     private void drawBackground(Canvas canvas) {
 
-        float sizeN = textPaint.measureText(TEXT_N);
-        float sizeS = textPaint.measureText(TEXT_S);
-        float sizeE = textPaint.measureText(TEXT_E);
+        float sizeN = backgroundTextPaint.measureText(TEXT_N);
+        float sizeS = backgroundTextPaint.measureText(TEXT_S);
+        float sizeE = backgroundTextPaint.measureText(TEXT_E);
 
         float padding = textSize / 4f;
 
@@ -143,25 +125,25 @@ public class CompassView extends View {
             TEXT_N,
             radius - sizeN / 2f,
             padding + textSize,
-            textPaint
+            backgroundTextPaint
         );
         canvas.drawText(
             TEXT_S,
             radius - sizeS / 2f,
             diameter - padding,
-            textPaint
+            backgroundTextPaint
         );
         canvas.drawText(
             TEXT_E,
             diameter - padding - sizeE,
             radius + textSize / 2f,
-            textPaint
+            backgroundTextPaint
         );
         canvas.drawText(
             TEXT_W,
             padding,
             radius + textSize / 2f,
-            textPaint
+            backgroundTextPaint
         );
 
     }
