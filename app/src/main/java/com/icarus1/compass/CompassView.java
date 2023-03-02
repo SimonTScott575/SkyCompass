@@ -2,7 +2,6 @@ package com.icarus1.compass;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.view.View;
@@ -21,10 +20,13 @@ public class CompassView extends View {
     private int maxLength;
     private float diameter;
     private float radius;
+    private float ringThickness;
     private int textSize;
     private final Paint backgroundPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint backgroundTrackPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint backgroundTextPaint2 = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint backgroundTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint backgroundRingPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint trackPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
     private CompassModel compass = new CompassModel(0,0); //TODO remove ? should not depend directly on model ?
@@ -52,11 +54,22 @@ public class CompassView extends View {
     private void init() {
 
         backgroundPaint.setColor(getResources().getColor(R.color.compass_background, getContext().getTheme()));
+        backgroundPaint.setStyle(Paint.Style.FILL);
+
+        backgroundRingPaint.setColor(getResources().getColor(R.color.compass_ring, getContext().getTheme()));
+        backgroundRingPaint.setStyle(Paint.Style.STROKE);
 
         backgroundTrackPaint.setColor(getResources().getColor(R.color.compass_deg_tracks, getContext().getTheme()));
+        backgroundTrackPaint.setStyle(Paint.Style.STROKE);
+
+        backgroundTextPaint2.setColor(getResources().getColor(R.color.compass_deg_tracks, getContext().getTheme()));
+        backgroundPaint.setStyle(Paint.Style.FILL);
+
         backgroundTextPaint.setColor(getResources().getColor(R.color.compass_NSEW, getContext().getTheme()));
+        backgroundPaint.setStyle(Paint.Style.FILL);
 
         trackPaint.setColor(getResources().getColor(R.color.compass_tracks, getContext().getTheme()));
+        backgroundPaint.setStyle(Paint.Style.FILL);
 
     }
 
@@ -75,10 +88,20 @@ public class CompassView extends View {
         float hh = h - ypad;
 
         maxLength = (int)Math.min(ww,hh);
-        diameter = maxLength;
-        radius = maxLength / 2f;
+
+        ringThickness = maxLength / 40f;
+        diameter = maxLength - 2* ringThickness;
+        radius = diameter / 2;
 
         textSize = maxLength / 10;
+
+        backgroundTrackPaint.setStrokeWidth(radius/100f);
+
+        backgroundTextPaint2.setTextSize(4*radius/100f);
+        backgroundTextPaint2.setStrokeWidth(radius/100f);
+        backgroundTextPaint2.setFakeBoldText(true);
+
+        backgroundRingPaint.setStrokeWidth(ringThickness);
 
         backgroundTextPaint.setTextSize(textSize);
 
@@ -90,10 +113,14 @@ public class CompassView extends View {
 
         drawBackground(canvas);
         drawTracks(canvas);
+        drawForeground(canvas);
 
     }
 
     private void drawBackground(Canvas canvas) {
+
+        canvas.save(); //TODO use better variables/approach than "radius"
+        canvas.translate(ringThickness, ringThickness);
 
         float sizeN = backgroundTextPaint.measureText(TEXT_N);
         float sizeS = backgroundTextPaint.measureText(TEXT_S);
@@ -101,25 +128,23 @@ public class CompassView extends View {
 
         float padding = textSize / 4f;
 
-        backgroundTrackPaint.setTextSize(4*radius/100f);
-        backgroundTrackPaint.setFakeBoldText(true);
-
         canvas.drawOval(0, 0, diameter, diameter, backgroundPaint);
         for (int i = 0; i < 8; i++) {
 
-            canvas.drawCircle(radius, radius, (8-i)*radius/9f + radius/100f, backgroundTrackPaint);
-            canvas.drawCircle(radius, radius, (8-i)*radius/9f, backgroundPaint);
+            float trackRadius = (8-i)*radius/9f;
+
+            canvas.drawCircle(radius, radius, trackRadius, backgroundTrackPaint);
 
             String text = 10*(i+1) + "\u00B0";
             canvas.drawText(
                 text,
-                radius - backgroundTrackPaint.measureText(text)/2,
-                radius - (8-i)*radius/9f - (1+0.25f)*radius/100f,
-                backgroundTrackPaint
+                radius - backgroundTextPaint2.measureText(text)/2,
+                radius - trackRadius - backgroundTextPaint2.getStrokeWidth(),
+                backgroundTextPaint2
             );
 
         }
-        canvas.drawCircle(radius, radius, radius/100f, backgroundTrackPaint);
+        canvas.drawCircle(radius, radius, 1, backgroundTrackPaint);
 
         canvas.drawText(
             TEXT_N,
@@ -146,9 +171,29 @@ public class CompassView extends View {
             backgroundTextPaint
         );
 
+        canvas.restore();
+
+    }
+
+    private void drawForeground(Canvas canvas) {
+
+        canvas.save(); //TODO use better variables/approach than "radius"
+        canvas.translate(ringThickness, ringThickness);
+
+        canvas.drawCircle(
+            radius, radius,
+            radius + ringThickness/2,
+            backgroundRingPaint
+        );
+
+        canvas.restore();
+
     }
 
     private void drawTracks(Canvas canvas) {
+
+        canvas.save(); //TODO use better variables/approach than "radius"
+        canvas.translate(ringThickness, ringThickness);
 
 /*
         HourAngleInfo sunriseInfo = Astronomy.searchHourAngle(
@@ -187,17 +232,47 @@ public class CompassView extends View {
         double[] altitude = new double[26];
 
         {
-            Coordinate coordinate = compass.getCoordinate(23, 0, 0);
+            Coordinate coordinate = compass.getCoordinate(-1, 0, 0);
             x[0] = coordinate.getX();
             y[0] = coordinate.getY();
             altitude[0] = coordinate.getAltitude();
             for (int i = 0; i < 25; i++) {
 
-                coordinate = compass.getCoordinate(i%24, 0, 0);
+                coordinate = compass.getCoordinate(i, 0, 0);
 
                 x[i + 1] = coordinate.getX();
                 y[i + 1] = coordinate.getY();
                 altitude[i + 1] = coordinate.getAltitude();
+
+                if (altitude[i+1] > 0 && altitude[i] < 0) {
+
+                    Coordinate c = coordinate;
+                    for (int j = 1; j < 7; j++) {
+                        c = compass.getCoordinate(i-1, j*10, 0d);
+                        double altitude2 = c.getAltitude();
+                        if (altitude2 > 0) {
+                            break;
+                        }
+                    }
+
+                    x[i] = c.getX();
+                    y[i] = c.getY();
+
+                } else if (altitude[i+1] < 0 && altitude[i] > 0) {
+
+                    Coordinate c = coordinate;
+                    for (int j = 1; j < 7; j++) {
+                        c = compass.getCoordinate(i-1, j*10, 0d);
+                        double altitude2 = c.getAltitude();
+                        if (altitude2 < 0) {
+                            break;
+                        }
+                    }
+
+                    x[i+1] = c.getX();
+                    y[i+1] = c.getY();
+
+                }
 
             }
         }
@@ -245,6 +320,8 @@ public class CompassView extends View {
             canvas.restore();
 
         }
+
+        canvas.restore();
 
     }
 

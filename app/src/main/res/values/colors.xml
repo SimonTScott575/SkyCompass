@@ -12,6 +12,7 @@
     <color name="sky_3">#1746A2</color>
 
     <color name="compass_background">#FF7F7F7F</color>
+    <color name="compass_ring">#AE9600</color>
     <color name="compass_deg_tracks">#FFBDBDBD</color>
     <color name="compass_NSEW">#FF505050</color>
     <color name="compass_tracks">#FFFF00FF</color>
