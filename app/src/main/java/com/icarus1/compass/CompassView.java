@@ -27,7 +27,7 @@ public class CompassView extends View {
     private final Paint backgroundTrackTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint backgroundTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint backgroundRingPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Paint trackPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+//    private final Paint trackPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
     private CompassModel compass = new CompassModel(0,0);
 
@@ -68,8 +68,8 @@ public class CompassView extends View {
         backgroundTextPaint.setColor(getResources().getColor(R.color.compass_NSEW, getContext().getTheme()));
         backgroundTextPaint.setStyle(Paint.Style.FILL);
 
-        trackPaint.setColor(getResources().getColor(R.color.compass_tracks, getContext().getTheme()));
-        trackPaint.setStyle(Paint.Style.FILL);
+//        trackPaint.setColor(getResources().getColor(R.color.compass_tracks, getContext().getTheme()));
+//        trackPaint.setStyle(Paint.Style.FILL);
 
     }
 
@@ -112,7 +112,9 @@ public class CompassView extends View {
         super.onDraw(canvas);
 
         drawBackground(canvas);
-        drawTracks(canvas);
+        for (CelestialBody body : CelestialBody.values()) {
+            drawTracks(body, canvas);
+        }
         drawForeground(canvas);
 
     }
@@ -190,7 +192,7 @@ public class CompassView extends View {
 
     }
 
-    private void drawTracks(Canvas canvas) {
+    private void drawTracks(CelestialBody body, Canvas canvas) {
 
         canvas.save();
         canvas.translate(ringThickness, ringThickness);
@@ -232,13 +234,13 @@ public class CompassView extends View {
         double[] altitude = new double[26];
 
         {
-            Coordinate coordinate = compass.getCoordinate(-1, 0, 0);
+            Coordinate coordinate = compass.getCoordinate(body.getBody(), -1, 0, 0);
             x[0] = coordinate.getX();
             y[0] = coordinate.getY();
             altitude[0] = coordinate.getAltitude();
             for (int i = 0; i < 25; i++) {
 
-                coordinate = compass.getCoordinate(i, 0, 0);
+                coordinate = compass.getCoordinate(body.getBody(), i, 0, 0);
 
                 x[i + 1] = coordinate.getX();
                 y[i + 1] = coordinate.getY();
@@ -248,7 +250,7 @@ public class CompassView extends View {
 
                     Coordinate c = coordinate;
                     for (int j = 1; j < 7; j++) {
-                        c = compass.getCoordinate(i-1, j*10, 0d);
+                        c = compass.getCoordinate(body.getBody(), i-1, j*10, 0d);
                         double altitude2 = c.getAltitude();
                         if (altitude2 > 0) {
                             break;
@@ -262,7 +264,7 @@ public class CompassView extends View {
 
                     Coordinate c = coordinate;
                     for (int j = 1; j < 7; j++) {
-                        c = compass.getCoordinate(i-1, j*10, 0d);
+                        c = compass.getCoordinate(body.getBody(), i-1, j*10, 0d);
                         double altitude2 = c.getAltitude();
                         if (altitude2 < 0) {
                             break;
@@ -296,7 +298,7 @@ public class CompassView extends View {
                 continue;
             }
 
-            float height = innerDiameter / 100f;
+            float height = innerDiameter / 150f;
             float length = (float) (Math.sqrt( Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2) ));
             float padding = length/20f;
             float angle = (float) Math.atan2(endY - startY, endX - startX);
@@ -315,7 +317,7 @@ public class CompassView extends View {
             canvas.save();
             canvas.rotate(-angle*360f/(2*(float)Math.PI), (float) startX, (float) startY); // (float)(startX + (endX - startX)/2f), (float)(startY + (endY - startY)/2f));
 
-            canvas.drawRect((float) startX + padding, (float) startY, (float) startX + length - padding, (float) startY + height, trackPaint);
+            canvas.drawRect((float) startX + padding, (float) startY, (float) startX + length - padding, (float) startY + height, body.getPaint());
 
             canvas.restore();
 

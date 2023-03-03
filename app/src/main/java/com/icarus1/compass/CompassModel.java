@@ -60,12 +60,12 @@ public class CompassModel {
 
     }
 
-    public Coordinate getCoordinate(int hour, int minute, double seconds) {
+    public Coordinate getCoordinate(Body body, int hour, int minute, double seconds) {
 
         Time time = new Time(year, month, dayOfMonth, hour, minute, seconds);
         Observer observer = new Observer(latitude, longitude, 0);
         Equatorial equatorial = Astronomy.equator(
-            Body.Sun,
+            body,
             time,
             observer,
             EquatorEpoch.OfDate,
