@@ -18,18 +18,18 @@ public class CompassView extends View {
     private static final String TEXT_W = "W";
 
     private int maxLength;
-    private float diameter;
-    private float radius;
+    private float innerDiameter;
+    private float innerRadius;
     private float ringThickness;
     private int textSize;
     private final Paint backgroundPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint backgroundTrackPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Paint backgroundTextPaint2 = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint backgroundTrackTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint backgroundTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint backgroundRingPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint trackPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
-    private CompassModel compass = new CompassModel(0,0); //TODO remove ? should not depend directly on model ?
+    private CompassModel compass = new CompassModel(0,0);
 
     public CompassView(Context context) {
         super(context);
@@ -62,14 +62,14 @@ public class CompassView extends View {
         backgroundTrackPaint.setColor(getResources().getColor(R.color.compass_deg_tracks, getContext().getTheme()));
         backgroundTrackPaint.setStyle(Paint.Style.STROKE);
 
-        backgroundTextPaint2.setColor(getResources().getColor(R.color.compass_deg_tracks, getContext().getTheme()));
-        backgroundPaint.setStyle(Paint.Style.FILL);
+        backgroundTrackTextPaint.setColor(getResources().getColor(R.color.compass_deg_tracks, getContext().getTheme()));
+        backgroundTrackTextPaint.setStyle(Paint.Style.FILL);
 
         backgroundTextPaint.setColor(getResources().getColor(R.color.compass_NSEW, getContext().getTheme()));
-        backgroundPaint.setStyle(Paint.Style.FILL);
+        backgroundTextPaint.setStyle(Paint.Style.FILL);
 
         trackPaint.setColor(getResources().getColor(R.color.compass_tracks, getContext().getTheme()));
-        backgroundPaint.setStyle(Paint.Style.FILL);
+        trackPaint.setStyle(Paint.Style.FILL);
 
     }
 
@@ -90,16 +90,16 @@ public class CompassView extends View {
         maxLength = (int)Math.min(ww,hh);
 
         ringThickness = maxLength / 40f;
-        diameter = maxLength - 2* ringThickness;
-        radius = diameter / 2;
+        innerDiameter = maxLength - 2* ringThickness;
+        innerRadius = innerDiameter / 2;
 
         textSize = maxLength / 10;
 
-        backgroundTrackPaint.setStrokeWidth(radius/100f);
+        backgroundTrackPaint.setStrokeWidth(innerRadius /100f);
 
-        backgroundTextPaint2.setTextSize(4*radius/100f);
-        backgroundTextPaint2.setStrokeWidth(radius/100f);
-        backgroundTextPaint2.setFakeBoldText(true);
+        backgroundTrackTextPaint.setTextSize(6 * innerRadius/100f);
+        backgroundTrackTextPaint.setStrokeWidth(innerRadius/100f);
+        backgroundTrackTextPaint.setFakeBoldText(true);
 
         backgroundRingPaint.setStrokeWidth(ringThickness);
 
@@ -119,7 +119,7 @@ public class CompassView extends View {
 
     private void drawBackground(Canvas canvas) {
 
-        canvas.save(); //TODO use better variables/approach than "radius"
+        canvas.save();
         canvas.translate(ringThickness, ringThickness);
 
         float sizeN = backgroundTextPaint.measureText(TEXT_N);
@@ -128,46 +128,46 @@ public class CompassView extends View {
 
         float padding = textSize / 4f;
 
-        canvas.drawOval(0, 0, diameter, diameter, backgroundPaint);
+        canvas.drawOval(0, 0, innerDiameter, innerDiameter, backgroundPaint);
         for (int i = 0; i < 8; i++) {
 
-            float trackRadius = (8-i)*radius/9f;
+            float trackRadius = (8-i)* innerRadius /9f;
 
-            canvas.drawCircle(radius, radius, trackRadius, backgroundTrackPaint);
+            canvas.drawCircle(innerRadius, innerRadius, trackRadius, backgroundTrackPaint);
 
             String text = 10*(i+1) + "\u00B0";
             canvas.drawText(
                 text,
-                radius - backgroundTextPaint2.measureText(text)/2,
-                radius - trackRadius - backgroundTextPaint2.getStrokeWidth(),
-                backgroundTextPaint2
+                innerRadius - backgroundTrackTextPaint.measureText(text)/2,
+                innerRadius - trackRadius - backgroundTrackTextPaint.getStrokeWidth(),
+                backgroundTrackTextPaint
             );
 
         }
-        canvas.drawCircle(radius, radius, 1, backgroundTrackPaint);
+        canvas.drawCircle(innerRadius, innerRadius, 1, backgroundTrackPaint);
 
         canvas.drawText(
             TEXT_N,
-            radius - sizeN / 2f,
+            innerRadius - sizeN / 2f,
             padding + textSize,
             backgroundTextPaint
         );
         canvas.drawText(
             TEXT_S,
-            radius - sizeS / 2f,
-            diameter - padding,
+            innerRadius - sizeS / 2f,
+            innerDiameter - padding,
             backgroundTextPaint
         );
         canvas.drawText(
             TEXT_E,
-            diameter - padding - sizeE,
-            radius + textSize / 2f,
+            innerDiameter - padding - sizeE,
+            innerRadius + textSize / 2f,
             backgroundTextPaint
         );
         canvas.drawText(
             TEXT_W,
             padding,
-            radius + textSize / 2f,
+            innerRadius + textSize / 2f,
             backgroundTextPaint
         );
 
@@ -177,12 +177,12 @@ public class CompassView extends View {
 
     private void drawForeground(Canvas canvas) {
 
-        canvas.save(); //TODO use better variables/approach than "radius"
+        canvas.save();
         canvas.translate(ringThickness, ringThickness);
 
         canvas.drawCircle(
-            radius, radius,
-            radius + ringThickness/2,
+            innerRadius, innerRadius,
+            innerRadius + ringThickness/2,
             backgroundRingPaint
         );
 
@@ -192,7 +192,7 @@ public class CompassView extends View {
 
     private void drawTracks(Canvas canvas) {
 
-        canvas.save(); //TODO use better variables/approach than "radius"
+        canvas.save();
         canvas.translate(ringThickness, ringThickness);
 
 /*
@@ -296,21 +296,21 @@ public class CompassView extends View {
                 continue;
             }
 
-            float height = diameter / 100f;
+            float height = innerDiameter / 100f;
             float length = (float) (Math.sqrt( Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2) ));
             float padding = length/20f;
             float angle = (float) Math.atan2(endY - startY, endX - startX);
 
-            length *= radius;
-            padding *= radius;
+            length *= innerRadius;
+            padding *= innerRadius;
 
-            startX *= radius;
-            startY *= radius;
+            startX *= innerRadius;
+            startY *= innerRadius;
 
-            startX += radius;
-            startY += radius;
+            startX += innerRadius;
+            startY += innerRadius;
 
-            startY = diameter - startY;
+            startY = innerDiameter - startY;
 
             canvas.save();
             canvas.rotate(-angle*360f/(2*(float)Math.PI), (float) startX, (float) startY); // (float)(startX + (endX - startX)/2f), (float)(startY + (endY - startY)/2f));
