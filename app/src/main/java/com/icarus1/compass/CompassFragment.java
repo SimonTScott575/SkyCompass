@@ -60,4 +60,20 @@ public class CompassFragment extends Fragment {
 
     }
 
+    public void setDrawSunMoon(boolean drawSunMoon) {
+        binding.compassView.setDrawSunMoon(drawSunMoon);
+    }
+
+    public boolean isDrawSunMoon() {
+        return binding.compassView.isDrawSunMoon();
+    }
+
+    public void setDrawPlanets(boolean drawPlanets) {
+        binding.compassView.setDrawPlanets(drawPlanets);
+    }
+
+    public boolean isDrawPlanets() {
+        return binding.compassView.isDrawPlanets();
+    }
+
 }

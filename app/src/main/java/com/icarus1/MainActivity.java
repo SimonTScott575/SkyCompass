@@ -15,9 +15,11 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 import com.icarus1.compass.CompassFragment;
 import com.icarus1.databinding.ActivityMainBinding;
@@ -82,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
         });
         request.launch(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION});
 
-        findViewById(R.id.change_location).setOnClickListener(new View.OnClickListener() {
+        binding.changeLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Panel a = (Panel) MainActivity.this.findViewById(R.id.map_card_view);
@@ -90,11 +92,28 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        findViewById(R.id.change_time).setOnClickListener(new View.OnClickListener() {
+        binding.changeTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Panel a = (Panel) MainActivity.this.findViewById(R.id.calendar_card_view);
                 a.show();
+            }
+        });
+
+        binding.toggleButton.check(R.id.sun_moon_btn);
+
+        binding.sunMoonBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                CompassFragment compassFragment = (CompassFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_compass);
+                compassFragment.setDrawSunMoon(!compassFragment.isDrawSunMoon());
+            }
+        });
+        binding.planetsBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                CompassFragment compassFragment = (CompassFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_compass);
+                compassFragment.setDrawPlanets(!compassFragment.isDrawPlanets());
             }
         });
 

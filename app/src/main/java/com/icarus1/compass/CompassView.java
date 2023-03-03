@@ -31,6 +31,9 @@ public class CompassView extends View {
 
     private CompassModel compass = new CompassModel(0,0);
 
+    private boolean drawSunMoon;
+    private boolean drawPlanets;
+
     public CompassView(Context context) {
         super(context);
         init();
@@ -71,10 +74,31 @@ public class CompassView extends View {
 //        trackPaint.setColor(getResources().getColor(R.color.compass_tracks, getContext().getTheme()));
 //        trackPaint.setStyle(Paint.Style.FILL);
 
+        drawSunMoon = true;
+        drawPlanets = false;
+
     }
 
     public void setCompassModel(CompassModel compassModel) {
         this.compass = compassModel;
+        invalidate();
+    }
+
+    public boolean isDrawSunMoon() {
+        return drawSunMoon;
+    }
+
+    public void setDrawSunMoon(boolean drawSunMoon) {
+        this.drawSunMoon = drawSunMoon;
+        invalidate();
+    }
+
+    public boolean isDrawPlanets() {
+        return drawPlanets;
+    }
+
+    public void setDrawPlanets(boolean drawPlanets) {
+        this.drawPlanets = drawPlanets;
         invalidate();
     }
 
@@ -113,7 +137,15 @@ public class CompassView extends View {
 
         drawBackground(canvas);
         for (CelestialBody body : CelestialBody.values()) {
-            drawTracks(body, canvas);
+            if (body == CelestialBody.SUN || body == CelestialBody.MOON) {
+                if (drawSunMoon) {
+                    drawTracks(body, canvas);
+                }
+            } else {
+                if (drawPlanets) {
+                    drawTracks(body, canvas);
+                }
+            }
         }
         drawForeground(canvas);
 
