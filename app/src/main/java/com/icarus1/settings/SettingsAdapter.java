@@ -62,6 +62,10 @@ class SettingsViewHolder extends RecyclerView.ViewHolder {
         R.id.navigation_settings_action_settings_to_display,
         R.id.navigation_settings_action_settings_to_about
     };
+    private static int[] settings3 = new int[]{
+        R.drawable.settings_display,
+        R.drawable.settings_about
+    };
 
     private ViewSettingsEntryBinding binding;
     private OnClick onClick;
@@ -79,6 +83,7 @@ class SettingsViewHolder extends RecyclerView.ViewHolder {
 
         this.pos = pos;
         binding.textView3.setText(settings[pos]);
+        binding.imageView.setImageDrawable(binding.imageView.getResources().getDrawable(settings3[pos]));
         binding.getRoot().setOnClickListener(onClick);
 
     }
