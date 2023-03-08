@@ -108,33 +108,25 @@ public class MapFragment extends Fragment {
                 double longitude = marker.getPosition().getLongitude();
                 double latitude = marker.getPosition().getLatitude();
 
-                onLocationChanged(longitude, latitude);
+                setLocation(longitude, latitude);
 
                 if (userLocation != null) {
                     binding.mapUseLocation.setVisibility(View.VISIBLE);
                 }
 
             }
-
             @Override
             public void onMarkerDragEnd(Marker marker) {
-
             }
-
             @Override
             public void onMarkerDragStart(Marker marker) {
-
             }
         });
 
         if (userLocation != null) {
-            binding.map.getSetLocationMarker().setPosition(userLocation);
-            binding.map.invalidate();
-            onLocationChanged(userLocation.getLongitude(), userLocation.getLatitude());
+            setLocation(userLocation.getLongitude(), userLocation.getLatitude());
         } else {
-            binding.map.getSetLocationMarker().setPosition(new GeoPoint(0d,0d));
-            binding.map.invalidate();
-            onLocationChanged(0d, 0d);
+            setLocation(0d, 0d);
         }
 
         binding.mapUseLocation.setOnClickListener(new OnClickSetToLocation());
@@ -156,6 +148,21 @@ public class MapFragment extends Fragment {
                     permissionsToRequest.toArray(new String[0]),
                     REQUEST_PERMISSIONS_REQUEST_CODE);
         }
+    }
+
+    public void setLocation(double longitude, double latitude) {
+
+        String text = String.format("%.2f", Math.abs(latitude)) + "\u00B0" + (latitude < 0 ? "S" : "N");
+        text += " ";
+        text += String.format("%.2f", Math.abs(longitude)) + "\u00B0" + (longitude < 0 ? "W" : "E");
+
+
+        binding.map.getSetLocationMarker().setPosition(new GeoPoint(latitude, longitude));
+        binding.map.invalidate();
+        binding.latLong.setText(text);
+
+        onLocationChanged(longitude, latitude);
+
     }
 
     public void setUserLocation(double longitude, double latitude) {
@@ -186,7 +193,7 @@ public class MapFragment extends Fragment {
             double longitude = userLocation.getLongitude();
             double latitude = userLocation.getLatitude();
 
-            onLocationChanged(longitude, latitude);
+            setLocation(longitude, latitude);
 
         }
     }
