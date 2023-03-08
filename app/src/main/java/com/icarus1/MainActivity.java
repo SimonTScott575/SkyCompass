@@ -15,25 +15,23 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.ToggleButton;
 
 import com.icarus1.compass.CompassFragment;
 import com.icarus1.databinding.ActivityMainBinding;
 import com.icarus1.map.MapFragment;
-import com.icarus1.views.Panel;
 
 import java.util.List;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static final String abc = "ABC";
-
     private ActivityMainBinding binding;
+    private final OnObjectSelection onObjectSelection = new OnObjectSelection();
+    private final OnChangeLocationListener onChangeLocationListener = new OnChangeLocationListener();
+    private final OnChangeTimeListener onChangeTimeListener = new OnChangeTimeListener();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
 
         initContentViewAndBinding();
         initToolbar();
+        initUI();
 
         // Request permissions
         ActivityResultLauncher<String[]> request = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), new ActivityResultCallback<Map<String,Boolean>>() {
@@ -54,12 +53,16 @@ public class MainActivity extends AppCompatActivity {
                     try {
 
                         LocationManager lm = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
-                        lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 10000, 100, new LocationListener() {
+                        lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 10000, 10, new LocationListener() {
                             @Override
                             public void onLocationChanged(@NonNull Location location) {
                                 double longitude = location.getLongitude();
                                 double latitude = location.getLatitude();
-                                MapFragment mapFragment = (MapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+                                MapFragment mapFragment = (MapFragment) getSupportFragmentManager().findFragmentById(R.id.map_fragment_container);
+                                if (mapFragment == null) {
+                                    //TODO log
+                                    return;
+                                }
                                 mapFragment.setUserLocation(longitude, latitude);
                             }
                         });
@@ -68,7 +71,11 @@ public class MainActivity extends AppCompatActivity {
                         if (location != null) {
                             double longitude = location.getLongitude();
                             double latitude = location.getLatitude();
-                            MapFragment mapFragment = (MapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+                            MapFragment mapFragment = (MapFragment) getSupportFragmentManager().findFragmentById(R.id.map_fragment_container);
+                            if (mapFragment == null) {
+                                //TODO log
+                                return;
+                            }
                             mapFragment.setUserLocation(longitude, latitude);
                         }
 
@@ -84,39 +91,6 @@ public class MainActivity extends AppCompatActivity {
         });
         request.launch(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION});
 
-        binding.changeLocation.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Panel a = (Panel) MainActivity.this.findViewById(R.id.map_card_view);
-                a.show();
-            }
-        });
-
-        binding.changeTime.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Panel a = (Panel) MainActivity.this.findViewById(R.id.calendar_card_view);
-                a.show();
-            }
-        });
-
-        binding.toggleButton.check(R.id.sun_moon_btn);
-
-        binding.sunMoonBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                CompassFragment compassFragment = (CompassFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_compass);
-                compassFragment.setDrawSunMoon(!compassFragment.isDrawSunMoon());
-            }
-        });
-        binding.planetsBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                CompassFragment compassFragment = (CompassFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_compass);
-                compassFragment.setDrawPlanets(!compassFragment.isDrawPlanets());
-            }
-        });
-
     }
 
     @Override
@@ -124,9 +98,9 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
 
         getSupportFragmentManager()
-            .setFragmentResultListener("A", this, new OnChangeTimeListener());
+            .setFragmentResultListener("A", this, onChangeTimeListener);
         getSupportFragmentManager()
-            .setFragmentResultListener("B", this, new OnChangeLocationListener());
+            .setFragmentResultListener("B", this, onChangeLocationListener);
 
     }
 
@@ -142,22 +116,20 @@ public class MainActivity extends AppCompatActivity {
     private void initToolbar() {
 
         binding.toolbar.setTitle(R.string.app_name);
+        binding.toolbar.setOnMenuItemClickListener(new OnMenuClick());
         binding.toolbar.inflateMenu(R.menu.main);
 
-        binding.toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
 
-                if (item.getItemId() == R.id.menu_settings) {
-                    Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
-                    startActivity(intent);
-                    return true;
-                }
+    }
 
-                return false;
-            }
-        });
+    private void initUI() {
 
+        binding.changeLocation.setOnClickListener(view -> binding.mapCardView.show());
+        binding.changeDate.setOnClickListener(view -> binding.calendarCardView.show());
+
+        binding.toggleObjectsGroup.check(R.id.toggle_objects_sun_moon);
+        binding.toggleObjectsSunMoon.setOnClickListener(onObjectSelection);
+        binding.toggleObjectsPlanets.setOnClickListener(onObjectSelection);
 
     }
 
@@ -203,7 +175,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void setDate(int year, int month, int day) {
 
-        TextView dateText = (TextView) findViewById(R.id.time_text);
+        TextView dateText = (TextView) findViewById(R.id.date_text);
         if (dateText == null) {
             return;
         }
@@ -237,6 +209,40 @@ public class MainActivity extends AppCompatActivity {
 
             setDate(year, month, day);
 
+        }
+    }
+
+    private class OnObjectSelection implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+
+            CompassFragment compassFragment = (CompassFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_compass);
+            if (compassFragment == null) {
+                //TODO log
+                return;
+            }
+
+            int viewID = v.getId();
+            if (viewID == R.id.toggle_objects_sun_moon) {
+                compassFragment.setDrawSunMoon(!compassFragment.isDrawSunMoon());
+            } else if (viewID == R.id.toggle_objects_planets) {
+                compassFragment.setDrawPlanets(!compassFragment.isDrawPlanets());
+            }
+
+        }
+    }
+
+    private class OnMenuClick implements Toolbar.OnMenuItemClickListener {
+        @Override
+        public boolean onMenuItemClick(MenuItem item) {
+
+            if (item.getItemId() == R.id.menu_settings) {
+                Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+                startActivity(intent);
+                return true;
+            }
+
+            return false;
         }
     }
 

@@ -46,7 +46,7 @@
             tools:layout="@layout/fragment_compass" />
 
         <com.google.android.material.button.MaterialButtonToggleGroup
-            android:id="@+id/toggleButton"
+            android:id="@+id/toggle_objects_group"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintTop_toBottomOf="@id/fragment_compass"
@@ -56,14 +56,14 @@
 
             <Button
                 style="?attr/materialButtonOutlinedStyle"
-                android:id="@+id/sun_moon_btn"
+                android:id="@+id/toggle_objects_sun_moon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/sun_moon"/>
 
             <Button
                 style="?attr/materialButtonOutlinedStyle"
-                android:id="@+id/planets_btn"
+                android:id="@+id/toggle_objects_planets"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/planets"/>
@@ -71,10 +71,9 @@
         </com.google.android.material.button.MaterialButtonToggleGroup>
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/constraintLayout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="@id/toggleButton"
+            app:layout_constraintTop_toTopOf="@id/toggle_objects_group"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
@@ -112,7 +111,7 @@
                 app:layout_constraintGuide_percent="0.5"/>
 
             <Button
-                android:id="@+id/change_time"
+                android:id="@+id/change_date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
@@ -125,15 +124,15 @@
                 style="@style/button"/>
 
             <TextView
-                android:id="@+id/time_text"
+                android:id="@+id/date_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="32dp"
                 android:text="@string/date"
                 android:textSize="24sp"
-                app:layout_constraintBottom_toBottomOf="@id/change_time"
+                app:layout_constraintBottom_toBottomOf="@id/change_date"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@id/change_time"
+                app:layout_constraintTop_toTopOf="@id/change_date"
                 style="@style/text"/>
 
 
@@ -155,7 +154,7 @@
             tools:visibility="gone">
 
             <androidx.fragment.app.FragmentContainerView
-                android:id="@+id/map"
+                android:id="@+id/map_fragment_container"
                 android:name="com.icarus1.map.MapFragment"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -178,7 +177,7 @@
             tools:visibility="gone">
 
             <androidx.fragment.app.FragmentContainerView
-                android:id="@+id/fragment_calendar"
+                android:id="@+id/calendar_fragment_container"
                 android:name="com.icarus1.calendar.CalendarFragment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

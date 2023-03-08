@@ -69,7 +69,7 @@ public class MapFragment extends Fragment {
         //if you make changes to the configuration, use
         //SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         //Configuration.getInstance().load(this, PreferenceManager.getDefaultSharedPreferences(this));
-        binding.map.onResume();
+        binding.mapView.onResume();
     }
 
     @Override
@@ -79,7 +79,7 @@ public class MapFragment extends Fragment {
         //if you make changes to the configuration, use
         //SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         //Configuration.getInstance().save(this, prefs);
-        binding.map.onPause();
+        binding.mapView.onPause();
     }
 
     @Override
@@ -101,7 +101,7 @@ public class MapFragment extends Fragment {
 
     private void setUpMap() {
 
-        binding.map.getSetLocationMarker().setOnMarkerDragListener(new Marker.OnMarkerDragListener() {
+        binding.mapView.getSetLocationMarker().setOnMarkerDragListener(new Marker.OnMarkerDragListener() {
             @Override
             public void onMarkerDrag(Marker marker) {
 
@@ -157,8 +157,8 @@ public class MapFragment extends Fragment {
         text += String.format("%.2f", Math.abs(longitude)) + "\u00B0" + (longitude < 0 ? "W" : "E");
 
 
-        binding.map.getSetLocationMarker().setPosition(new GeoPoint(latitude, longitude));
-        binding.map.invalidate();
+        binding.mapView.getSetLocationMarker().setPosition(new GeoPoint(latitude, longitude));
+        binding.mapView.invalidate();
         binding.latLong.setText(text);
 
         onLocationChanged(longitude, latitude);
@@ -185,8 +185,8 @@ public class MapFragment extends Fragment {
         @Override
         public void onClick(View v) {
 
-            binding.map.getSetLocationMarker().setPosition(userLocation);
-            binding.map.invalidate();
+            binding.mapView.getSetLocationMarker().setPosition(userLocation);
+            binding.mapView.invalidate();
 
             v.setVisibility(View.INVISIBLE);
 
