@@ -49,9 +49,7 @@ public class MapFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         requestPermissionsIfNecessary(new String[]{
-            // if you need to show the current location, uncomment the line below
             Manifest.permission.ACCESS_FINE_LOCATION,
-            // WRITE_EXTERNAL_STORAGE is required in order to show the map
             Manifest.permission.WRITE_EXTERNAL_STORAGE
         });
 
@@ -87,14 +85,17 @@ public class MapFragment extends Fragment {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults); //TODO call super here or at end ?
 
         ArrayList<String> permissionsToRequest = new ArrayList<>();
+
         for (int i = 0; i < grantResults.length; i++) {
             permissionsToRequest.add(permissions[i]);
         }
+
         if (permissionsToRequest.size() > 0) {
             ActivityCompat.requestPermissions(
-                this.getActivity(),
+                requireActivity(),
                 permissionsToRequest.toArray(new String[0]),
-                REQUEST_PERMISSIONS_REQUEST_CODE);
+                REQUEST_PERMISSIONS_REQUEST_CODE
+            );
         }
 
     }
@@ -134,20 +135,27 @@ public class MapFragment extends Fragment {
     }
 
     private void requestPermissionsIfNecessary(String[] permissions) {
+
         ArrayList<String> permissionsToRequest = new ArrayList<>();
+
         for (String permission : permissions) {
-            if (ContextCompat.checkSelfPermission(this.getActivity(), permission)
-                    != PackageManager.PERMISSION_GRANTED) {
-                // Permission is not granted
+
+            int permissionStatus = ContextCompat.checkSelfPermission(requireActivity(), permission);
+
+            if (permissionStatus != PackageManager.PERMISSION_GRANTED) {
                 permissionsToRequest.add(permission);
             }
+
         }
+
         if (permissionsToRequest.size() > 0) {
             ActivityCompat.requestPermissions(
-                    this.getActivity(),
-                    permissionsToRequest.toArray(new String[0]),
-                    REQUEST_PERMISSIONS_REQUEST_CODE);
+                requireActivity(),
+                permissionsToRequest.toArray(new String[0]),
+                REQUEST_PERMISSIONS_REQUEST_CODE
+            );
         }
+
     }
 
     public void setLocation(double longitude, double latitude) {
