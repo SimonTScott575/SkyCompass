@@ -35,8 +35,9 @@ public class SelectionMapView extends MapView {
         setMultiTouchControls(true);
 
         setLocationMarker = new Marker(this);
-        setLocationMarker.setDraggable(true);
-        getOverlays().add(setLocationMarker);
+        getSetLocationMarker().setDraggable(true);
+        getSetLocationMarker().setDragOffset(7);
+        getOverlays().add(getSetLocationMarker());
 
     }
 

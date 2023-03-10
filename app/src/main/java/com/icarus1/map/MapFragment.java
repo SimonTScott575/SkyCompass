@@ -111,7 +111,7 @@ public class MapFragment extends Fragment {
                 setLocation(longitude, latitude);
 
                 if (userLocation != null) {
-                    binding.mapUseLocation.setVisibility(View.VISIBLE);
+                    binding.useLocation.setVisibility(View.VISIBLE);
                 }
 
             }
@@ -129,7 +129,7 @@ public class MapFragment extends Fragment {
             setLocation(0d, 0d);
         }
 
-        binding.mapUseLocation.setOnClickListener(new OnClickSetToLocation());
+        binding.useLocation.setOnClickListener(new OnClickSetToLocation());
 
     }
 
@@ -168,7 +168,7 @@ public class MapFragment extends Fragment {
     public void setUserLocation(double longitude, double latitude) {
 
         userLocation = new GeoPoint(latitude, longitude);
-        binding.mapUseLocation.setVisibility(View.VISIBLE);
+        binding.useLocation.setVisibility(View.VISIBLE);
 
     }
 
