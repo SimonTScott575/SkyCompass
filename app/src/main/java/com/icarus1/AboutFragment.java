@@ -1,4 +1,4 @@
-package com.icarus1.settings;
+package com.icarus1;
 
 import android.os.Bundle;
 

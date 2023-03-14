@@ -33,7 +33,7 @@
 
     <fragment
         android:id="@+id/navigation_settings_fragment_about"
-        android:name="com.icarus1.settings.AboutFragment"
+        android:name="com.icarus1.AboutFragment"
         android:label="@string/page_about"
         tools:layout="@layout/fragment_about" />
 

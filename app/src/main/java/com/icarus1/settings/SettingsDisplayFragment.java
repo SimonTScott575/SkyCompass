@@ -11,7 +11,6 @@ import android.view.ViewGroup;
 import com.icarus1.R;
 
 public class SettingsDisplayFragment extends Fragment {
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {

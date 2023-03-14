@@ -1,10 +1,12 @@
 package com.icarus1.settings;
 
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
@@ -15,7 +17,7 @@ import com.icarus1.databinding.ViewSettingsEntryBinding;
 
 public class SettingsAdapter extends ListAdapter<Integer, SettingsViewHolder> {
 
-    private LayoutInflater inflater;
+    private final LayoutInflater inflater;
 
     public SettingsAdapter(LayoutInflater inflater) {
         super(DIFF_CALLBACK);
@@ -37,15 +39,19 @@ public class SettingsAdapter extends ListAdapter<Integer, SettingsViewHolder> {
     private static final DiffUtil.ItemCallback<Integer> DIFF_CALLBACK = new DiffUtil.ItemCallback<Integer>() {
 
         @Override
-        public boolean areItemsTheSame(@NonNull Integer oldColor,
-                                       @NonNull Integer newColor) {
-            return oldColor.equals(newColor);
+        public boolean areItemsTheSame(
+            @NonNull Integer oldItem,
+            @NonNull Integer newItem
+        ) {
+            return oldItem.equals(newItem);
         }
 
         @Override
-        public boolean areContentsTheSame(@NonNull Integer oldColor,
-                                          @NonNull Integer newColor) {
-            return areItemsTheSame(oldColor, newColor);
+        public boolean areContentsTheSame(
+            @NonNull Integer oldItem,
+            @NonNull Integer newItem
+        ) {
+            return areItemsTheSame(oldItem, newItem);
         }
 
     };
@@ -54,21 +60,8 @@ public class SettingsAdapter extends ListAdapter<Integer, SettingsViewHolder> {
 
 class SettingsViewHolder extends RecyclerView.ViewHolder {
 
-    private static String[] settings = new String[]{
-        "Display",
-        "About"
-    };
-    private static int[] settings2 = new int[]{
-        R.id.navigation_settings_action_settings_to_display,
-        R.id.navigation_settings_action_settings_to_about
-    };
-    private static int[] settings3 = new int[]{
-        R.drawable.settings_display,
-        R.drawable.settings_about
-    };
-
-    private ViewSettingsEntryBinding binding;
-    private OnClick onClick;
+    private final ViewSettingsEntryBinding binding;
+    private final OnClick onClick;
     private int pos;
 
     SettingsViewHolder(ViewSettingsEntryBinding binding) {
@@ -81,9 +74,16 @@ class SettingsViewHolder extends RecyclerView.ViewHolder {
 
     public void setPos(int pos) {
 
+        SettingsData data = SettingsData.values()[pos];
+        Drawable drawable = ResourcesCompat.getDrawable(
+            binding.imageView.getResources(),
+            data.getIcon(),
+            binding.imageView.getContext().getTheme()
+        );
+
         this.pos = pos;
-        binding.textView3.setText(settings[pos]);
-        binding.imageView.setImageDrawable(binding.imageView.getResources().getDrawable(settings3[pos]));
+        binding.textView3.setText(data.getName());
+        binding.imageView.setImageDrawable(drawable);
         binding.getRoot().setOnClickListener(onClick);
 
     }
@@ -92,8 +92,58 @@ class SettingsViewHolder extends RecyclerView.ViewHolder {
         @Override
         public void onClick(View v) {
 
-            Navigation.findNavController(v).navigate(settings2[pos]);
+            SettingsData data = SettingsData.values()[pos];
+            Navigation.findNavController(v).navigate(data.getAction());
 
+        }
+    }
+
+}
+
+enum SettingsData {
+
+    DISPLAY(new DisplayFactory()),
+    ABOUT(new AboutFactory());
+
+    private String name;
+    private int icon;
+    private int action;
+
+    SettingsData(Factory factory) {
+        factory.init(this);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getIcon() {
+        return icon;
+    }
+
+    public int getAction() {
+        return action;
+    }
+
+    private interface Factory {
+        void init(SettingsData data);
+    }
+
+    private static class DisplayFactory implements Factory {
+        @Override
+        public void init(SettingsData data) {
+            data.name = "Display";
+            data.icon = R.drawable.settings_display;
+            data.action = R.id.navigation_settings_action_settings_to_display;
+        }
+    }
+
+    private static class AboutFactory implements Factory {
+        @Override
+        public void init(SettingsData data) {
+            data.name = "About";
+            data.icon = R.drawable.settings_about;
+            data.action = R.id.navigation_settings_action_settings_to_about;
         }
     }
 
