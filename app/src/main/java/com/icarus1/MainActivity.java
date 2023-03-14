@@ -19,10 +19,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.icarus1.clock.ClockFragment;
 import com.icarus1.compass.CompassFragment;
 import com.icarus1.databinding.ActivityMainBinding;
 import com.icarus1.map.MapFragment;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -31,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
     private final OnObjectSelection onObjectSelection = new OnObjectSelection();
     private final OnChangeLocationListener onChangeLocationListener = new OnChangeLocationListener();
+    private final OnChangeDateListener onChangeDateListener = new OnChangeDateListener();
     private final OnChangeTimeListener onChangeTimeListener = new OnChangeTimeListener();
 
     @Override
@@ -98,17 +102,17 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
 
         getSupportFragmentManager()
-            .setFragmentResultListener("A", this, onChangeTimeListener);
+            .setFragmentResultListener("A", this, onChangeDateListener);
         getSupportFragmentManager()
             .setFragmentResultListener("B", this, onChangeLocationListener);
+        getSupportFragmentManager()
+            .setFragmentResultListener("C", this, onChangeTimeListener);
 
     }
 
     private void initContentViewAndBinding() {
 
         binding = ActivityMainBinding.inflate(getLayoutInflater(), null, false);
-        binding.setTestText("XYZ");
-        binding.executePendingBindings();
         setContentView(binding.getRoot());
 
     }
@@ -126,6 +130,7 @@ public class MainActivity extends AppCompatActivity {
 
         binding.changeLocation.setOnClickListener(view -> binding.mapCardView.show());
         binding.changeDate.setOnClickListener(view -> binding.calendarCardView.show());
+        binding.changeTime.setOnClickListener(view -> binding.clockCardView.show());
 
         binding.toggleObjectsGroup.check(R.id.toggle_objects_sun_moon);
         binding.toggleObjectsSunMoon.setOnClickListener(onObjectSelection);
@@ -187,6 +192,20 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private void setTime(int hour, int minute, float seconds) {
+
+        TextView timeText = (TextView) findViewById(R.id.time_text);
+        if (timeText == null) {
+            return;
+        }
+
+        timeText.setText(hour+":"+minute+":"+(int)seconds);
+
+        CompassFragment compassFragment = (CompassFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_compass);
+        compassFragment.setTime(hour, minute, seconds);
+
+    }
+
     private class OnChangeLocationListener implements FragmentResultListener {
         @Override
         public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
@@ -199,7 +218,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private class OnChangeTimeListener implements FragmentResultListener {
+    private class OnChangeDateListener implements FragmentResultListener {
         @Override
         public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
 
@@ -208,6 +227,19 @@ public class MainActivity extends AppCompatActivity {
             int day = result.getInt("D");
 
             setDate(year, month, day);
+
+        }
+    }
+
+    private class OnChangeTimeListener implements FragmentResultListener {
+        @Override
+        public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
+
+            int hour = result.getInt("HOUR");
+            int minute = result.getInt("MINUTE");
+            float seconds = result.getInt("SECONDS");
+
+            setTime(hour, minute, seconds);
 
         }
     }

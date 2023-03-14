@@ -11,6 +11,7 @@
 
     <string name="location">Location</string>
     <string name="date">Date</string>
+    <string name="time">Time</string>
     <string name="change">Change</string>
 
     <string name="map_set_to_current_location">Current location</string>

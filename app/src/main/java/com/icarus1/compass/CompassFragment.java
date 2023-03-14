@@ -60,6 +60,12 @@ public class CompassFragment extends Fragment {
 
     }
 
+    public void setTime(int hour, int minute, float seconds) {
+
+        binding.compassView.setTime(hour, minute, seconds);
+
+    }
+
     public void setDrawSunMoon(boolean drawSunMoon) {
         binding.compassView.setDrawSunMoon(drawSunMoon);
     }

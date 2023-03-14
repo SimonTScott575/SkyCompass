@@ -21,6 +21,9 @@ public class CompassView extends View {
     private final Paint backgroundRingPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
     private CompassModel compass = new CompassModel(0,0);
+    private int hour;
+    private int minutes;
+    private float seconds;
 
     private boolean drawSunMoon;
     private boolean drawPlanets;
@@ -60,6 +63,13 @@ public class CompassView extends View {
 
     public void setCompassModel(CompassModel compassModel) {
         this.compass = compassModel;
+        invalidate();
+    }
+
+    public void setTime(int hour, int minutes, float seconds) {
+        this.hour = hour;
+        this.minutes = minutes;
+        this.seconds = seconds;
         invalidate();
     }
 
@@ -111,11 +121,11 @@ public class CompassView extends View {
         for (CelestialBody body : CelestialBody.values()) {
             if (body == CelestialBody.SUN || body == CelestialBody.MOON) {
                 if (drawSunMoon) {
-                    drawTracks(12,0,0, body, canvas);
+                    drawTracks(hour,minutes,seconds, body, canvas);
                 }
             } else {
                 if (drawPlanets) {
-                    drawTracks(12,0,0, body, canvas);
+                    drawTracks(hour,minutes,seconds, body, canvas);
                 }
             }
         }
