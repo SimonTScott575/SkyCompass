@@ -17,16 +17,15 @@ import com.icarus1.R;
 import com.icarus1.compass.CompassFragment;
 import com.icarus1.databinding.FragmentClockBinding;
 
+import java.sql.Time;
 import java.util.Calendar;
+import java.util.TimeZone;
 
 public class ClockFragment extends Fragment {
 
     private ClockViewModel mViewModel;
     private FragmentClockBinding binding;
-
-    public static ClockFragment newInstance() {
-        return new ClockFragment();
-    }
+    private int UTCOffset;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -45,13 +44,14 @@ public class ClockFragment extends Fragment {
         int hour = calendar.get(Calendar.HOUR)+(calendar.get(Calendar.AM_PM)==Calendar.PM?12:0);
         int minute = calendar.get(Calendar.MINUTE);
         float seconds = calendar.get(Calendar.SECOND);
+        UTCOffset = TimeZone.getDefault().getRawOffset();
 
-        onTimeChanged(hour, minute, seconds);
+        onTimeChanged(hour, minute, seconds, UTCOffset);
 
         binding.timePicker.setOnTimeChangedListener(new TimePicker.OnTimeChangedListener() {
             @Override
             public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
-                ClockFragment.this.onTimeChanged(hourOfDay, minute, 0);
+                ClockFragment.this.onTimeChanged(hourOfDay, minute, 0, TimeZone.getDefault().getRawOffset());
             }
         });
 
@@ -64,12 +64,13 @@ public class ClockFragment extends Fragment {
         // TODO: Use the ViewModel
     }
 
-    public void onTimeChanged(int hour, int minute, float second) {
+    public void onTimeChanged(int hour, int minute, float second, int UTCOffset) {
 
         Bundle bundle = new Bundle();
         bundle.putInt("HOUR", hour);
         bundle.putInt("MINUTE", minute);
         bundle.putFloat("SECOND", second);
+        bundle.putInt("TIMEZONE", UTCOffset);
         requireActivity().getSupportFragmentManager().setFragmentResult("C", bundle);
 
     }

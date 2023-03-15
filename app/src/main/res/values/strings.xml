@@ -16,6 +16,10 @@
 
     <string name="map_set_to_current_location">Current location</string>
 
+    <string name="time_zone">Time zone (UTC+/-)</string>
+    <string name="plus">+</string>
+    <string name="minus">-</string>
+
     <string name="about_blurb">Thanks to:
  - OpenStreetMap.org
  - Astronomy Engine</string>

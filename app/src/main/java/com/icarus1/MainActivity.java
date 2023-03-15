@@ -28,6 +28,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -192,14 +193,17 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void setTime(int hour, int minute, float seconds) {
+    private void setTime(int hour, int minute, float seconds, int timeZone) {
 
         TextView timeText = (TextView) findViewById(R.id.time_text);
         if (timeText == null) {
             return;
         }
 
-        timeText.setText(hour+":"+minute+":"+(int)seconds);
+        String text = hour+":"+minute+":"+(int)seconds;
+        text += " (UTC+" + (timeZone/(60*60)) + ")";
+
+        timeText.setText(text);
 
         CompassFragment compassFragment = (CompassFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_compass);
         compassFragment.setTime(hour, minute, seconds);
@@ -238,8 +242,9 @@ public class MainActivity extends AppCompatActivity {
             int hour = result.getInt("HOUR");
             int minute = result.getInt("MINUTE");
             float seconds = result.getInt("SECONDS");
+            int timeZoneID = result.getInt("TIMEZONE");
 
-            setTime(hour, minute, seconds);
+            setTime(hour, minute, seconds, timeZoneID);
 
         }
     }
