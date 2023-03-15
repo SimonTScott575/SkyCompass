@@ -6,15 +6,21 @@
     <color name="sunset_2">#F55353</color>
     <color name="sunset_3">#000000</color><!--143F6B-->
 
-    <color name="sky_0">#FFFFFF</color><!--E8F9FD-->
-    <color name="sky_1">#0AA1DD</color>
+    <color name="sky_0">#F6F6F6</color><!--E8F9FD-->
+    <color name="sky_1">#D6E4F0</color>
     <color name="sky_2">#2155CD</color>
     <color name="sky_3">#1746A2</color>
 
-    <color name="compass_background">#FF7F7F7F</color>
-    <color name="compass_ring">#AE9600</color>
-    <color name="compass_deg_tracks">#FFBDBDBD</color>
-    <color name="compass_NSEW">#FF505050</color>
+    <color name="brown_3">#F4DFBA</color>
+    <color name="brown_2">#EEC373</color>
+    <color name="brown_1">#CA965C</color>
+    <color name="brown_0">#876445</color>
+
+    <color name="compass_background">#3F4E4F</color>
+    <color name="compass_ring">#A27B5C</color>
+    <color name="compass_deg_tracks">#DCD7C9</color>
+    <color name="compass_SEW">#F5F5F5</color>
+    <color name="compass_N">#F05454</color>
     <color name="compass_tracks">#FFFF00FF</color>
 
 </resources>

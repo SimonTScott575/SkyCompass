@@ -6,13 +6,16 @@
         <item name="colorPrimaryVariant">@color/sky_3</item>
         <item name="colorOnPrimary">@color/sky_0</item>
 
-        <item name="colorSecondary">@color/sunset_0</item>
-        <item name="colorSecondaryVariant">@color/sunset_1</item>
-        <item name="colorOnSecondary">@color/sunset_2</item>
+        <item name="colorSecondary">@color/brown_1</item>
+        <item name="colorSecondaryVariant">@color/brown_0</item>
+        <item name="colorOnSecondary">@color/brown_3</item>
 
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
 
         <!-- Customize your theme here. -->
+
+        <item name="backgroundColor">?attr/colorOnPrimary</item>
+        <item name="colorOnBackground">#000000</item>
 
     </style>
 
