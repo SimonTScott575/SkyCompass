@@ -31,6 +31,7 @@
             app:layout_constraintTop_toBottomOf="@+id/time_picker" />
 
         <com.icarus1.clock.TimeZonePicker
+            android:id="@+id/time_zone_picker"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"

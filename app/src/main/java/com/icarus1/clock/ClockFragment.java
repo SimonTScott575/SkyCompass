@@ -25,7 +25,6 @@ public class ClockFragment extends Fragment {
 
     private ClockViewModel mViewModel;
     private FragmentClockBinding binding;
-    private int UTCOffset;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -44,16 +43,28 @@ public class ClockFragment extends Fragment {
         int hour = calendar.get(Calendar.HOUR)+(calendar.get(Calendar.AM_PM)==Calendar.PM?12:0);
         int minute = calendar.get(Calendar.MINUTE);
         float seconds = calendar.get(Calendar.SECOND);
-        UTCOffset = TimeZone.getDefault().getRawOffset();
+        int UTCOffset = TimeZone.getDefault().getRawOffset();
 
-        onTimeChanged(hour, minute, seconds, UTCOffset);
+        binding.timePicker.setIs24HourView(true);
+        binding.timePicker.setHour(hour);
+        binding.timePicker.setMinute(minute);
+        binding.timeZonePicker.setUTCOffset(UTCOffset);
+
+        binding.timeZonePicker.setOnUTCOffsetChanged(new TimeZonePicker.OnUTCOffsetChanged() {
+            @Override
+            public void onUTCOffsetChanged(int UTCOffset) {
+                onTimeChanged(binding.timePicker.getHour(), binding.timePicker.getMinute(), 0, UTCOffset);
+            }
+        });
 
         binding.timePicker.setOnTimeChangedListener(new TimePicker.OnTimeChangedListener() {
             @Override
             public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
-                ClockFragment.this.onTimeChanged(hourOfDay, minute, 0, TimeZone.getDefault().getRawOffset());
+                ClockFragment.this.onTimeChanged(hourOfDay, minute, 0, binding.timeZonePicker.getUTCOffset());
             }
         });
+
+        onTimeChanged(hour, minute, seconds, UTCOffset);
 
     }
 

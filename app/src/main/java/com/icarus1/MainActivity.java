@@ -201,12 +201,12 @@ public class MainActivity extends AppCompatActivity {
         }
 
         String text = hour+":"+minute+":"+(int)seconds;
-        text += " (UTC+" + (timeZone/(60*60)) + ")";
+        text += " (UTC" + (timeZone < 0 ? "" : "+") + timeZone + ")";
 
         timeText.setText(text);
 
         CompassFragment compassFragment = (CompassFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_compass);
-        compassFragment.setTime(hour, minute, seconds);
+        compassFragment.setTime(hour + timeZone, minute, seconds);
 
     }
 
