@@ -206,7 +206,7 @@ public class MainActivity extends AppCompatActivity {
         timeText.setText(text);
 
         CompassFragment compassFragment = (CompassFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_compass);
-        compassFragment.setTime(hour + timeZone, minute, seconds);
+        compassFragment.setTime(hour - timeZone, minute, seconds);
 
     }
 
