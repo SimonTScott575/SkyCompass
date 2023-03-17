@@ -2,7 +2,11 @@
 <resources>
 
     <style name="background">
-        <item name="android:background">?attr/colorOnPrimary</item>
+        <item name="android:background">?attr/backgroundColor</item>
+    </style>
+
+    <style name="panel">
+        <item name="android:background">?attr/backgroundColor</item>
     </style>
 
     <style name="text">
@@ -12,6 +16,7 @@
     <style name="button">
         <item name="android:backgroundTint">?attr/colorPrimary</item>
         <item name="android:textColor">?attr/colorOnPrimary</item>
+        <item name="android:background">@drawable/rounded_ripple</item>
     </style>
 
 </resources>

@@ -5,14 +5,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:parentTag="androidx.cardview.widget.CardView"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="?attr/backgroundColor">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/view_panel_ui_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:elevation="1dp" >
-        <!--TODO alternative to elevation ? -->
+        android:elevation="1dp"
+        android:clickable="false">
 
         <ImageButton
             android:id="@+id/imageButton"
@@ -24,7 +25,8 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/close" />
+            app:srcCompat="@drawable/close"
+            app:tint="?attr/colorOnBackground"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
