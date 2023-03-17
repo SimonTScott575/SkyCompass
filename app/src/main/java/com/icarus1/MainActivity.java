@@ -193,7 +193,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void setTime(int hour, int minute, float seconds, int timeZone) {
+    private void setTime(int hour, int minute, float seconds, int offset, String location) {
 
         TextView timeText = (TextView) findViewById(R.id.time_text);
         if (timeText == null) {
@@ -201,12 +201,14 @@ public class MainActivity extends AppCompatActivity {
         }
 
         String text = hour+":"+minute+":"+(int)seconds;
-        text += " (UTC" + (timeZone < 0 ? "" : "+") + timeZone + ")";
+        text += " (UTC" + (offset < 0 ? "" : "+") + offset + ")";
 
         timeText.setText(text);
 
+        binding.timeLocation.setText((location != null ? location : getResources().getString(R.string.time)));
+
         CompassFragment compassFragment = (CompassFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_compass);
-        compassFragment.setTime(hour - timeZone, minute, seconds);
+        compassFragment.setTime(hour - offset, minute, seconds);
 
     }
 
@@ -242,9 +244,10 @@ public class MainActivity extends AppCompatActivity {
             int hour = result.getInt("HOUR");
             int minute = result.getInt("MINUTE");
             float seconds = result.getInt("SECONDS");
-            int timeZoneID = result.getInt("TIMEZONE");
+            int timeZoneID = result.getInt("OFFSET");
+            String location = result.getString("LOCATION");
 
-            setTime(hour, minute, seconds, timeZoneID);
+            setTime(hour, minute, seconds, timeZoneID, location);
 
         }
     }

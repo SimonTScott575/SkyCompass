@@ -1,7 +1,6 @@
 package com.icarus1.clock;
 
 import android.content.Context;
-import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
@@ -12,14 +11,14 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
-import com.icarus1.R;
 import com.icarus1.databinding.ViewTimeZonePickerBinding;
 
 public class TimeZonePicker extends ConstraintLayout {
 
     private ViewTimeZonePickerBinding binding;
     private int UTCOffset;
-    private OnUTCOffsetChanged onUTCOffsetChanged;
+    private String location;
+    private onTimeZoneChanged onTimeZoneChanged;
 
     public TimeZonePicker(@NonNull Context context) {
         super(context);
@@ -57,12 +56,17 @@ public class TimeZonePicker extends ConstraintLayout {
         return UTCOffset;
     }
 
-    public void setUTCOffset(int UTCOffset) {
-        binding.numberEditText.setText(String.valueOf(UTCOffset));
+    public String getLocation() {
+        return location;
     }
 
-    public void setOnUTCOffsetChanged(OnUTCOffsetChanged onUTCOffsetChanged) {
-        this.onUTCOffsetChanged = onUTCOffsetChanged;
+    public void setUTCOffset(int UTCOffset) {
+        binding.numberEditText.setText(String.valueOf(UTCOffset));
+        location = null;
+    }
+
+    public void setOnUTCOffsetChanged(onTimeZoneChanged onTimeZoneChanged) {
+        this.onTimeZoneChanged = onTimeZoneChanged;
     }
 
     private class ShiftNumber implements View.OnClickListener {
@@ -137,8 +141,8 @@ public class TimeZonePicker extends ConstraintLayout {
 
             try {
                 UTCOffset = Integer.parseInt(s.toString());
-                if (onUTCOffsetChanged != null) {
-                    onUTCOffsetChanged.onUTCOffsetChanged(UTCOffset);
+                if (onTimeZoneChanged != null) {
+                    onTimeZoneChanged.onUTCOffsetChanged(UTCOffset, null);
                 }
             } catch (NumberFormatException e) {
             }
@@ -146,8 +150,8 @@ public class TimeZonePicker extends ConstraintLayout {
         }
     }
 
-    public interface OnUTCOffsetChanged {
-        void onUTCOffsetChanged(int UTCOffset);
+    public interface onTimeZoneChanged {
+        void onUTCOffsetChanged(int UTCOffset, String location);
     }
 
 }

@@ -13,11 +13,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TimePicker;
 
-import com.icarus1.R;
-import com.icarus1.compass.CompassFragment;
 import com.icarus1.databinding.FragmentClockBinding;
 
-import java.sql.Time;
 import java.util.Calendar;
 import java.util.TimeZone;
 
@@ -43,28 +40,31 @@ public class ClockFragment extends Fragment {
         int hour = calendar.get(Calendar.HOUR)+(calendar.get(Calendar.AM_PM)==Calendar.PM?12:0);
         int minute = calendar.get(Calendar.MINUTE);
         float seconds = calendar.get(Calendar.SECOND);
-        int UTCOffset = TimeZone.getDefault().getRawOffset();
+
+        TimeZone timeZone = TimeZone.getDefault();
+        int UTCOffset = timeZone.getRawOffset();
+        String location = timeZone.getDisplayName() + " - " + timeZone.getID();
 
         binding.timePicker.setIs24HourView(true);
         binding.timePicker.setHour(hour);
         binding.timePicker.setMinute(minute);
         binding.timeZonePicker.setUTCOffset(UTCOffset);
 
-        binding.timeZonePicker.setOnUTCOffsetChanged(new TimeZonePicker.OnUTCOffsetChanged() {
+        binding.timeZonePicker.setOnUTCOffsetChanged(new TimeZonePicker.onTimeZoneChanged() {
             @Override
-            public void onUTCOffsetChanged(int UTCOffset) {
-                onTimeChanged(binding.timePicker.getHour(), binding.timePicker.getMinute(), 0, UTCOffset);
+            public void onUTCOffsetChanged(int UTCOffset, String location) {
+                onTimeChanged(binding.timePicker.getHour(), binding.timePicker.getMinute(), 0, UTCOffset, location);
             }
         });
 
         binding.timePicker.setOnTimeChangedListener(new TimePicker.OnTimeChangedListener() {
             @Override
             public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
-                ClockFragment.this.onTimeChanged(hourOfDay, minute, 0, binding.timeZonePicker.getUTCOffset());
+                ClockFragment.this.onTimeChanged(hourOfDay, minute, 0, binding.timeZonePicker.getUTCOffset(), binding.timeZonePicker.getLocation());
             }
         });
 
-        onTimeChanged(hour, minute, seconds, UTCOffset);
+        onTimeChanged(hour, minute, seconds, UTCOffset, location);
 
     }
 
@@ -75,13 +75,14 @@ public class ClockFragment extends Fragment {
         // TODO: Use the ViewModel
     }
 
-    public void onTimeChanged(int hour, int minute, float second, int UTCOffset) {
+    public void onTimeChanged(int hour, int minute, float second, int UTCOffset, String location) {
 
         Bundle bundle = new Bundle();
         bundle.putInt("HOUR", hour);
         bundle.putInt("MINUTE", minute);
         bundle.putFloat("SECOND", second);
-        bundle.putInt("TIMEZONE", UTCOffset);
+        bundle.putInt("OFFSET", UTCOffset);
+        bundle.putString("LOCATION", location);
         requireActivity().getSupportFragmentManager().setFragmentResult("C", bundle);
 
     }
