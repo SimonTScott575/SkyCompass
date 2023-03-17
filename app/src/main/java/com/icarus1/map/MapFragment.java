@@ -17,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.icarus1.R;
 import com.icarus1.databinding.FragmentMapBinding;
 import com.icarus1.util.Format;
 
@@ -110,7 +111,7 @@ public class MapFragment extends Fragment {
                 double longitude = marker.getPosition().getLongitude();
                 double latitude = marker.getPosition().getLatitude();
 
-                setLocation(longitude, latitude);
+                setLocation(longitude, latitude, null);
 
                 if (userLocation != null) {
                     binding.useLocation.setVisibility(View.VISIBLE);
@@ -126,9 +127,9 @@ public class MapFragment extends Fragment {
         });
 
         if (userLocation != null) {
-            setLocation(userLocation.getLongitude(), userLocation.getLatitude());
+            setLocation(userLocation.getLongitude(), userLocation.getLatitude(), getResources().getString(R.string.current_location));
         } else {
-            setLocation(0d, 0d);
+            setLocation(0d, 0d, null);
         }
 
         binding.useLocation.setOnClickListener(new OnClickSetToLocation());
@@ -159,13 +160,13 @@ public class MapFragment extends Fragment {
 
     }
 
-    public void setLocation(double longitude, double latitude) {
+    public void setLocation(double longitude, double latitude, String location) {
 
         binding.mapView.getSetLocationMarker().setPosition(new GeoPoint(latitude, longitude));
         binding.mapView.invalidate();
         binding.latLong.setText(Format.LatitudeLongitude(latitude, longitude));
 
-        onLocationChanged(longitude, latitude);
+        onLocationChanged(longitude, latitude, location);
 
     }
 
@@ -176,11 +177,12 @@ public class MapFragment extends Fragment {
 
     }
 
-    public void onLocationChanged(double longitude, double latitude) {
+    public void onLocationChanged(double longitude, double latitude, String location) {
 
         Bundle bundle = new Bundle();
         bundle.putDouble("Longitude", longitude);
         bundle.putDouble("Latitude", latitude);
+        bundle.putString("Location", location);
         requireActivity().getSupportFragmentManager().setFragmentResult("B", bundle);
 
     }
@@ -197,7 +199,7 @@ public class MapFragment extends Fragment {
             double longitude = userLocation.getLongitude();
             double latitude = userLocation.getLatitude();
 
-            setLocation(longitude, latitude);
+            setLocation(longitude, latitude, getResources().getString(R.string.current_location));
 
         }
     }

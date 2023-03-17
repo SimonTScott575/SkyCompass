@@ -19,17 +19,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
-import com.icarus1.clock.ClockFragment;
 import com.icarus1.compass.CompassFragment;
 import com.icarus1.databinding.ActivityMainBinding;
 import com.icarus1.map.MapFragment;
 import com.icarus1.util.Format;
 
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.TimeZone;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -162,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void setLocation(double longitude, double latitude) {
+    private void setLocation(double longitude, double latitude, String location) {
 
         TextView locationText = (TextView) findViewById(R.id.location_text);
         if (locationText == null) {
@@ -170,6 +166,12 @@ public class MainActivity extends AppCompatActivity {
         }
 
         locationText.setText(Format.LatitudeLongitude(latitude, longitude));
+
+        if (location != null) {
+            binding.locationAddress.setText(location);
+        } else {
+            binding.locationAddress.setText(R.string.location);
+        }
 
         CompassFragment compassFragment = (CompassFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_compass);
         compassFragment.setLocation(longitude, latitude);
@@ -215,8 +217,9 @@ public class MainActivity extends AppCompatActivity {
 
             double longitude = result.getDouble("Longitude");
             double latitude = result.getDouble("Latitude");
+            String location = result.getString("Location");
 
-            setLocation(longitude, latitude);
+            setLocation(longitude, latitude, location);
 
         }
     }

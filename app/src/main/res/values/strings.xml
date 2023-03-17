@@ -14,6 +14,8 @@
     <string name="time">Time</string>
     <string name="change">Change</string>
 
+    <string name="current_location">Current location</string>
+
     <string name="map_set_to_current_location">Current location</string>
 
     <string name="time_zone">Time zone (UTC+/-)</string>
