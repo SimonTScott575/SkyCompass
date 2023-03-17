@@ -15,6 +15,23 @@ public class Format {
     private Format() {
     }
 
+    public static String Time(int hour, int minute, int seconds) {
+
+        StringBuilder result = new StringBuilder();
+
+        result.append(hour < 10 ? "0" : "");
+        result.append(hour);
+        result.append(":");
+        result.append(minute < 10 ? "0" : "");
+        result.append(minute);
+        result.append(":");
+        result.append(seconds < 10 ? "0" : "");
+        result.append(seconds);
+
+        return result.toString();
+
+    }
+
     public static String UTCOffset(int hoursOffset, int minutesOffset) {
 
         StringBuilder result = new StringBuilder("UTC");

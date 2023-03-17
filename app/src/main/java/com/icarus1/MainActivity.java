@@ -192,14 +192,14 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void setTime(int hour, int minute, float seconds, int offset, String location) {
+    private void setTime(int hour, int minute, int seconds, int offset, String location) {
 
         TextView timeText = (TextView) findViewById(R.id.time_text);
         if (timeText == null) {
             return;
         }
 
-        String text = hour+":"+minute+":"+(int)seconds;
+        String text = Format.Time(hour, minute, seconds);
         text += " (" + Format.UTCOffset(offset, 0) + ")";
 
         timeText.setText(text);
@@ -243,7 +243,7 @@ public class MainActivity extends AppCompatActivity {
 
             int hour = result.getInt("HOUR");
             int minute = result.getInt("MINUTE");
-            float seconds = result.getInt("SECONDS");
+            int seconds = result.getInt("SECOND");
             int timeZoneID = result.getInt("OFFSET");
             String location = result.getString("LOCATION");
 

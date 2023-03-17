@@ -40,7 +40,7 @@ public class ClockFragment extends Fragment {
 
         int hour = calendar.get(Calendar.HOUR)+(calendar.get(Calendar.AM_PM)==Calendar.PM?12:0);
         int minute = calendar.get(Calendar.MINUTE);
-        float seconds = calendar.get(Calendar.SECOND);
+        int seconds = calendar.get(Calendar.SECOND);
 
         TimeZone timeZone = TimeZone.getDefault();
         int UTCOffset = timeZone.getRawOffset();
@@ -76,12 +76,12 @@ public class ClockFragment extends Fragment {
         // TODO: Use the ViewModel
     }
 
-    public void onTimeChanged(int hour, int minute, float second, int UTCOffset, String location) {
+    public void onTimeChanged(int hour, int minute, int second, int UTCOffset, String location) {
 
         Bundle bundle = new Bundle();
         bundle.putInt("HOUR", hour);
         bundle.putInt("MINUTE", minute);
-        bundle.putFloat("SECOND", second);
+        bundle.putInt("SECOND", second);
         bundle.putInt("OFFSET", UTCOffset);
         bundle.putString("LOCATION", location);
         requireActivity().getSupportFragmentManager().setFragmentResult("C", bundle);
