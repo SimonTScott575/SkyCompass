@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.icarus1.databinding.FragmentMapBinding;
+import com.icarus1.util.Format;
 
 import org.osmdroid.config.Configuration;
 import org.osmdroid.util.GeoPoint;
@@ -160,14 +161,9 @@ public class MapFragment extends Fragment {
 
     public void setLocation(double longitude, double latitude) {
 
-        String text = String.format("%.2f", Math.abs(latitude)) + "\u00B0" + (latitude < 0 ? "S" : "N");
-        text += " ";
-        text += String.format("%.2f", Math.abs(longitude)) + "\u00B0" + (longitude < 0 ? "W" : "E");
-
-
         binding.mapView.getSetLocationMarker().setPosition(new GeoPoint(latitude, longitude));
         binding.mapView.invalidate();
-        binding.latLong.setText(text);
+        binding.latLong.setText(Format.LatitudeLongitude(latitude, longitude));
 
         onLocationChanged(longitude, latitude);
 

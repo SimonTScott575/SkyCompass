@@ -23,6 +23,7 @@ import com.icarus1.clock.ClockFragment;
 import com.icarus1.compass.CompassFragment;
 import com.icarus1.databinding.ActivityMainBinding;
 import com.icarus1.map.MapFragment;
+import com.icarus1.util.Format;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -163,16 +164,12 @@ public class MainActivity extends AppCompatActivity {
 
     private void setLocation(double longitude, double latitude) {
 
-        String text = String.format("%.2f", Math.abs(latitude)) + "\u00B0" + (latitude < 0 ? "S" : "N");
-        text += " ";
-        text += String.format("%.2f", Math.abs(longitude)) + "\u00B0" + (longitude < 0 ? "W" : "E");
-
         TextView locationText = (TextView) findViewById(R.id.location_text);
         if (locationText == null) {
             return;
         }
 
-        locationText.setText(text);
+        locationText.setText(Format.LatitudeLongitude(latitude, longitude));
 
         CompassFragment compassFragment = (CompassFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_compass);
         compassFragment.setLocation(longitude, latitude);
@@ -186,7 +183,7 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        dateText.setText(year + "-" + (month+1) + "-" + (day+1));
+        dateText.setText(Format.Date(year, month, day));
 
         CompassFragment compassFragment = (CompassFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_compass);
         compassFragment.setDate(year, month, day);
@@ -201,7 +198,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         String text = hour+":"+minute+":"+(int)seconds;
-        text += " (UTC" + (offset < 0 ? "" : "+") + offset + ")";
+        text += " (" + Format.UTCOffset(offset, 0) + ")";
 
         timeText.setText(text);
 

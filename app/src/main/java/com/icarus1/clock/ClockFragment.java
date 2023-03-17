@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.TimePicker;
 
 import com.icarus1.databinding.FragmentClockBinding;
+import com.icarus1.util.Format;
 
 import java.util.Calendar;
 import java.util.TimeZone;
@@ -43,7 +44,7 @@ public class ClockFragment extends Fragment {
 
         TimeZone timeZone = TimeZone.getDefault();
         int UTCOffset = timeZone.getRawOffset();
-        String location = timeZone.getDisplayName() + " - " + timeZone.getID();
+        String location = Format.Location(timeZone);
 
         binding.timePicker.setIs24HourView(true);
         binding.timePicker.setHour(hour);
