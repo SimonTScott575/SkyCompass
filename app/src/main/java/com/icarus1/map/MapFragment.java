@@ -55,7 +55,7 @@ public class MapFragment extends Fragment {
             Manifest.permission.WRITE_EXTERNAL_STORAGE
         });
 
-        Context ctx = getActivity();
+        Context ctx = requireActivity();
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
 
         setUpMap();

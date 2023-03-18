@@ -4,6 +4,7 @@ import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.FragmentResultListener;
@@ -22,6 +23,7 @@ import android.widget.TextView;
 import com.icarus1.compass.CompassFragment;
 import com.icarus1.databinding.ActivityMainBinding;
 import com.icarus1.map.MapFragment;
+import com.icarus1.util.Debug;
 import com.icarus1.util.Format;
 
 import java.util.List;
@@ -158,10 +160,15 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void setLocation(double longitude, double latitude, String location) {
+    private void setLocation(double longitude, double latitude, @Nullable String location) {
 
         TextView locationText = (TextView) findViewById(R.id.location_text);
+        CompassFragment compassFragment = (CompassFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_compass);
         if (locationText == null) {
+            return;
+        }
+        if (compassFragment == null) {
+            Debug.error(MainActivityError.FragmentNotFound.getMsg());
             return;
         }
 
@@ -173,7 +180,6 @@ public class MainActivity extends AppCompatActivity {
             binding.locationAddress.setText(R.string.location);
         }
 
-        CompassFragment compassFragment = (CompassFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_compass);
         compassFragment.setLocation(longitude, latitude);
 
     }
@@ -181,21 +187,30 @@ public class MainActivity extends AppCompatActivity {
     private void setDate(int year, int month, int day) {
 
         TextView dateText = (TextView) findViewById(R.id.date_text);
+        CompassFragment compassFragment = (CompassFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_compass);
         if (dateText == null) {
+            return;
+        }
+        if (compassFragment == null) {
+            Debug.error(MainActivityError.FragmentNotFound.getMsg());
             return;
         }
 
         dateText.setText(Format.Date(year, month, day));
 
-        CompassFragment compassFragment = (CompassFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_compass);
         compassFragment.setDate(year, month, day);
 
     }
 
-    private void setTime(int hour, int minute, int seconds, int offset, String location) {
+    private void setTime(int hour, int minute, int seconds, int offset, @Nullable String location) {
 
         TextView timeText = (TextView) findViewById(R.id.time_text);
+        CompassFragment compassFragment = (CompassFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_compass);
         if (timeText == null) {
+            return;
+        }
+        if (compassFragment == null) {
+            Debug.error(MainActivityError.FragmentNotFound.getMsg());
             return;
         }
 
@@ -206,7 +221,6 @@ public class MainActivity extends AppCompatActivity {
 
         binding.timeLocation.setText((location != null ? location : getResources().getString(R.string.time)));
 
-        CompassFragment compassFragment = (CompassFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_compass);
         compassFragment.setTime(hour - offset, minute, seconds);
 
     }
@@ -258,7 +272,7 @@ public class MainActivity extends AppCompatActivity {
 
             CompassFragment compassFragment = (CompassFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_compass);
             if (compassFragment == null) {
-                //TODO log
+                Debug.error(MainActivityError.FragmentNotFound.getMsg());
                 return;
             }
 
@@ -284,6 +298,22 @@ public class MainActivity extends AppCompatActivity {
 
             return false;
         }
+    }
+
+}
+
+enum MainActivityError {
+
+    FragmentNotFound("Fragment not found.");
+
+    private String msg;
+
+    MainActivityError(String msg) {
+        this.msg = msg;
+    }
+
+    public String getMsg() {
+        return msg;
     }
 
 }

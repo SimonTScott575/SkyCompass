@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.view.MenuItem;
 
 import com.icarus1.databinding.ActivitySettingsBinding;
+import com.icarus1.util.Debug;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -25,13 +26,14 @@ public class SettingsActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         Fragment settingsFragment = getSupportFragmentManager().findFragmentById(R.id.settings_fragment_container);
-        NavHostFragment settingsNavHostFragment = (NavHostFragment) settingsFragment;
 
-        if (settingsNavHostFragment == null) {
-            //TODO log
+        if (settingsFragment == null) {
+            Debug.error(SettingsActivityError.FragmentNotFound.getMsg());
             finish();
             return;
         }
+
+        NavHostFragment settingsNavHostFragment = (NavHostFragment) settingsFragment;
 
         nav = settingsNavHostFragment.getNavController();
 
@@ -64,7 +66,7 @@ public class SettingsActivity extends AppCompatActivity {
         NavDestination destination = nav.getCurrentDestination();
 
         if (destination == null) {
-            //TODO log
+            Debug.error(SettingsActivityError.NavigationDestinationNotFound.getMsg());
             return;
         }
 
@@ -76,6 +78,23 @@ public class SettingsActivity extends AppCompatActivity {
             nav.navigateUp();
         }
 
+    }
+
+}
+
+enum SettingsActivityError {
+
+    FragmentNotFound("Fragment not found."),
+    NavigationDestinationNotFound("Navigation Destination null.");
+
+    private final String msg;
+
+    SettingsActivityError(String msg) {
+        this.msg = msg;
+    }
+
+    public String getMsg() {
+        return msg;
     }
 
 }
