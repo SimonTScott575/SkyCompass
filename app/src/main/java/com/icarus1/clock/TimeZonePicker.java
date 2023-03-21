@@ -18,7 +18,7 @@ public class TimeZonePicker extends ConstraintLayout {
     private ViewTimeZonePickerBinding binding;
     private int UTCOffset;
     private String location;
-    private onTimeZoneChanged onTimeZoneChanged;
+    private OnTimeZoneChanged onTimeZoneChanged;
 
     public TimeZonePicker(@NonNull Context context) {
         super(context);
@@ -65,7 +65,7 @@ public class TimeZonePicker extends ConstraintLayout {
         location = null;
     }
 
-    public void setOnUTCOffsetChanged(onTimeZoneChanged onTimeZoneChanged) {
+    public void setOnUTCOffsetChanged(OnTimeZoneChanged onTimeZoneChanged) {
         this.onTimeZoneChanged = onTimeZoneChanged;
     }
 
@@ -150,7 +150,7 @@ public class TimeZonePicker extends ConstraintLayout {
         }
     }
 
-    public interface onTimeZoneChanged {
+    public interface OnTimeZoneChanged {
         void onUTCOffsetChanged(int UTCOffset, String location);
     }
 
