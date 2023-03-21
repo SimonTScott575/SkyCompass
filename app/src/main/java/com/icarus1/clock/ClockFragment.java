@@ -31,7 +31,6 @@ public class ClockFragment extends Fragment {
     private RetrieveSystemTime retrieveSystemTime;
 
     public ClockFragment() {
-        useSystemTime = true;
         onTimeChangedListener = new OnTimeChanged();
         onTimeZoneChanged = new OnTimeZoneChange();
         retrieveSystemTime = new RetrieveSystemTime();
@@ -58,7 +57,11 @@ public class ClockFragment extends Fragment {
         setUseSystemTime(true);
 
         handler = new Handler(requireActivity().getMainLooper());
-        handler.post(retrieveSystemTime);
+        boolean success = handler.post(retrieveSystemTime);
+        if (!success) {
+            Debug.error("ClockFragment no post");
+            setUseSystemTime(false);
+        }
 
     }
 
