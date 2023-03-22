@@ -58,20 +58,20 @@ public class CalendarFragment extends Fragment {
 
     }
 
-    public void setDate(int year, int month, int dayOfMonth) {
+    public void setDate(int year, int month, int dayOfMonth, boolean currentDate) {
 
         binding.datePicker.updateDate(year, month, dayOfMonth);
-        onDateChanged(year, month, dayOfMonth);
+        onDateChanged(year, month, dayOfMonth, currentDate);
 
     }
 
-    public void setDateWithoutNotification(int year, int month, int dayOfMonth) {
+    public void setDateWithoutNotification(int year, int month, int dayOfMonth, boolean currentDate) {
 
         binding.datePicker.setOnDateChangedListener(null);
         binding.datePicker.updateDate(year, month, dayOfMonth);
         binding.datePicker.setOnDateChangedListener(onDateChangedListener);
 
-        onDateChanged(year, month, dayOfMonth);
+        onDateChanged(year, month, dayOfMonth, currentDate);
 
     }
 
@@ -86,7 +86,7 @@ public class CalendarFragment extends Fragment {
             int month = calendar.get(Calendar.MONTH);
             int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
 
-            setDateWithoutNotification(year, month, dayOfMonth);
+            setDateWithoutNotification(year, month, dayOfMonth, true);
 
         } else {
             binding.useSystemDate.setVisibility(View.VISIBLE);
@@ -96,12 +96,13 @@ public class CalendarFragment extends Fragment {
 
     }
 
-    public void onDateChanged(int year, int monthOfYear, int dayOfMonth) {
+    public void onDateChanged(int year, int monthOfYear, int dayOfMonth, boolean currentDate) {
 
         Bundle bundle = new Bundle();
         bundle.putInt("Y", year);
         bundle.putInt("M", monthOfYear);
         bundle.putInt("D", dayOfMonth-1);
+        bundle.putBoolean("CURRENT DATE", currentDate);
         requireActivity().getSupportFragmentManager().setFragmentResult("A", bundle);
 
     }
@@ -112,7 +113,7 @@ public class CalendarFragment extends Fragment {
 
             setUseSystemDate(false);
 
-            CalendarFragment.this.onDateChanged(year, monthOfYear, dayOfMonth);
+            CalendarFragment.this.onDateChanged(year, monthOfYear, dayOfMonth, false);
 
         }
     }
@@ -128,7 +129,7 @@ public class CalendarFragment extends Fragment {
                 int month = calendar.get(Calendar.MONTH);
                 int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
 
-                setDateWithoutNotification(year, month, dayOfMonth);
+                setDateWithoutNotification(year, month, dayOfMonth, true);
 
             }
 

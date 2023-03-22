@@ -177,26 +177,27 @@ public class MainActivity extends AppCompatActivity {
         if (location != null) {
             binding.locationAddress.setText(location);
         } else {
-            binding.locationAddress.setText(R.string.location);
+            binding.locationAddress.setText(R.string.tap_to_change_location);
         }
 
         compassFragment.setLocation(longitude, latitude);
 
     }
 
-    private void setDate(int year, int month, int day) {
+    private void setDate(int year, int month, int day, boolean currentDate) {
 
-        TextView dateText = (TextView) findViewById(R.id.date_text);
         CompassFragment compassFragment = (CompassFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_compass);
-        if (dateText == null) {
-            return;
-        }
         if (compassFragment == null) {
             Debug.error(MainActivityError.FragmentNotFound.getMsg());
             return;
         }
 
-        dateText.setText(Format.Date(year, month, day));
+        binding.dateText.setText(Format.Date(year, month, day));
+        if (currentDate) {
+            binding.dateSubscript.setText(R.string.using_system_date);
+        } else {
+            binding.dateSubscript.setText(R.string.tap_to_change_date);
+        }
 
         compassFragment.setDate(year, month, day);
 
@@ -204,11 +205,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void setTime(int hour, int minute, int seconds, int offset, @Nullable String location) {
 
-        TextView timeText = (TextView) findViewById(R.id.time_text);
         CompassFragment compassFragment = (CompassFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_compass);
-        if (timeText == null) {
-            return;
-        }
         if (compassFragment == null) {
             Debug.error(MainActivityError.FragmentNotFound.getMsg());
             return;
@@ -217,9 +214,12 @@ public class MainActivity extends AppCompatActivity {
         String text = Format.Time(hour, minute, seconds);
         text += " (" + Format.UTCOffset(offset, 0) + ")";
 
-        timeText.setText(text);
-
-        binding.timeLocation.setText((location != null ? location : getResources().getString(R.string.time)));
+        binding.timeText.setText(text);
+        if (location != null) {
+            binding.timeLocation.setText(location);
+        } else {
+            binding.timeLocation.setText(R.string.tap_to_change_time);
+        }
 
         compassFragment.setTime(hour - offset, minute, seconds);
 
@@ -245,8 +245,9 @@ public class MainActivity extends AppCompatActivity {
             int year = result.getInt("Y");
             int month = result.getInt("M");
             int day = result.getInt("D");
+            boolean currentDate = result.getBoolean("CURRENT DATE");
 
-            setDate(year, month, day);
+            setDate(year, month, day, currentDate);
 
         }
     }

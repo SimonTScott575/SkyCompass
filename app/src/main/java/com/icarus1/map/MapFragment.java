@@ -127,7 +127,7 @@ public class MapFragment extends Fragment {
         });
 
         if (userLocation != null) {
-            setLocation(userLocation.getLongitude(), userLocation.getLatitude(), getResources().getString(R.string.current_location));
+            setLocation(userLocation.getLongitude(), userLocation.getLatitude(), getResources().getString(R.string.using_system_location));
         } else {
             setLocation(0d, 0d, null);
         }
@@ -199,7 +199,7 @@ public class MapFragment extends Fragment {
             double longitude = userLocation.getLongitude();
             double latitude = userLocation.getLatitude();
 
-            setLocation(longitude, latitude, getResources().getString(R.string.current_location));
+            setLocation(longitude, latitude, getResources().getString(R.string.using_system_location));
 
         }
     }

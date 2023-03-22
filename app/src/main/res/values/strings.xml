@@ -12,13 +12,17 @@
     <string name="location">Location</string>
     <string name="date">Date</string>
     <string name="time">Time</string>
-    <string name="change">Change</string>
 
     <string name="use_system_time">Current time</string>
     <string name="use_system_date">Current date</string>
+    <string name="use_system_location">Current location</string>
 
-    <string name="current_location">Current location</string>
-    <string name="map_set_to_current_location">Current location</string>
+    <string name="using_system_date">Current date</string>
+    <string name="using_system_location">Current location</string>
+
+    <string name="tap_to_change_time">Tap to change time</string>
+    <string name="tap_to_change_date">Tap to change date</string>
+    <string name="tap_to_change_location">Tap to change location</string>
 
     <string name="time_zone">Time zone (UTC+/-)</string>
     <string name="plus">+</string>
