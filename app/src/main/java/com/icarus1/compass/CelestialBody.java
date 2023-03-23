@@ -5,35 +5,29 @@ import android.graphics.Paint;
 
 import io.github.cosinekitty.astronomy.Body;
 
-enum CelestialBody {
+public enum CelestialBody {
 
-    SUN(Body.Sun),
-    MOON(Body.Moon),
-    MERCURY(Body.Mercury),
-    VENUS(Body.Venus),
-    EARTH(Body.Earth),
-    MARS(Body.Mars),
-    JUPITER(Body.Jupiter),
-    SATURN(Body.Saturn),
-    URANUS(Body.Uranus),
-    NEPTUNE(Body.Neptune),
-    PLUTO(Body.Pluto);
+    SUN(new SunFactory()),
+    MOON(new MoonFactory()),
+    MERCURY(new MercuryFactory()),
+    VENUS(new VenusFactory()),
+    MARS(new MarsFactory()),
+    JUPITER(new JupiterFactory()),
+    SATURN(new SaturnFactory()),
+    URANUS(new UranusFactory()),
+    NEPTUNE(new NeptuneFactory()),
+    PLUTO(new PlutoFactory());
 
     private Body body;
     private Paint paint;
+    private String name;
 
-    CelestialBody(Body body) {
-        this.body = body;
-        switch (body) {
-            case Sun :
-                initSun();
-                break;
-            case Moon :
-                initMoon();
-                break;
-            default :
-                initPlanet();
-        }
+    CelestialBody(Factory factory) {
+        factory.init(this);
+    }
+
+    public String getName() {
+        return name;
     }
 
     public Body getBody() {
@@ -44,24 +38,109 @@ enum CelestialBody {
         return paint;
     }
 
-    private void initSun() {
-        body = Body.Sun;
-        paint = new Paint();
-        paint.setColor(Color.argb(0.75f,1f,1f,0f));
-        paint.setStyle(Paint.Style.FILL);
+    private interface Factory {
+        void init(CelestialBody body);
     }
 
-    private void initMoon() {
-        body = Body.Moon;
-        paint = new Paint();
-        paint.setColor(Color.argb(0.75f,1f,1f,1f));
-        paint.setStyle(Paint.Style.FILL);
+    private static class SunFactory implements Factory {
+        @Override
+        public void init(CelestialBody body) {
+            body.name = Body.Sun.toString();
+            body.body = Body.Sun;
+            body.paint = new Paint();
+            body.paint.setColor(Color.argb(0.75f,1f,1f,0f));
+            body.paint.setStyle(Paint.Style.FILL);
+        }
     }
-
-    private void initPlanet() {
-        paint = new Paint();
-        paint.setColor(Color.argb(0.5f,1f,0f,1f));
-        paint.setStyle(Paint.Style.FILL);
+    private static class MoonFactory implements Factory {
+        @Override
+        public void init(CelestialBody body) {
+            body.name = Body.Moon.toString();
+            body.body = Body.Moon;
+            body.paint = new Paint();
+            body.paint.setColor(Color.argb(0.75f,1f,1f,1f));
+            body.paint.setStyle(Paint.Style.FILL);
+        }
+    }
+    private static class MercuryFactory implements Factory {
+        @Override
+        public void init(CelestialBody body) {
+            body.name = Body.Mercury.toString();
+            body.body = Body.Mercury;
+            body.paint = new Paint();
+            body.paint.setColor(Color.argb(0.75f,1f,0f,1f));
+            body.paint.setStyle(Paint.Style.FILL);
+        }
+    }
+    private static class VenusFactory implements Factory {
+        @Override
+        public void init(CelestialBody body) {
+            body.name = Body.Venus.toString();
+            body.body = Body.Venus;
+            body.paint = new Paint();
+            body.paint.setColor(Color.argb(0.75f,1f,0f,1f));
+            body.paint.setStyle(Paint.Style.FILL);
+        }
+    }
+    private static class MarsFactory implements Factory {
+        @Override
+        public void init(CelestialBody body) {
+            body.name = Body.Mars.toString();
+            body.body = Body.Mars;
+            body.paint = new Paint();
+            body.paint.setColor(Color.argb(0.75f,1f,0f,1f));
+            body.paint.setStyle(Paint.Style.FILL);
+        }
+    }
+    private static class JupiterFactory implements Factory {
+        @Override
+        public void init(CelestialBody body) {
+            body.name = Body.Jupiter.toString();
+            body.body = Body.Jupiter;
+            body.paint = new Paint();
+            body.paint.setColor(Color.argb(0.75f,1f,0f,1f));
+            body.paint.setStyle(Paint.Style.FILL);
+        }
+    }
+    private static class SaturnFactory implements Factory {
+        @Override
+        public void init(CelestialBody body) {
+            body.name = Body.Saturn.toString();
+            body.body = Body.Saturn;
+            body.paint = new Paint();
+            body.paint.setColor(Color.argb(0.75f,1f,0f,1f));
+            body.paint.setStyle(Paint.Style.FILL);
+        }
+    }
+    private static class UranusFactory implements Factory {
+        @Override
+        public void init(CelestialBody body) {
+            body.name = Body.Uranus.toString();
+            body.body = Body.Uranus;
+            body.paint = new Paint();
+            body.paint.setColor(Color.argb(0.75f,1f,0f,1f));
+            body.paint.setStyle(Paint.Style.FILL);
+        }
+    }
+    private static class NeptuneFactory implements Factory {
+        @Override
+        public void init(CelestialBody body) {
+            body.name = Body.Neptune.toString();
+            body.body = Body.Neptune;
+            body.paint = new Paint();
+            body.paint.setColor(Color.argb(0.75f,1f,0f,1f));
+            body.paint.setStyle(Paint.Style.FILL);
+        }
+    }
+    private static class PlutoFactory implements Factory {
+        @Override
+        public void init(CelestialBody body) {
+            body.name = Body.Pluto.toString();
+            body.body = Body.Pluto;
+            body.paint = new Paint();
+            body.paint.setColor(Color.argb(0.75f,1f,0f,1f));
+            body.paint.setStyle(Paint.Style.FILL);
+        }
     }
 
 }

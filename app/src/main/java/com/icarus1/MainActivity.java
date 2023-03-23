@@ -128,6 +128,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void initUI() {
 
+        binding.viewBodies.setOnClickListener(view -> binding.selectBodiesView.show());
+
         binding.changeLocation.setOnClickListener(view -> binding.mapCardView.show());
         binding.changeDate.setOnClickListener(view -> binding.calendarCardView.show());
         binding.changeTime.setOnClickListener(view -> binding.clockCardView.show());
