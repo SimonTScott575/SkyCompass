@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory android:title="Preferences">
+
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="switch_preference_1"
+            android:title="Night mode" />
+
+        <EditTextPreference
+            android:defaultValue="00&#176;N 00&#176;E"
+            android:key="edit_text_preference_1"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="Default location" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Permissions">
+
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="switch_preference_1"
+            android:title="Ask for location if don't have permission" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>
