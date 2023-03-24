@@ -33,17 +33,4 @@ public class SettingsFragment extends Fragment {
         return binding.getRoot();
     }
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        binding.about.getRoot().setOnClickListener(v -> {
-
-            NavController controller = Navigation.findNavController(v);
-            controller.navigate(R.id.navigation_settings_action_settings_to_about);
-
-        });
-
-    }
-
 }
