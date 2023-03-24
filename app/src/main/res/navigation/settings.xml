@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/navigation_settings_fragment_start"
-        android:name="com.icarus1.settings.SettingsFragment"
+        android:name="com.icarus1.settings.PreferenceFragment"
         tools:layout="@layout/fragment_settings" >
 
         <action
@@ -18,29 +18,8 @@
 
     <fragment
         android:id="@+id/navigation_settings_fragment_settings"
-        android:name="com.icarus1.settings.SettingsFragment"
+        android:name="com.icarus1.settings.PreferenceFragment"
         android:label="@string/page_settings"
-        tools:layout="@layout/fragment_settings" >
-
-        <action
-            android:id="@+id/navigation_settings_action_settings_to_about"
-            app:destination="@id/navigation_settings_fragment_about" />
-        <action
-            android:id="@+id/navigation_settings_action_settings_to_display"
-            app:destination="@id/navigation_settings_fragment_display" />
-
-    </fragment>
-
-    <fragment
-        android:id="@+id/navigation_settings_fragment_about"
-        android:name="com.icarus1.AboutFragment"
-        android:label="@string/page_about"
-        tools:layout="@layout/fragment_about" />
-
-    <fragment
-        android:id="@+id/navigation_settings_fragment_display"
-        android:name="com.icarus1.settings.SettingsDisplayFragment"
-        android:label="@string/page_display"
-        tools:layout="@layout/fragment_settings_display" />
+        tools:layout="@layout/fragment_settings" />
 
 </navigation>
