@@ -5,59 +5,67 @@
 
     <data/>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <com.icarus1.views.ScrollTable
+        android:id="@+id/custom_linear_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".SelectBodiesFragment">
+        android:layout_height="wrap_content"
+        android:orientation="vertical" />
 
-        <TextView
-            android:id="@+id/textView6"
-            style="@style/text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="32dp"
-            android:layout_marginTop="16dp"
-            android:text="@string/title_planets"
-            android:textSize="16sp"
-            bind:layout_constraintStart_toStartOf="parent"
-            bind:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/textView7"
-            style="@style/text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="32dp"
-            android:text="@string/title_view"
-            android:textSize="16sp"
-            bind:layout_constraintEnd_toEndOf="parent"
-            bind:layout_constraintTop_toTopOf="parent" />
-
-        <androidx.constraintlayout.widget.Barrier
-            android:id="@+id/barrier2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            bind:barrierDirection="top"
-            bind:constraint_referenced_ids="scrollView" />
-
-        <ScrollView
-            android:id="@+id/scrollView"
+    <!--
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            bind:layout_constraintBottom_toBottomOf="parent"
-            bind:layout_constraintEnd_toEndOf="parent"
-            bind:layout_constraintStart_toStartOf="parent"
-            bind:layout_constraintTop_toBottomOf="@+id/textView6">
+            android:layout_height="match_parent"
+            tools:context=".SelectBodiesFragment">
 
-            <LinearLayout
-                android:id="@+id/bodies_linear_layout"
-                android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/textView6"
+                style="@style/text"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"/>
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="16dp"
+                android:text="@string/title_planets"
+                android:textSize="16sp"
+                bind:layout_constraintStart_toStartOf="parent"
+                bind:layout_constraintTop_toTopOf="parent" />
 
-        </ScrollView>
+            <TextView
+                android:id="@+id/textView7"
+                style="@style/text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="32dp"
+                android:text="@string/title_view"
+                android:textSize="16sp"
+                bind:layout_constraintEnd_toEndOf="parent"
+                bind:layout_constraintTop_toTopOf="parent" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <androidx.constraintlayout.widget.Barrier
+                android:id="@+id/barrier2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                bind:barrierDirection="top"
+                bind:constraint_referenced_ids="scrollView" />
+
+            <ScrollView
+                android:id="@+id/scrollView"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                bind:layout_constraintBottom_toBottomOf="parent"
+                bind:layout_constraintEnd_toEndOf="parent"
+                bind:layout_constraintStart_toStartOf="parent"
+                bind:layout_constraintTop_toBottomOf="@+id/textView6">
+
+                <LinearLayout
+                    android:id="@+id/bodies_linear_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"/>
+
+            </ScrollView>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    -->
 
 </layout>
