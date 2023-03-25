@@ -5,11 +5,71 @@
 
     <data/>
 
-    <com.icarus1.views.ScrollTable
-        android:id="@+id/custom_linear_layout"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical" />
+        android:layout_height="match_parent"
+        android:scrollbars="none">
+
+        <TableLayout
+            android:id="@+id/bodies_table"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <!--    android:background="#FFFFFFFF">-->
+
+                <TextView
+                    style="@style/text"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="32dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:layout_weight="1"
+                    android:text="@string/title_planets" />
+
+                <TextView
+                    style="@style/text"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:layout_weight="1"
+                    android:text="@string/title_sunrise" />
+
+                <TextView
+                    style="@style/text"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:layout_weight="1"
+                    android:text="@string/title_sunset" />
+
+                <TextView
+                    style="@style/text"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginEnd="32dp"
+                    android:text="@string/title_view" />
+
+            </TableRow>
+
+        </TableLayout>
+
+    </ScrollView>
 
     <!--
         <androidx.constraintlayout.widget.ConstraintLayout

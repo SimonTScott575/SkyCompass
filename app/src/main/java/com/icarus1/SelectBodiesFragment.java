@@ -15,7 +15,6 @@ import android.view.ViewGroup;
 import com.icarus1.compass.CelestialBody;
 import com.icarus1.databinding.FragmentSelectBodiesBinding;
 import com.icarus1.databinding.SelectableBodyBinding;
-import com.icarus1.views.ScrollTable;
 
 public class SelectBodiesFragment extends Fragment {
 
@@ -43,13 +42,15 @@ public class SelectBodiesFragment extends Fragment {
 
         for (CelestialBody body : CelestialBody.values()) {
 
-            SelectableBodyBinding selectableBodyBinding = SelectableBodyBinding.inflate(getLayoutInflater(), binding.getRoot().findViewById(R.id.bodies_table), true);
+            SelectableBodyBinding selectableBodyBinding = SelectableBodyBinding.inflate(getLayoutInflater(), binding.bodiesTable, true);
             selectableBodyBinding.name.setText(body.getName());
 
         }
 
+/*
         ScrollTable scrollTable = binding.getRoot().findViewById(R.id.custom_linear_layout);
         scrollTable.setHeader(R.layout.selectable_body_header);
+*/
 
 /*
         ScrollTable scrollTable = binding.getRoot().findViewById(R.id.custom_linear_layout);
