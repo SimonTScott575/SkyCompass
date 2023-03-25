@@ -14,7 +14,7 @@ import android.view.ViewGroup;
 
 import com.icarus1.compass.CelestialBody;
 import com.icarus1.databinding.FragmentSelectBodiesBinding;
-import com.icarus1.databinding.SelectableBodyBinding;
+import com.icarus1.databinding.ViewSelectableBodyBinding;
 
 public class SelectBodiesFragment extends Fragment {
 
@@ -42,7 +42,7 @@ public class SelectBodiesFragment extends Fragment {
 
         for (CelestialBody body : CelestialBody.values()) {
 
-            SelectableBodyBinding selectableBodyBinding = SelectableBodyBinding.inflate(getLayoutInflater(), binding.bodiesTable, true);
+            ViewSelectableBodyBinding selectableBodyBinding = ViewSelectableBodyBinding.inflate(getLayoutInflater(), binding.bodiesTable, true);
             selectableBodyBinding.name.setText(body.getName());
 
         }
