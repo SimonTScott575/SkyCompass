@@ -255,8 +255,9 @@ public class MainActivity extends AppCompatActivity {
             int year = result.getInt("Y");
             int month = result.getInt("M");
             int day = result.getInt("D");
+            boolean currentDate = result.getBoolean("CURRENT DATE");
 
-            setDate(year, month, day);
+            setDate(year, month, day, currentDate);
 
         }
     }
@@ -281,33 +282,6 @@ public class MainActivity extends AppCompatActivity {
 
         compassFragment.setTime(hour - offset, minute, seconds);
 
-    }
-
-    private class OnChangeLocationListener implements FragmentResultListener {
-        @Override
-        public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
-
-            double longitude = result.getDouble("Longitude");
-            double latitude = result.getDouble("Latitude");
-            String location = result.getString("Location");
-
-            setLocation(longitude, latitude, location);
-
-        }
-    }
-
-    private class OnChangeDateListener implements FragmentResultListener {
-        @Override
-        public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
-
-            int year = result.getInt("Y");
-            int month = result.getInt("M");
-            int day = result.getInt("D");
-            boolean currentDate = result.getBoolean("CURRENT DATE");
-
-            setDate(year, month, day, currentDate);
-
-        }
     }
 
     private class OnChangeTimeListener implements FragmentResultListener {
