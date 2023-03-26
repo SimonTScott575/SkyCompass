@@ -20,6 +20,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.icarus1.compass.CelestialBody;
 import com.icarus1.compass.CompassFragment;
 import com.icarus1.databinding.ActivityMainBinding;
 import com.icarus1.map.MapFragment;
@@ -36,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
     private final OnChangeLocationListener onChangeLocationListener = new OnChangeLocationListener();
     private final OnChangeDateListener onChangeDateListener = new OnChangeDateListener();
     private final OnChangeTimeListener onChangeTimeListener = new OnChangeTimeListener();
+    private final OnChangeViewListener ON_CHANGE_VIEW_LISTENER = new OnChangeViewListener();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,6 +100,30 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+
+        //TODO POSSIBLE that fragments haven't have view created yet - possible elsewhere too ?
+        CompassFragment compassFragment = (CompassFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_compass);
+        SelectBodiesFragment selectBodiesFragment = (SelectBodiesFragment) getSupportFragmentManager().findFragmentById(R.id.select_bodies_fragment);
+        if (compassFragment == null || selectBodiesFragment == null) {
+            Debug.error(MainActivityError.FragmentNotFound.getMsg());
+            return;
+        }
+
+        selectBodiesFragment.setView(CelestialBody.SUN, compassFragment.isDrawSunMoon());
+        selectBodiesFragment.setView(CelestialBody.MOON, compassFragment.isDrawSunMoon());
+
+        for (CelestialBody body : CelestialBody.values()) {
+            if (body == CelestialBody.SUN || body == CelestialBody.MOON) {
+                continue;
+            }
+            selectBodiesFragment.setView(body, compassFragment.isDrawPlanets());
+        }
+
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
 
@@ -107,6 +133,10 @@ public class MainActivity extends AppCompatActivity {
             .setFragmentResultListener("B", this, onChangeLocationListener);
         getSupportFragmentManager()
             .setFragmentResultListener("C", this, onChangeTimeListener);
+        for (CelestialBody body : CelestialBody.values()) {
+            getSupportFragmentManager()
+                .setFragmentResultListener("E_"+body.getName(), this, ON_CHANGE_VIEW_LISTENER);
+        }
 
     }
 
@@ -127,6 +157,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initUI() {
+
+        binding.viewBodies.setOnClickListener(view -> binding.selectBodiesView.show());
 
         binding.changeLocation.setOnClickListener(view -> binding.mapCardView.show());
         binding.changeDate.setOnClickListener(view -> binding.calendarCardView.show());
@@ -184,6 +216,19 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private class OnChangeLocationListener implements FragmentResultListener {
+        @Override
+        public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
+
+            double longitude = result.getDouble("Longitude");
+            double latitude = result.getDouble("Latitude");
+            String location = result.getString("Location");
+
+            setLocation(longitude, latitude, location);
+
+        }
+    }
+
     private void setDate(int year, int month, int day, boolean currentDate) {
 
         CompassFragment compassFragment = (CompassFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_compass);
@@ -201,6 +246,19 @@ public class MainActivity extends AppCompatActivity {
 
         compassFragment.setDate(year, month, day);
 
+    }
+
+    private class OnChangeDateListener implements FragmentResultListener {
+        @Override
+        public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
+
+            int year = result.getInt("Y");
+            int month = result.getInt("M");
+            int day = result.getInt("D");
+
+            setDate(year, month, day);
+
+        }
     }
 
     private void setTime(int hour, int minute, int seconds, int offset, @Nullable String location) {
@@ -267,21 +325,86 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void setView(CelestialBody body, boolean checked) {
+
+        CompassFragment compassFragment = (CompassFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_compass);
+        if (compassFragment == null) {
+            Debug.error(MainActivityError.FragmentNotFound.getMsg());
+            return;
+        }
+
+        compassFragment.setDrawBody(body, checked);
+
+        if (!checked) {
+            if (body == CelestialBody.SUN || body == CelestialBody.MOON) {
+                binding.toggleObjectsGroup.uncheck(R.id.toggle_objects_sun_moon);
+            } else {
+                binding.toggleObjectsGroup.uncheck(R.id.toggle_objects_planets);
+            }
+        } else {
+
+            if (body == CelestialBody.SUN || body == CelestialBody.MOON) {
+                boolean allViewable = compassFragment.getDrawBody(CelestialBody.SUN) && compassFragment.getDrawBody(CelestialBody.MOON);
+                if (allViewable) {
+                    binding.toggleObjectsGroup.check(R.id.toggle_objects_sun_moon);
+                }
+            } else {
+                boolean allViewable = true;
+                for (CelestialBody body2 : CelestialBody.values()) {
+                    allViewable &= compassFragment.getDrawBody(body2);
+                }
+                if (allViewable) {
+                    binding.toggleObjectsGroup.check(R.id.toggle_objects_planets);
+                }
+            }
+
+        }
+
+    }
+
+    private class OnChangeViewListener implements FragmentResultListener {
+        @Override
+        public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
+
+            int index = result.getInt("INDEX");
+            boolean checked = result.getBoolean("CHECKED");
+
+            setView(CelestialBody.values()[index], checked);
+
+        }
+    }
+
     private class OnObjectSelection implements View.OnClickListener {
         @Override
         public void onClick(View v) {
 
             CompassFragment compassFragment = (CompassFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_compass);
-            if (compassFragment == null) {
+            SelectBodiesFragment selectBodiesFragment = (SelectBodiesFragment) getSupportFragmentManager().findFragmentById(R.id.select_bodies_fragment);
+            if (compassFragment == null || selectBodiesFragment == null) {
                 Debug.error(MainActivityError.FragmentNotFound.getMsg());
                 return;
             }
 
             int viewID = v.getId();
+
             if (viewID == R.id.toggle_objects_sun_moon) {
-                compassFragment.setDrawSunMoon(!compassFragment.isDrawSunMoon());
+
+                boolean checked = binding.toggleObjectsGroup.getCheckedButtonIds().contains(R.id.toggle_objects_sun_moon);
+
+                selectBodiesFragment.setView(CelestialBody.SUN, checked);
+                selectBodiesFragment.setView(CelestialBody.MOON, checked);
+
             } else if (viewID == R.id.toggle_objects_planets) {
-                compassFragment.setDrawPlanets(!compassFragment.isDrawPlanets());
+
+                boolean checked = binding.toggleObjectsGroup.getCheckedButtonIds().contains(R.id.toggle_objects_planets);
+
+                for (CelestialBody body : CelestialBody.values()) {
+                    if (body == CelestialBody.SUN || body == CelestialBody.MOON) {
+                        continue;
+                    }
+                    selectBodiesFragment.setView(body, checked);
+                }
+
             }
 
         }
