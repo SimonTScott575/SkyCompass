@@ -11,7 +11,13 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.RadioGroup;
+import android.widget.SimpleAdapter;
+import android.widget.TableRow;
 
+import com.google.android.material.progressindicator.CircularProgressIndicator;
 import com.icarus1.compass.CelestialBody;
 import com.icarus1.databinding.FragmentSelectBodiesBinding;
 import com.icarus1.databinding.ViewSelectableBodyBinding;
@@ -20,10 +26,6 @@ public class SelectBodiesFragment extends Fragment {
 
     private SelectBodiesViewModel mViewModel;
     private FragmentSelectBodiesBinding binding;
-
-    public static SelectBodiesFragment newInstance() {
-        return new SelectBodiesFragment();
-    }
 
     @Override
     public View onCreateView(
@@ -40,38 +42,17 @@ public class SelectBodiesFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
 
+        int i = 0;
+
         for (CelestialBody body : CelestialBody.values()) {
 
             ViewSelectableBodyBinding selectableBodyBinding = ViewSelectableBodyBinding.inflate(getLayoutInflater(), binding.bodiesTable, true);
             selectableBodyBinding.name.setText(body.getName());
+            selectableBodyBinding.checkBox.setOnCheckedChangeListener(new OnCheckListener(i));
+
+            i++;
 
         }
-
-/*
-        ScrollTable scrollTable = binding.getRoot().findViewById(R.id.custom_linear_layout);
-        scrollTable.setHeader(R.layout.selectable_body_header);
-*/
-
-/*
-        ScrollTable scrollTable = binding.getRoot().findViewById(R.id.custom_linear_layout);
-        ScrollView customScrollView = scrollTable.findViewById(R.id.custom_scroll_view);
-        TableLayout customTableLayout = customScrollView.findViewById(R.id.bodies_table);
-        TableRow customTableHeader = customTableLayout.findViewById(R.id.custom_header);
-
-        if (customTableHeader == null) {
-            return;
-        }
-
-//        customTableLayout.setBackgroundColor(Color.argb(1f,1f,1f,1f));
-
-        customTableLayout.removeView(customTableHeader);
-        customTableHeader.setBackgroundColor(Color.argb(1f,1f,1f,1f));
-        scrollTable.setHeader(customTableHeader);
-
-        View v = getLayoutInflater().inflate(R.layout.selectable_body_header, customTableLayout, false);
-        v.setScaleY(0);
-        customTableLayout.addView(v,0);
-*/
 
     }
 
@@ -80,6 +61,50 @@ public class SelectBodiesFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         mViewModel = new ViewModelProvider(this).get(SelectBodiesViewModel.class);
         // TODO: Use the ViewModel
+    }
+
+    public void setView(CelestialBody body, boolean view) {
+
+        int index = 1;
+
+        for (CelestialBody testBody : CelestialBody.values()) {
+            if (testBody == body) {
+                break;
+            }
+            index++;
+        }
+
+        TableRow row = (TableRow) binding.bodiesTable.getChildAt(index);
+        CheckBox checkBox = row.findViewById(R.id.checkBox);
+        checkBox.setChecked(view);
+
+    }
+
+    private class OnCheckListener implements CompoundButton.OnCheckedChangeListener {
+
+        private int index;
+
+        public OnCheckListener(int index) {
+            this.index = index;
+        }
+
+        @Override
+        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+            onCheckView(CelestialBody.values()[index], isChecked, index);
+
+        }
+
+    }
+
+    public void onCheckView(CelestialBody body, boolean isChecked, int index) {
+
+        Bundle bundle = new Bundle();
+        bundle.putInt("INDEX", index);
+        bundle.putBoolean("CHECKED", isChecked);
+
+        requireActivity().getSupportFragmentManager().setFragmentResult("E_"+body.getName(), bundle);
+
     }
 
 }

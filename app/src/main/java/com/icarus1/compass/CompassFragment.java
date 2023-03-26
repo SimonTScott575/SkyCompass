@@ -5,7 +5,6 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentResultListener;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -80,6 +79,14 @@ public class CompassFragment extends Fragment {
 
     public boolean isDrawPlanets() {
         return binding.compassView.isDrawPlanets();
+    }
+
+    public void setDrawBody(CelestialBody body, boolean draw) {
+        binding.compassView.setDrawBody(body, draw);
+    }
+
+    public boolean getDrawBody(CelestialBody body) {
+        return binding.compassView.getDrawBody(body);
     }
 
 }

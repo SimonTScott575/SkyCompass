@@ -27,6 +27,7 @@ public class CompassView extends View {
 
     private boolean drawSunMoon;
     private boolean drawPlanets;
+    private boolean[] drawBody;
 
     public CompassView(Context context) {
         super(context);
@@ -58,6 +59,7 @@ public class CompassView extends View {
 
         drawSunMoon = true;
         drawPlanets = false;
+        drawBody = new boolean[CelestialBody.values().length];
 
     }
 
@@ -91,6 +93,15 @@ public class CompassView extends View {
         invalidate();
     }
 
+    public void setDrawBody(CelestialBody body, boolean draw) {
+        drawBody[body.getIndex()] = draw;
+        invalidate();
+    }
+
+    public boolean getDrawBody(CelestialBody body) {
+        return drawBody[body.getIndex()];
+    }
+
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
 
@@ -119,14 +130,8 @@ public class CompassView extends View {
 
         drawBackground(canvas);
         for (CelestialBody body : CelestialBody.values()) {
-            if (body == CelestialBody.SUN || body == CelestialBody.MOON) {
-                if (drawSunMoon) {
-                    drawTracks(hour,minutes,seconds, body, canvas);
-                }
-            } else {
-                if (drawPlanets) {
-                    drawTracks(hour,minutes,seconds, body, canvas);
-                }
+            if (drawBody[body.getIndex()]) {
+                drawTracks(hour,minutes,seconds, body, canvas);
             }
         }
         drawForeground(canvas);
