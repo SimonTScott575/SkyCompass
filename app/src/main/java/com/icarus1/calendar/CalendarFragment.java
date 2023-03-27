@@ -6,6 +6,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.os.Handler;
 import android.view.LayoutInflater;
@@ -13,20 +14,22 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.DatePicker;
 
+import com.icarus1.clock.ClockFragment;
+import com.icarus1.clock.ClockViewModel;
 import com.icarus1.databinding.FragmentCalendarBinding;
 import com.icarus1.util.Debug;
 
 public class CalendarFragment extends Fragment {
 
+    private CalendarViewModel viewModel;
     private FragmentCalendarBinding binding;
     private Handler handler;
     private boolean useSystemDate;
     private final OnDateChangedListener onDateChangedListener;
-    private final RetrieveSystemDate retrieveSystemDate;
+    private RetrieveSystemDate retrieveSystemDate;
 
     public CalendarFragment() {
         onDateChangedListener = new OnDateChangedListener();
-        retrieveSystemDate = new RetrieveSystemDate();
     }
 
     @Override
@@ -36,6 +39,7 @@ public class CalendarFragment extends Fragment {
         Bundle savedInstanceState
     ) {
 
+        viewModel = new ViewModelProvider(this).get(CalendarViewModel.class);
         binding = FragmentCalendarBinding.inflate(inflater);
 
         return binding.getRoot();
@@ -44,11 +48,23 @@ public class CalendarFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
 
-        binding.datePicker.setOnDateChangedListener(onDateChangedListener);
         binding.useSystemDate.setOnClickListener(v -> setUseSystemDate(true));
 
-        setUseSystemDate(true);
+    }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        binding.datePicker.setOnDateChangedListener(onDateChangedListener);
+
+        setDateWithoutNotification(
+            viewModel.getYear(), viewModel.getMonth(), viewModel.getDayOfMonth(),
+            viewModel.isSystemDate()
+        );
+        setUseSystemDate(viewModel.isSystemDate());
+
+        retrieveSystemDate = new RetrieveSystemDate();
         handler = new Handler(requireActivity().getMainLooper());
         boolean success = handler.post(retrieveSystemDate);
         if (!success) {
@@ -58,18 +74,23 @@ public class CalendarFragment extends Fragment {
 
     }
 
-    public void setDate(int year, int month, int dayOfMonth, boolean currentDate) {
+    @Override
+    public void onPause() {
+        super.onPause();
 
-        binding.datePicker.updateDate(year, month, dayOfMonth);
-        onDateChanged(year, month, dayOfMonth, currentDate);
+        binding.datePicker.setOnDateChangedListener(null);
+
+        retrieveSystemDate.end();
 
     }
 
-    public void setDateWithoutNotification(int year, int month, int dayOfMonth, boolean currentDate) {
+    private void setDateWithoutNotification(int year, int month, int dayOfMonth, boolean currentDate) {
 
         binding.datePicker.setOnDateChangedListener(null);
         binding.datePicker.updateDate(year, month, dayOfMonth);
         binding.datePicker.setOnDateChangedListener(onDateChangedListener);
+
+        viewModel.setDate(year, month, dayOfMonth, currentDate);
 
         onDateChanged(year, month, dayOfMonth, currentDate);
 
@@ -103,7 +124,11 @@ public class CalendarFragment extends Fragment {
         bundle.putInt("M", monthOfYear);
         bundle.putInt("D", dayOfMonth-1);
         bundle.putBoolean("CURRENT DATE", currentDate);
-        requireActivity().getSupportFragmentManager().setFragmentResult("A", bundle);
+        try {
+            requireActivity().getSupportFragmentManager().setFragmentResult("A", bundle);
+        } catch (IllegalStateException e) {
+            Debug.log("CalendarFragment requireActivity exception.");
+        }
 
     }
 
@@ -113,12 +138,15 @@ public class CalendarFragment extends Fragment {
 
             setUseSystemDate(false);
 
-            CalendarFragment.this.onDateChanged(year, monthOfYear, dayOfMonth, false);
+            setDateWithoutNotification(year, monthOfYear, dayOfMonth, false);
 
         }
     }
 
     private class RetrieveSystemDate implements Runnable {
+
+        private boolean end = false;
+
         @Override
         public void run() {
 
@@ -138,12 +166,19 @@ public class CalendarFragment extends Fragment {
                 return;
             }
 
-            boolean success = handler.post(this);
-            if (!success) {
-                Debug.error("CalendarFragment no post");
+            if (!end) {
+                boolean success = handler.postDelayed(this, 10);
+                if (!success) {
+                    Debug.error("CalendarFragment handler failed post.");
+                }
             }
 
         }
+
+        public void end() {
+            end = true;
+        }
+
     }
 
 }

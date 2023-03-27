@@ -21,25 +21,25 @@ import com.icarus1.util.Format;
 import java.util.TimeZone;
 
 public class ClockFragment extends Fragment {
+    //TODO
 
-    private ClockViewModel mViewModel;
+    private ClockViewModel viewModel;
     private FragmentClockBinding binding;
     private Handler handler;
-    private boolean useSystemTime;
-    private TimePicker.OnTimeChangedListener onTimeChangedListener;
-    private TimeZonePicker.OnTimeZoneChanged onTimeZoneChanged;
     private RetrieveSystemTime retrieveSystemTime;
+    private final TimePicker.OnTimeChangedListener onTimeChangedListener;
+    private final TimeZonePicker.OnTimeZoneChanged onTimeZoneChanged;
 
     public ClockFragment() {
         onTimeChangedListener = new OnTimeChanged();
         onTimeZoneChanged = new OnTimeZoneChange();
-        retrieveSystemTime = new RetrieveSystemTime();
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
 
+        viewModel = new ViewModelProvider(this).get(ClockViewModel.class);
         binding = FragmentClockBinding.inflate(inflater, container, false);
 
         return binding.getRoot();
@@ -49,13 +49,26 @@ public class ClockFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
 
         binding.timePicker.setIs24HourView(true);
-        binding.timePicker.setOnTimeChangedListener(onTimeChangedListener);
-        binding.timeZonePicker.setOnUTCOffsetChanged(onTimeZoneChanged);
 
         binding.useSystemTime.setOnClickListener(v -> setUseSystemTime(true));
 
-        setUseSystemTime(true);
+    }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        binding.timePicker.setOnTimeChangedListener(onTimeChangedListener);
+        binding.timeZonePicker.setOnUTCOffsetChanged(onTimeZoneChanged);
+
+        setTimeAndTimeZoneWithoutNotification(
+            viewModel.getHour(), viewModel.getMinute(), viewModel.getSecond(),
+            viewModel.getUTCOffset(),
+            viewModel.getLocation()
+        );
+        setUseSystemTime(viewModel.isUseSystemTime());
+
+        retrieveSystemTime = new RetrieveSystemTime();
         handler = new Handler(requireActivity().getMainLooper());
         boolean success = handler.post(retrieveSystemTime);
         if (!success) {
@@ -66,23 +79,24 @@ public class ClockFragment extends Fragment {
     }
 
     @Override
+    public void onPause() { //TODO onPause ? but when new Retrieve* ?
+
+        binding.timePicker.setOnTimeChangedListener(null);
+        binding.timeZonePicker.setOnUTCOffsetChanged(null);
+
+        retrieveSystemTime.end();
+
+        super.onPause();
+    }
+
+    @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mViewModel = new ViewModelProvider(this).get(ClockViewModel.class);
+        viewModel = new ViewModelProvider(this).get(ClockViewModel.class);
         // TODO: Use the ViewModel
     }
 
-    public void setTimeAndTimeZone(int hour, int minute, int second, int UTCOffset, @Nullable String location) {
-
-        binding.timePicker.setHour(hour);
-        binding.timePicker.setMinute(minute);
-        binding.timeZonePicker.setUTCOffset(UTCOffset);
-
-        onTimeAndTimeZoneChanged(hour, minute, second, UTCOffset, location);
-
-    }
-
-    public void setTimeAndTimeZoneWithoutNotification(int hour, int minute, int second, int UTCOffset, @Nullable String location) {
+    private void setTimeAndTimeZoneWithoutNotification(int hour, int minute, int second, int UTCOffset, @Nullable String location) {
 
         binding.timePicker.setOnTimeChangedListener(null);
         binding.timeZonePicker.setOnUTCOffsetChanged(null);
@@ -93,6 +107,8 @@ public class ClockFragment extends Fragment {
 
         binding.timePicker.setOnTimeChangedListener(onTimeChangedListener);
         binding.timeZonePicker.setOnUTCOffsetChanged(onTimeZoneChanged);
+
+        viewModel.setTime(hour, minute, second, UTCOffset, location);
 
         onTimeAndTimeZoneChanged(hour, minute, second, UTCOffset, location);
 
@@ -117,7 +133,7 @@ public class ClockFragment extends Fragment {
 
         }
 
-        this.useSystemTime = useSystemTime;
+        viewModel.setUseSystemTime(useSystemTime);
 
     }
 
@@ -129,7 +145,11 @@ public class ClockFragment extends Fragment {
         bundle.putInt("SECOND", second);
         bundle.putInt("OFFSET", UTCOffset);
         bundle.putString("LOCATION", location);
-        requireActivity().getSupportFragmentManager().setFragmentResult("C", bundle);
+        try {
+            requireActivity().getSupportFragmentManager().setFragmentResult("C", bundle);
+        } catch (IllegalStateException e) {
+            Debug.log("ClockFragment requireActivity exception.");
+        }
 
     }
 
@@ -139,7 +159,7 @@ public class ClockFragment extends Fragment {
 
             setUseSystemTime(false);
 
-            ClockFragment.this.onTimeAndTimeZoneChanged(
+            setTimeAndTimeZoneWithoutNotification(
                 hourOfDay, minute, 0,
                 binding.timeZonePicker.getUTCOffset(),
                 binding.timeZonePicker.getLocation()
@@ -154,7 +174,7 @@ public class ClockFragment extends Fragment {
 
             setUseSystemTime(false);
 
-            ClockFragment.this.onTimeAndTimeZoneChanged(
+            setTimeAndTimeZoneWithoutNotification(
                 binding.timePicker.getHour(), binding.timePicker.getMinute(), 0,
                 UTCOffset,
                 location
@@ -164,10 +184,13 @@ public class ClockFragment extends Fragment {
     }
 
     private class RetrieveSystemTime implements Runnable {
+
+        private boolean end = false;
+
         @Override
         public void run() {
 
-            if (useSystemTime) {
+            if (viewModel.isUseSystemTime()) {
 
                 Time systemTime = Time.fromSystem();
                 TimeZone timeZone = TimeZone.getDefault();
@@ -179,16 +202,23 @@ public class ClockFragment extends Fragment {
             }
 
             if (handler == null) {
-                Debug.error("Clock fragment handler null.");
+                Debug.error("ClockFragment handler null.");
                 return;
             }
 
-            boolean success = handler.postDelayed(this, 10);
-            if (!success) {
-                Debug.error("Clock fragment handler failed post.");
+            if (!end) {
+                boolean success = handler.postDelayed(this, 10);
+                if (!success) {
+                    Debug.error("ClockFragment handler failed post.");
+                }
             }
 
         }
+
+        public void end() {
+            end = true;
+        }
+
     }
 
 }

@@ -11,6 +11,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
@@ -31,6 +32,7 @@ public class MapFragment extends Fragment {
 
     private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 1;
 
+    private MapViewModel viewModel;
     private FragmentMapBinding binding;
     private GeoPoint userLocation;
 
@@ -41,6 +43,7 @@ public class MapFragment extends Fragment {
         @Nullable Bundle savedInstanceState
     ) {
 
+        viewModel = new ViewModelProvider(this).get(MapViewModel.class);
         binding = FragmentMapBinding.inflate(inflater);
 
         return binding.getRoot();
@@ -80,6 +83,9 @@ public class MapFragment extends Fragment {
         //SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         //Configuration.getInstance().save(this, prefs);
         binding.mapView.onPause();
+
+        userLocation = null;
+
     }
 
     @Override
@@ -126,11 +132,7 @@ public class MapFragment extends Fragment {
             }
         });
 
-        if (userLocation != null) {
-            setLocation(userLocation.getLongitude(), userLocation.getLatitude(), getResources().getString(R.string.using_system_location));
-        } else {
-            setLocation(0d, 0d, null);
-        }
+        setLocation(viewModel.getLongitude(), viewModel.getLatitude(), viewModel.getLocation());
 
         binding.useLocation.setOnClickListener(new OnClickSetToLocation());
 
@@ -165,6 +167,8 @@ public class MapFragment extends Fragment {
         binding.mapView.getSetLocationMarker().setPosition(new GeoPoint(latitude, longitude));
         binding.mapView.invalidate();
         binding.latLong.setText(Format.LatitudeLongitude(latitude, longitude));
+
+        viewModel.setLatitudeLongitude(latitude, longitude, location);
 
         onLocationChanged(longitude, latitude, location);
 
