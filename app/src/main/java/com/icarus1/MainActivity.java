@@ -20,7 +20,6 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
 
 import com.icarus1.compass.CelestialBody;
 import com.icarus1.compass.CompassFragment;
@@ -205,17 +204,13 @@ public class MainActivity extends AppCompatActivity {
 
     private void setLocation(double longitude, double latitude, @Nullable String location) {
 
-        TextView locationText = (TextView) findViewById(R.id.location_text);
         CompassFragment compassFragment = (CompassFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_compass);
-        if (locationText == null) {
-            return;
-        }
         if (compassFragment == null) {
             Debug.error(MainActivityError.FragmentNotFound.getMsg());
             return;
         }
 
-        locationText.setText(Format.LatitudeLongitude(latitude, longitude));
+        binding.locationText.setText(Format.LatitudeLongitude(latitude, longitude));
 
         if (location != null) {
             binding.locationAddress.setText(location);
@@ -335,37 +330,35 @@ public class MainActivity extends AppCompatActivity {
     private void setView(CelestialBody body, boolean checked) {
 
         CompassFragment compassFragment = (CompassFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_compass);
-        if (compassFragment == null) {
+        SelectBodiesFragment selectBodiesFragment = (SelectBodiesFragment) getSupportFragmentManager().findFragmentById(R.id.select_bodies_fragment);
+        if (compassFragment == null || selectBodiesFragment == null) {
             Debug.error(MainActivityError.FragmentNotFound.getMsg());
             return;
         }
 
-        compassFragment.setDrawBody(body, checked);
+        int viewID;
+        CelestialBody[] objects;
+        if (body == CelestialBody.SUN || body == CelestialBody.MOON) {
+            viewID = R.id.toggle_objects_sun_moon;
+            objects = CelestialBody.nonPlanets();
+        } else {
+            viewID = R.id.toggle_objects_planets;
+            objects = CelestialBody.planets();
+        }
 
         if (!checked) {
-            if (body == CelestialBody.SUN || body == CelestialBody.MOON) {
-                binding.toggleObjectsGroup.uncheck(R.id.toggle_objects_sun_moon);
-            } else {
-                binding.toggleObjectsGroup.uncheck(R.id.toggle_objects_planets);
-            }
+            binding.toggleObjectsGroup.uncheck(viewID);
         } else {
-
-            if (body == CelestialBody.SUN || body == CelestialBody.MOON) {
-                boolean allViewable = compassFragment.getDrawBody(CelestialBody.SUN) && compassFragment.getDrawBody(CelestialBody.MOON);
-                if (allViewable) {
-                    binding.toggleObjectsGroup.check(R.id.toggle_objects_sun_moon);
-                }
-            } else {
-                boolean allViewable = true;
-                for (CelestialBody body2 : CelestialBody.values()) {
-                    allViewable &= compassFragment.getDrawBody(body2);
-                }
-                if (allViewable) {
-                    binding.toggleObjectsGroup.check(R.id.toggle_objects_planets);
-                }
+            boolean allViewable = true;
+            for (CelestialBody body2 : objects) {
+                allViewable &= selectBodiesFragment.getCheck(body2); // compassFragment.getDrawBody(body2);
             }
-
+            if (allViewable) {
+                binding.toggleObjectsGroup.check(viewID);
+            }
         }
+
+        compassFragment.setDrawBody(body, checked);
 
     }
 
@@ -405,10 +398,7 @@ public class MainActivity extends AppCompatActivity {
 
                 boolean checked = binding.toggleObjectsGroup.getCheckedButtonIds().contains(R.id.toggle_objects_planets);
 
-                for (CelestialBody body : CelestialBody.values()) {
-                    if (body == CelestialBody.SUN || body == CelestialBody.MOON) {
-                        continue;
-                    }
+                for (CelestialBody body : CelestialBody.planets()) {
                     selectBodiesFragment.setView(body, checked);
                 }
 
@@ -447,7 +437,7 @@ enum MainActivityError {
 
     FragmentNotFound("Fragment not found.");
 
-    private String msg;
+    private final String msg;
 
     MainActivityError(String msg) {
         this.msg = msg;

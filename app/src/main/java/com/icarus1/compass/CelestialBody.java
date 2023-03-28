@@ -18,6 +18,24 @@ public enum CelestialBody {
     NEPTUNE(new NeptuneFactory()),
     PLUTO(new PlutoFactory());
 
+    private static final CelestialBody[] planets = new CelestialBody[]{
+        MERCURY,
+        VENUS,
+        MARS,
+        JUPITER,
+        SATURN,
+        URANUS,
+        NEPTUNE,
+        PLUTO
+    };
+
+    public static CelestialBody[] planets() {
+        return planets.clone();
+    }
+    public static CelestialBody[] nonPlanets() {
+        return new CelestialBody[]{SUN, MOON};
+    }
+
     private int index;
     private Body body;
     private Paint paint;
