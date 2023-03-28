@@ -23,7 +23,6 @@
             app:theme="?attr/actionBarPopupTheme" />
 
         <androidx.fragment.app.FragmentContainerView
-            tools:layout="@layout/fragment_settings"
             android:id="@+id/settings_fragment_container"
             android:name="androidx.navigation.fragment.NavHostFragment"
             android:layout_width="match_parent"
