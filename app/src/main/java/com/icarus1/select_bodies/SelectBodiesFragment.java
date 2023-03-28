@@ -1,5 +1,6 @@
-package com.icarus1;
+package com.icarus1.select_bodies;
 
+import androidx.databinding.adapters.ChronometerBindingAdapter;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.os.Bundle;
@@ -13,11 +14,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.RadioGroup;
-import android.widget.SimpleAdapter;
 import android.widget.TableRow;
 
-import com.google.android.material.progressindicator.CircularProgressIndicator;
+import com.icarus1.R;
 import com.icarus1.compass.CelestialBody;
 import com.icarus1.databinding.FragmentSelectBodiesBinding;
 import com.icarus1.databinding.ViewSelectableBodyBinding;
@@ -94,6 +93,10 @@ public class SelectBodiesFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         viewModel = new ViewModelProvider(this).get(SelectBodiesViewModel.class);
+    }
+
+    public boolean getCheck(CelestialBody body) {
+        return viewModel.getCheck(body);
     }
 
     public void setView(CelestialBody body, boolean view) {

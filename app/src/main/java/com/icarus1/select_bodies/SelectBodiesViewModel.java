@@ -1,4 +1,4 @@
-package com.icarus1;
+package com.icarus1.select_bodies;
 
 import androidx.lifecycle.ViewModel;
 

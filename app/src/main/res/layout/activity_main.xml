@@ -252,7 +252,7 @@
 
             <androidx.fragment.app.FragmentContainerView
                 android:id="@+id/select_bodies_fragment"
-                android:name="com.icarus1.SelectBodiesFragment"
+                android:name="com.icarus1.select_bodies.SelectBodiesFragment"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 tools:layout="@layout/fragment_select_bodies"/>

@@ -9,17 +9,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.FragmentResultListener;
-import androidx.preference.PreferenceManager;
 
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
@@ -28,6 +27,7 @@ import com.icarus1.compass.CelestialBody;
 import com.icarus1.compass.CompassFragment;
 import com.icarus1.databinding.ActivityMainBinding;
 import com.icarus1.map.MapFragment;
+import com.icarus1.select_bodies.SelectBodiesFragment;
 import com.icarus1.util.Debug;
 import com.icarus1.util.Format;
 
@@ -37,6 +37,7 @@ import java.util.Map;
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
+    private boolean restoredState;
     private final OnObjectSelection onObjectSelection = new OnObjectSelection();
     private final OnChangeLocationListener onChangeLocationListener = new OnChangeLocationListener();
     private final OnChangeDateListener onChangeDateListener = new OnChangeDateListener();
@@ -46,6 +47,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        restoredState = savedInstanceState != null;
 
         initContentViewAndBinding();
         initToolbar();
@@ -115,17 +118,17 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-/*
-        selectBodiesFragment.setView(CelestialBody.SUN, compassFragment.isDrawSunMoon());
-        selectBodiesFragment.setView(CelestialBody.MOON, compassFragment.isDrawSunMoon());
+        if (!restoredState) {
+            selectBodiesFragment.setView(CelestialBody.SUN, true);
+            selectBodiesFragment.setView(CelestialBody.MOON, true);
 
-        for (CelestialBody body : CelestialBody.values()) {
-            if (body == CelestialBody.SUN || body == CelestialBody.MOON) {
-                continue;
+            for (CelestialBody body : CelestialBody.values()) {
+                if (body == CelestialBody.SUN || body == CelestialBody.MOON) {
+                    continue;
+                }
+                selectBodiesFragment.setView(body, false);
             }
-            selectBodiesFragment.setView(body, compassFragment.isDrawPlanets());
         }
-*/
 
     }
 
