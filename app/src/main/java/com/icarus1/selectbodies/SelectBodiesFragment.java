@@ -1,6 +1,5 @@
-package com.icarus1.select_bodies;
+package com.icarus1.selectbodies;
 
-import androidx.databinding.adapters.ChronometerBindingAdapter;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.os.Bundle;

@@ -18,7 +18,6 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
@@ -27,7 +26,7 @@ import com.icarus1.compass.CelestialBody;
 import com.icarus1.compass.CompassFragment;
 import com.icarus1.databinding.ActivityMainBinding;
 import com.icarus1.map.MapFragment;
-import com.icarus1.select_bodies.SelectBodiesFragment;
+import com.icarus1.selectbodies.SelectBodiesFragment;
 import com.icarus1.util.Debug;
 import com.icarus1.util.Format;
 
