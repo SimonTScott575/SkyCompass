@@ -6,12 +6,14 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.FragmentResultListener;
 
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -151,10 +153,40 @@ public class MainActivity extends AppCompatActivity {
 
     private void initToolbar() {
 
-        binding.toolbar.setTitle(R.string.app_name);
         binding.toolbar.setOnMenuItemClickListener(new OnMenuClick());
         binding.toolbar.inflateMenu(R.menu.main);
 
+        int currentNightMode = AppCompatDelegate.getDefaultNightMode();
+        MenuItem item = binding.toolbar.getMenu().findItem(R.id.menu_dark_mode);
+        int nightModeFlags = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+
+        switch (currentNightMode) {
+            case AppCompatDelegate.MODE_NIGHT_YES :
+                item.setIcon(R.drawable.light_mode);
+                item.setTitle(R.string.light_mode);
+                break;
+            case AppCompatDelegate.MODE_NIGHT_NO :
+                item.setIcon(R.drawable.dark_mode);
+                item.setTitle(R.string.dark_mode);
+                break;
+            case AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM :
+                if (nightModeFlags == Configuration.UI_MODE_NIGHT_YES) {
+                    item.setIcon(R.drawable.light_mode);
+                    item.setTitle(R.string.light_mode);
+                } else if (nightModeFlags == Configuration.UI_MODE_NIGHT_NO) {
+                    item.setIcon(R.drawable.dark_mode);
+                    item.setTitle(R.string.dark_mode);
+                } else if (nightModeFlags == Configuration.UI_MODE_NIGHT_UNDEFINED) {
+                    item.setIcon(R.drawable.dark_mode);
+                    item.setTitle(R.string.dark_mode);
+                } else {
+                    Debug.log("Unrecognised nightModeFlags.");
+                }
+                break;
+            default :
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+                break;
+        }
 
     }
 
@@ -393,6 +425,28 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
                 startActivity(intent);
                 return true;
+            }
+
+            if (item.getItemId() == R.id.menu_about) {
+                //TODO switch to about fragment in MainActivity - requires rewrite of MainActivity
+                return true;
+            }
+
+            if (item.getItemId() == R.id.menu_dark_mode) {
+
+                int currentAppNightMode = AppCompatDelegate.getDefaultNightMode();
+
+                switch (currentAppNightMode) {
+                    case AppCompatDelegate.MODE_NIGHT_YES :
+                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                        break;
+                    default :
+                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                        break;
+                }
+
+                return true;
+
             }
 
             return false;

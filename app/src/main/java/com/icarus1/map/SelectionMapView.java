@@ -27,6 +27,11 @@ public class SelectionMapView extends MapView {
         init();
     }
 
+    public SelectionMapView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs);
+        init();
+    }
+
     private void init() {
 
         setTileSource(TileSourceFactory.MAPNIK);
