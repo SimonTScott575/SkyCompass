@@ -108,7 +108,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        //TODO POSSIBLE that fragments haven't have view created yet - possible elsewhere too ?
         CompassFragment compassFragment = (CompassFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_compass);
         SelectBodiesFragment selectBodiesFragment = (SelectBodiesFragment) getSupportFragmentManager().findFragmentById(R.id.select_bodies_fragment);
         if (compassFragment == null || selectBodiesFragment == null) {
@@ -117,14 +116,11 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (!restoredState) {
-            selectBodiesFragment.setView(CelestialBody.SUN, true);
-            selectBodiesFragment.setView(CelestialBody.MOON, true);
+            selectBodiesFragment.setViewable(CelestialBody.SUN, true);
+            selectBodiesFragment.setViewable(CelestialBody.MOON, true);
 
-            for (CelestialBody body : CelestialBody.values()) {
-                if (body == CelestialBody.SUN || body == CelestialBody.MOON) {
-                    continue;
-                }
-                selectBodiesFragment.setView(body, false);
+            for (CelestialBody body : CelestialBody.planets()) {
+                selectBodiesFragment.setViewable(body, false);
             }
         }
 
@@ -327,7 +323,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void setView(CelestialBody body, boolean checked) {
+    private void setViewable(CelestialBody body, boolean viewable) {
 
         CompassFragment compassFragment = (CompassFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_compass);
         SelectBodiesFragment selectBodiesFragment = (SelectBodiesFragment) getSupportFragmentManager().findFragmentById(R.id.select_bodies_fragment);
@@ -346,19 +342,19 @@ public class MainActivity extends AppCompatActivity {
             objects = CelestialBody.planets();
         }
 
-        if (!checked) {
+        if (!viewable) {
             binding.toggleObjectsGroup.uncheck(viewID);
         } else {
             boolean allViewable = true;
             for (CelestialBody body2 : objects) {
-                allViewable &= selectBodiesFragment.getCheck(body2); // compassFragment.getDrawBody(body2);
+                allViewable &= selectBodiesFragment.getViewable(body2);
             }
             if (allViewable) {
                 binding.toggleObjectsGroup.check(viewID);
             }
         }
 
-        compassFragment.setDrawBody(body, checked);
+        compassFragment.setDrawBody(body, viewable);
 
     }
 
@@ -369,7 +365,7 @@ public class MainActivity extends AppCompatActivity {
             int index = result.getInt("INDEX");
             boolean checked = result.getBoolean("CHECKED");
 
-            setView(CelestialBody.values()[index], checked);
+            setViewable(CelestialBody.values()[index], checked);
 
         }
     }
@@ -391,15 +387,15 @@ public class MainActivity extends AppCompatActivity {
 
                 boolean checked = binding.toggleObjectsGroup.getCheckedButtonIds().contains(R.id.toggle_objects_sun_moon);
 
-                selectBodiesFragment.setView(CelestialBody.SUN, checked);
-                selectBodiesFragment.setView(CelestialBody.MOON, checked);
+                selectBodiesFragment.setViewable(CelestialBody.SUN, checked);
+                selectBodiesFragment.setViewable(CelestialBody.MOON, checked);
 
             } else if (viewID == R.id.toggle_objects_planets) {
 
                 boolean checked = binding.toggleObjectsGroup.getCheckedButtonIds().contains(R.id.toggle_objects_planets);
 
                 for (CelestialBody body : CelestialBody.planets()) {
-                    selectBodiesFragment.setView(body, checked);
+                    selectBodiesFragment.setViewable(body, checked);
                 }
 
             }

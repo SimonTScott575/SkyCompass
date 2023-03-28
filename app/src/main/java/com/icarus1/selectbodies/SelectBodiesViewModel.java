@@ -12,11 +12,11 @@ public class SelectBodiesViewModel extends ViewModel {
         viewChecks = new boolean[CelestialBody.values().length];
     }
 
-    public boolean getCheck(CelestialBody body) {
+    public boolean getViewable(CelestialBody body) {
         return viewChecks[body.getIndex()];
     }
 
-    public void setView(CelestialBody body, boolean check) {
+    public void setViewable(CelestialBody body, boolean check) {
         viewChecks[body.getIndex()] = check;
     }
 

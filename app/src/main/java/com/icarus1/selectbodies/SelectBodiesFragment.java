@@ -31,6 +31,7 @@ public class SelectBodiesFragment extends Fragment {
         @Nullable ViewGroup container,
         @Nullable Bundle savedInstanceState
     ) {
+        super.onCreateView(inflater, container, savedInstanceState);
 
         binding = FragmentSelectBodiesBinding.inflate(inflater, container, false);
 
@@ -39,80 +40,37 @@ public class SelectBodiesFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        viewModel = new ViewModelProvider(this).get(SelectBodiesViewModel.class);
 
         for (CelestialBody body : CelestialBody.values()) {
 
             ViewSelectableBodyBinding selectableBodyBinding = ViewSelectableBodyBinding.inflate(getLayoutInflater(), binding.bodiesTable, true);
             selectableBodyBinding.name.setText(body.getName());
+            selectableBodyBinding.checkBox.setOnCheckedChangeListener(new OnCheckListener(body.getIndex()));
+
+            setViewable(body, viewModel.getViewable(body));
 
         }
 
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-
-        for (CelestialBody body : CelestialBody.values()) {
-
-            setView(body, viewModel.getCheck(body));
-
-        }
-
+    public boolean getViewable(CelestialBody body) {
+        return viewModel.getViewable(body);
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        for (CelestialBody body : CelestialBody.values()) {
-
-            CheckBox checkBox = binding.bodiesTable.getChildAt(body.getIndex()+1).findViewById(R.id.checkBox);
-            checkBox.setOnCheckedChangeListener(new OnCheckListener(body.getIndex()));
-
-        }
-
-
-    }
-
-    @Override
-    public void onPause() {
-
-        for (CelestialBody body : CelestialBody.values()) {
-
-            CheckBox checkBox = binding.bodiesTable.getChildAt(body.getIndex()+1).findViewById(R.id.checkBox);
-            checkBox.setOnCheckedChangeListener(null);
-
-        }
-
-        super.onPause();
-    }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        viewModel = new ViewModelProvider(this).get(SelectBodiesViewModel.class);
-    }
-
-    public boolean getCheck(CelestialBody body) {
-        return viewModel.getCheck(body);
-    }
-
-    public void setView(CelestialBody body, boolean view) {
+    public void setViewable(CelestialBody body, boolean viewable) {
 
         TableRow row = (TableRow) binding.bodiesTable.getChildAt(body.getIndex()+1);
-        CheckBox checkBox = row.findViewById(R.id.checkBox);
-        checkBox.setChecked(view);
-
-        viewModel.setView(body, view);
-
-        onCheckView(body, view, body.getIndex());
+        CheckBox checkBox = (CheckBox) row.findViewById(R.id.checkBox);
+        checkBox.setChecked(viewable);
 
     }
 
     private class OnCheckListener implements CompoundButton.OnCheckedChangeListener {
 
-        private int index;
+        private final int index;
 
         public OnCheckListener(int index) {
             this.index = index;
@@ -121,7 +79,10 @@ public class SelectBodiesFragment extends Fragment {
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
-            setView(CelestialBody.values()[index], isChecked);
+            CelestialBody body = CelestialBody.values()[index];
+
+            viewModel.setViewable(body, isChecked);
+            onCheckView(body, isChecked, index);
 
         }
 
