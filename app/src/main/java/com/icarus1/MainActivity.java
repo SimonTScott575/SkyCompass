@@ -111,6 +111,7 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
+/*
         selectBodiesFragment.setView(CelestialBody.SUN, compassFragment.isDrawSunMoon());
         selectBodiesFragment.setView(CelestialBody.MOON, compassFragment.isDrawSunMoon());
 
@@ -120,6 +121,7 @@ public class MainActivity extends AppCompatActivity {
             }
             selectBodiesFragment.setView(body, compassFragment.isDrawPlanets());
         }
+*/
 
     }
 
@@ -164,7 +166,6 @@ public class MainActivity extends AppCompatActivity {
         binding.changeDate.setOnClickListener(view -> binding.calendarCardView.show());
         binding.changeTime.setOnClickListener(view -> binding.clockCardView.show());
 
-        binding.toggleObjectsGroup.check(R.id.toggle_objects_sun_moon);
         binding.toggleObjectsSunMoon.setOnClickListener(onObjectSelection);
         binding.toggleObjectsPlanets.setOnClickListener(onObjectSelection);
 
