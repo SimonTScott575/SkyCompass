@@ -44,7 +44,13 @@ public class SettingsActivity extends AppCompatActivity {
 
         // Navigate to second fragment that is effectively the starting fragment since back from
         // here closes the activity.
-        nav.navigate(R.id.navigation_settings_action_start);
+        NavDestination currentDestination = nav.getCurrentDestination();
+
+        if (currentDestination == null) {
+            Debug.error(SettingsActivityError.NavigationDestinationNotFound.getMsg());
+        } else if (currentDestination.getId() == R.id.navigation_settings_fragment_start) {
+            nav.navigate(R.id.navigation_settings_action_start);
+        }
 
     }
 

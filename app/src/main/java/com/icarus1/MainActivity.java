@@ -9,10 +9,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.FragmentResultListener;
+import androidx.preference.PreferenceManager;
 
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.location.Location;
 import android.location.LocationListener;
@@ -156,36 +158,20 @@ public class MainActivity extends AppCompatActivity {
         binding.toolbar.setOnMenuItemClickListener(new OnMenuClick());
         binding.toolbar.inflateMenu(R.menu.main);
 
-        int currentNightMode = AppCompatDelegate.getDefaultNightMode();
         MenuItem item = binding.toolbar.getMenu().findItem(R.id.menu_dark_mode);
         int nightModeFlags = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
 
-        switch (currentNightMode) {
-            case AppCompatDelegate.MODE_NIGHT_YES :
-                item.setIcon(R.drawable.light_mode);
-                item.setTitle(R.string.light_mode);
-                break;
-            case AppCompatDelegate.MODE_NIGHT_NO :
-                item.setIcon(R.drawable.dark_mode);
-                item.setTitle(R.string.dark_mode);
-                break;
-            case AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM :
-                if (nightModeFlags == Configuration.UI_MODE_NIGHT_YES) {
-                    item.setIcon(R.drawable.light_mode);
-                    item.setTitle(R.string.light_mode);
-                } else if (nightModeFlags == Configuration.UI_MODE_NIGHT_NO) {
-                    item.setIcon(R.drawable.dark_mode);
-                    item.setTitle(R.string.dark_mode);
-                } else if (nightModeFlags == Configuration.UI_MODE_NIGHT_UNDEFINED) {
-                    item.setIcon(R.drawable.dark_mode);
-                    item.setTitle(R.string.dark_mode);
-                } else {
-                    Debug.log("Unrecognised nightModeFlags.");
-                }
-                break;
-            default :
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
-                break;
+        if (nightModeFlags == Configuration.UI_MODE_NIGHT_YES) {
+            item.setIcon(R.drawable.light_mode);
+            item.setTitle(R.string.light_mode);
+        } else if (nightModeFlags == Configuration.UI_MODE_NIGHT_NO) {
+            item.setIcon(R.drawable.dark_mode);
+            item.setTitle(R.string.dark_mode);
+        } else if (nightModeFlags == Configuration.UI_MODE_NIGHT_UNDEFINED) {
+            item.setIcon(R.drawable.dark_mode);
+            item.setTitle(R.string.dark_mode);
+        } else {
+            Debug.log("Unrecognised nightModeFlags.");
         }
 
     }
@@ -203,25 +189,15 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private Location getLastKnownLocation() throws SecurityException {
+    private void toggleNightMode() {
 
-        LocationManager mLocationManager = (LocationManager)getApplicationContext().getSystemService(LOCATION_SERVICE);
+        int nightModeFlags = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
 
-        List<String> providers = mLocationManager.getProviders(true);
-        Location bestLocation = null;
-        for (String provider : providers) {
-
-            Location l = mLocationManager.getLastKnownLocation(provider);
-            if (l == null) {
-                continue;
-            }
-            if (bestLocation == null || l.getAccuracy() < bestLocation.getAccuracy()) {
-                bestLocation = l;
-            }
-
+        if (nightModeFlags == Configuration.UI_MODE_NIGHT_YES) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
         }
-
-        return bestLocation;
 
     }
 
@@ -260,6 +236,28 @@ public class MainActivity extends AppCompatActivity {
             setLocation(longitude, latitude, location);
 
         }
+    }
+
+    private Location getLastKnownLocation() throws SecurityException {
+
+        LocationManager mLocationManager = (LocationManager)getApplicationContext().getSystemService(LOCATION_SERVICE);
+
+        List<String> providers = mLocationManager.getProviders(true);
+        Location bestLocation = null;
+        for (String provider : providers) {
+
+            Location l = mLocationManager.getLastKnownLocation(provider);
+            if (l == null) {
+                continue;
+            }
+            if (bestLocation == null || l.getAccuracy() < bestLocation.getAccuracy()) {
+                bestLocation = l;
+            }
+
+        }
+
+        return bestLocation;
+
     }
 
     private void setDate(int year, int month, int day, boolean currentDate) {
@@ -433,20 +431,8 @@ public class MainActivity extends AppCompatActivity {
             }
 
             if (item.getItemId() == R.id.menu_dark_mode) {
-
-                int currentAppNightMode = AppCompatDelegate.getDefaultNightMode();
-
-                switch (currentAppNightMode) {
-                    case AppCompatDelegate.MODE_NIGHT_YES :
-                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-                        break;
-                    default :
-                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-                        break;
-                }
-
+                toggleNightMode();
                 return true;
-
             }
 
             return false;
