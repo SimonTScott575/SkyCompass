@@ -25,8 +25,8 @@ public class CalendarFragment extends Fragment {
     private FragmentCalendarBinding binding;
     private Handler handler;
     private boolean useSystemDate;
-    private final OnDateChangedListener onDateChangedListener;
     private RetrieveSystemDate retrieveSystemDate;
+    private final OnDateChangedListener onDateChangedListener;
 
     public CalendarFragment() {
         onDateChangedListener = new OnDateChangedListener();
@@ -64,13 +64,7 @@ public class CalendarFragment extends Fragment {
         );
         setUseSystemDate(viewModel.isSystemDate());
 
-        retrieveSystemDate = new RetrieveSystemDate();
-        handler = new Handler(requireActivity().getMainLooper());
-        boolean success = handler.post(retrieveSystemDate);
-        if (!success) {
-            Debug.error("CalendarFragment no post");
-            setUseSystemDate(false);
-        }
+        startRetrieveSystemDate();
 
     }
 
@@ -80,7 +74,7 @@ public class CalendarFragment extends Fragment {
 
         binding.datePicker.setOnDateChangedListener(null);
 
-        retrieveSystemDate.end();
+        endRetrieveSystemDate();
 
     }
 
@@ -115,6 +109,22 @@ public class CalendarFragment extends Fragment {
 
         this.useSystemDate = useSystemDate;
 
+    }
+
+    private void startRetrieveSystemDate() {
+
+        retrieveSystemDate = new RetrieveSystemDate();
+        handler = new Handler(requireActivity().getMainLooper());
+        boolean success = handler.post(retrieveSystemDate);
+        if (!success) {
+            Debug.error("CalendarFragment no post");
+            setUseSystemDate(false);
+        }
+
+    }
+
+    private void endRetrieveSystemDate() {
+        retrieveSystemDate.end();
     }
 
     public void onDateChanged(int year, int monthOfYear, int dayOfMonth, boolean currentDate) {

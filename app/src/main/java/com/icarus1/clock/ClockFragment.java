@@ -22,7 +22,6 @@ import com.icarus1.util.Time;
 import java.util.TimeZone;
 
 public class ClockFragment extends Fragment {
-    //TODO
 
     private ClockViewModel viewModel;
     private FragmentClockBinding binding;
@@ -50,7 +49,6 @@ public class ClockFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
 
         binding.timePicker.setIs24HourView(true);
-
         binding.useSystemTime.setOnClickListener(v -> setUseSystemTime(true));
 
     }
