@@ -14,25 +14,32 @@ import org.osmdroid.views.overlay.Marker;
 
 public class SelectionMapView extends MapView {
 
+    private boolean setUp;
+    private boolean drawnOnce;
     private Marker setLocationMarker;
-    private boolean drawnOnce = false;
 
     public SelectionMapView(Context context) {
         super(context);
-        init();
     }
 
     public SelectionMapView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        init();
     }
 
     public SelectionMapView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs);
-        init();
     }
 
-    private void init() {
+    @Override
+    protected void onLayout(boolean changed, int l, int t, int r, int b) {
+        super.onLayout(changed, l, t, r, b);
+        if (setUp && !drawnOnce) {
+            getController().setZoom(getScreenRect(new Rect()).right / 256d / 2d);
+            drawnOnce = true;
+        }
+    }
+
+    public void setUp() {
 
         setTileSource(TileSourceFactory.MAPNIK);
         getZoomController().setVisibility(CustomZoomButtonsController.Visibility.NEVER);
@@ -44,15 +51,8 @@ public class SelectionMapView extends MapView {
         getSetLocationMarker().setDragOffset(7);
         getOverlays().add(getSetLocationMarker());
 
-    }
+        setUp = true;
 
-    @Override
-    protected void onLayout(boolean changed, int l, int t, int r, int b) {
-        super.onLayout(changed, l, t, r, b);
-        if (!drawnOnce) {
-            getController().setZoom(getScreenRect(new Rect()).right / 256d / 2d);
-            drawnOnce = true;
-        }
     }
 
     public Marker getSetLocationMarker() {
