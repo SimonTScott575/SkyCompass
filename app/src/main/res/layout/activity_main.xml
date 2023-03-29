@@ -2,9 +2,14 @@
 <layout xmlns:tools="http://schemas.android.com/tools"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:custom="http://schemas.android.com/apk/res-auto">
+    xmlns:custom="http://schemas.android.com/apk/res-auto"
+    xmlns:bind="http://schemas.android.com/apk/res-auto">
     
-    <data/>
+    <data>
+
+        <import type="com.icarus1.views.Panel" />
+
+    </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -28,9 +33,10 @@
             android:name="com.icarus1.compass.CompassFragment"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
             app:layout_constraintBottom_toTopOf="@+id/toggle_objects_group"
             app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintEnd_toEndOf="parent"
@@ -42,32 +48,34 @@
             android:id="@+id/toggle_objects_group"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
             app:layout_constraintBottom_toTopOf="@id/constraintLayout"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="8dp">
+            app:layout_constraintStart_toStartOf="parent">
 
             <Button
-                style="?attr/materialButtonOutlinedStyle"
                 android:id="@+id/toggle_objects_sun_moon"
+                style="?attr/materialButtonOutlinedStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/sun_moon"/>
+                android:text="@string/sun_moon" />
 
             <Button
-                style="?attr/materialButtonOutlinedStyle"
                 android:id="@+id/toggle_objects_planets"
+                style="?attr/materialButtonOutlinedStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/planets"/>
-            
+                android:text="@string/planets" />
+
         </com.google.android.material.button.MaterialButtonToggleGroup>
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/constraintLayout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
@@ -76,13 +84,8 @@
                 android:id="@+id/change_location"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="16dp"
-                android:layout_marginBottom="8dp"
                 android:background="@drawable/rounded_corners_ripple"
                 android:backgroundTint="?attr/colorOnBackground"
-                app:layout_constraintBottom_toTopOf="@+id/guideline2"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
@@ -92,8 +95,8 @@
                     style="@style/text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
                     android:layout_marginStart="32dp"
+                    android:layout_marginTop="8dp"
                     android:layout_marginBottom="8dp"
                     android:text="@string/location"
                     android:textSize="24sp"
@@ -105,8 +108,8 @@
                     style="@style/text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
                     android:layout_marginStart="32dp"
+                    android:layout_marginBottom="8dp"
                     android:text="@string/location"
                     android:textSize="12sp"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -126,9 +129,7 @@
                 android:id="@+id/change_date"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
                 android:layout_marginTop="8dp"
-                android:layout_marginEnd="16dp"
                 android:layout_marginBottom="8dp"
                 android:background="@drawable/rounded_corners_ripple"
                 android:backgroundTint="?attr/colorOnBackground"
@@ -155,8 +156,8 @@
                     style="@style/text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
                     android:layout_marginStart="32dp"
+                    android:layout_marginBottom="8dp"
                     android:text="@string/date"
                     android:textSize="12sp"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -176,16 +177,11 @@
                 android:id="@+id/change_time"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="16dp"
-                android:layout_marginBottom="8dp"
                 android:background="@drawable/rounded_corners_ripple"
                 android:backgroundTint="?attr/colorOnBackground"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@id/guideline3">
+                app:layout_constraintStart_toStartOf="parent">
 
                 <TextView
                     android:id="@+id/time_text"
@@ -237,25 +233,18 @@
             android:id="@+id/select_bodies_view"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="8dp"
-            android:clickable="false"
-            android:visibility="invisible"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintDimensionRatio="1:1"
-            tools:visibility="gone">
+            style="@style/panel">
 
             <androidx.fragment.app.FragmentContainerView
-                android:id="@+id/select_bodies_fragment"
-                android:name="com.icarus1.selectbodies.SelectBodiesFragment"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                tools:layout="@layout/fragment_select_bodies"/>
+                    android:id="@+id/select_bodies_fragment"
+                    android:name="com.icarus1.selectbodies.SelectBodiesFragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    tools:layout="@layout/fragment_select_bodies" />
 
         </com.icarus1.views.Panel>
 
@@ -263,82 +252,53 @@
             android:id="@+id/map_card_view"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="8dp"
-            android:clickable="false"
-            android:visibility="invisible"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintDimensionRatio="1:1"
-            tools:visibility="gone">
+            style="@style/panel">
 
             <androidx.fragment.app.FragmentContainerView
-                android:id="@+id/map_fragment_container"
-                android:name="com.icarus1.map.MapFragment"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                tools:layout="@layout/fragment_map"/>
+                    android:id="@+id/map_fragment_container"
+                    android:name="com.icarus1.map.MapFragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    tools:layout="@layout/fragment_map" />
 
         </com.icarus1.views.Panel>
 
         <com.icarus1.views.Panel
             android:id="@+id/calendar_card_view"
-            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="8dp"
-            android:visibility="invisible"
-            android:clickable="false"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="8dp"
+            android:layout_width="match_parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            tools:visibility="gone">
+            style="@style/panel">
 
             <androidx.fragment.app.FragmentContainerView
-                android:id="@+id/calendar_fragment_container"
-                android:name="com.icarus1.calendar.CalendarFragment"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                tools:layout="@layout/fragment_calendar"/>
+                    android:id="@+id/calendar_fragment_container"
+                    android:name="com.icarus1.calendar.CalendarFragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    tools:layout="@layout/fragment_calendar" />
 
         </com.icarus1.views.Panel>
 
         <com.icarus1.views.Panel
             android:id="@+id/clock_card_view"
-            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="8dp"
-            android:clickable="false"
-            android:visibility="invisible"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="8dp"
+            android:layout_width="match_parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            tools:visibility="gone">
+            style="@style/panel">
 
             <androidx.fragment.app.FragmentContainerView
                 android:id="@+id/clock_fragment_container"
                 android:name="com.icarus1.clock.ClockFragment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
                 tools:layout="@layout/fragment_clock" />
 
         </com.icarus1.views.Panel>
