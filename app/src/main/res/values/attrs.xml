@@ -2,7 +2,10 @@
 <resources>
 
     <declare-styleable name="Panel">
-        <attr name="internal_layout" format="reference">0</attr>
+        <attr name="direction" format="enum">
+            <enum name="bottom" value="0"/>
+            <enum name="left" value="1"/>
+        </attr>
     </declare-styleable>
 
 </resources>

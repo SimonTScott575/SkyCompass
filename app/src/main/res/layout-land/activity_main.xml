@@ -230,20 +230,22 @@
 
         <com.icarus1.views.Panel
             android:id="@+id/select_bodies_view"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp"
             android:clickable="false"
             android:visibility="invisible"
             app:cardCornerRadius="8dp"
             app:cardElevation="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/toolbar"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintDimensionRatio="1:1"
-            tools:visibility="gone">
+            tools:visibility="gone"
+            custom:direction="left">
 
             <androidx.fragment.app.FragmentContainerView
                 android:id="@+id/select_bodies_fragment"
@@ -261,15 +263,17 @@
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp"
             android:clickable="false"
             android:visibility="invisible"
             app:cardCornerRadius="8dp"
             app:cardElevation="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/toolbar"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintDimensionRatio="1:1"
-            tools:visibility="gone">
+            tools:visibility="gone"
+            custom:direction="left">
 
             <androidx.fragment.app.FragmentContainerView
                 android:id="@+id/map_fragment_container"
@@ -282,19 +286,21 @@
 
         <com.icarus1.views.Panel
             android:id="@+id/calendar_card_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp"
             android:visibility="invisible"
             android:clickable="false"
             app:cardCornerRadius="8dp"
             app:cardElevation="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/toolbar"
             app:layout_constraintStart_toStartOf="parent"
-            tools:visibility="gone">
+            tools:visibility="gone"
+            custom:direction="left">
 
             <androidx.fragment.app.FragmentContainerView
                 android:id="@+id/calendar_fragment_container"
@@ -311,19 +317,21 @@
 
         <com.icarus1.views.Panel
             android:id="@+id/clock_card_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp"
             android:clickable="false"
             android:visibility="invisible"
             app:cardCornerRadius="8dp"
             app:cardElevation="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/toolbar"
             app:layout_constraintStart_toStartOf="parent"
-            tools:visibility="gone">
+            tools:visibility="gone"
+            custom:direction="left">
 
             <androidx.fragment.app.FragmentContainerView
                 android:id="@+id/clock_fragment_container"
