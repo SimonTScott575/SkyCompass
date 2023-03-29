@@ -21,6 +21,8 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.icarus1.calendar.CalendarFragment;
+import com.icarus1.clock.ClockFragment;
 import com.icarus1.compass.CelestialBody;
 import com.icarus1.compass.CompassFragment;
 import com.icarus1.databinding.ActivityMainBinding;
@@ -108,10 +110,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        CompassFragment compassFragment = (CompassFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_compass);
-        SelectBodiesFragment selectBodiesFragment = (SelectBodiesFragment) getSupportFragmentManager().findFragmentById(R.id.select_bodies_fragment);
-        if (compassFragment == null || selectBodiesFragment == null) {
-            Debug.error(MainActivityError.FragmentNotFound.getMsg());
+        SelectBodiesFragment selectBodiesFragment;
+        try {
+            selectBodiesFragment = getSelectBodiesFragment();
+        } catch (FragmentNotFoundException e) {
+            Debug.error(e);
             return;
         }
 
@@ -186,6 +189,32 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private CompassFragment getCompassFragment()
+    throws FragmentNotFoundException {
+
+        CompassFragment fragment = (CompassFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_compass);
+
+        if (fragment == null) {
+            throw new FragmentNotFoundException();
+        }
+
+        return fragment;
+
+    }
+
+    private SelectBodiesFragment getSelectBodiesFragment()
+    throws FragmentNotFoundException {
+
+        SelectBodiesFragment fragment = (SelectBodiesFragment) getSupportFragmentManager().findFragmentById(R.id.select_bodies_fragment);
+
+        if (fragment == null) {
+            throw new FragmentNotFoundException();
+        }
+
+        return fragment;
+
+    }
+
     private void toggleNightMode() {
 
         int nightModeFlags = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
@@ -200,9 +229,11 @@ public class MainActivity extends AppCompatActivity {
 
     private void setLocation(double longitude, double latitude, @Nullable String location) {
 
-        CompassFragment compassFragment = (CompassFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_compass);
-        if (compassFragment == null) {
-            Debug.error(MainActivityError.FragmentNotFound.getMsg());
+        CompassFragment compassFragment;
+        try {
+            compassFragment = getCompassFragment();
+        } catch (FragmentNotFoundException e) {
+            Debug.error(e);
             return;
         }
 
@@ -255,9 +286,11 @@ public class MainActivity extends AppCompatActivity {
 
     private void setDate(int year, int month, int day, boolean currentDate) {
 
-        CompassFragment compassFragment = (CompassFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_compass);
-        if (compassFragment == null) {
-            Debug.error(MainActivityError.FragmentNotFound.getMsg());
+        CompassFragment compassFragment;
+        try {
+            compassFragment = getCompassFragment();
+        } catch (FragmentNotFoundException e) {
+            Debug.error(e);
             return;
         }
 
@@ -288,9 +321,11 @@ public class MainActivity extends AppCompatActivity {
 
     private void setTime(int hour, int minute, int seconds, int offset, @Nullable String location) {
 
-        CompassFragment compassFragment = (CompassFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_compass);
-        if (compassFragment == null) {
-            Debug.error(MainActivityError.FragmentNotFound.getMsg());
+        CompassFragment compassFragment;
+        try {
+            compassFragment = getCompassFragment();
+        } catch (FragmentNotFoundException e) {
+            Debug.error(e);
             return;
         }
 
@@ -325,10 +360,13 @@ public class MainActivity extends AppCompatActivity {
 
     private void setViewable(CelestialBody body, boolean viewable) {
 
-        CompassFragment compassFragment = (CompassFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_compass);
-        SelectBodiesFragment selectBodiesFragment = (SelectBodiesFragment) getSupportFragmentManager().findFragmentById(R.id.select_bodies_fragment);
-        if (compassFragment == null || selectBodiesFragment == null) {
-            Debug.error(MainActivityError.FragmentNotFound.getMsg());
+        CompassFragment compassFragment;
+        SelectBodiesFragment selectBodiesFragment;
+        try {
+            compassFragment = getCompassFragment();
+            selectBodiesFragment = getSelectBodiesFragment();
+        } catch (FragmentNotFoundException e) {
+            Debug.error(e);
             return;
         }
 
@@ -374,10 +412,11 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onClick(View v) {
 
-            CompassFragment compassFragment = (CompassFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_compass);
-            SelectBodiesFragment selectBodiesFragment = (SelectBodiesFragment) getSupportFragmentManager().findFragmentById(R.id.select_bodies_fragment);
-            if (compassFragment == null || selectBodiesFragment == null) {
-                Debug.error(MainActivityError.FragmentNotFound.getMsg());
+            SelectBodiesFragment selectBodiesFragment;
+            try {
+                selectBodiesFragment = getSelectBodiesFragment();
+            } catch (FragmentNotFoundException e) {
+                Debug.error(e);
                 return;
             }
 
@@ -427,20 +466,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-}
-
-enum MainActivityError {
-
-    FragmentNotFound("Fragment not found.");
-
-    private final String msg;
-
-    MainActivityError(String msg) {
-        this.msg = msg;
-    }
-
-    public String getMsg() {
-        return msg;
+    private static class FragmentNotFoundException extends Debug.Exception {
+        private FragmentNotFoundException() {
+            super("Fragment Not Found.");
+        }
     }
 
 }

@@ -6,6 +6,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.os.Handler;
@@ -14,8 +15,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.DatePicker;
 
-import com.icarus1.clock.ClockFragment;
-import com.icarus1.clock.ClockViewModel;
 import com.icarus1.databinding.FragmentCalendarBinding;
 import com.icarus1.util.Debug;
 
@@ -64,7 +63,12 @@ public class CalendarFragment extends Fragment {
         );
         setUseSystemDate(viewModel.isSystemDate());
 
-        startRetrieveSystemDate();
+        try {
+            startRetrieveSystemDate();
+        } catch (HandlerNoPostException e) {
+            Debug.error(e);
+            setUseSystemDate(false);
+        }
 
     }
 
@@ -90,6 +94,32 @@ public class CalendarFragment extends Fragment {
 
     }
 
+    public void onDateChanged(int year, int monthOfYear, int dayOfMonth, boolean currentDate) {
+
+        Bundle bundle = new Bundle();
+        bundle.putInt("Y", year);
+        bundle.putInt("M", monthOfYear);
+        bundle.putInt("D", dayOfMonth-1);
+        bundle.putBoolean("CURRENT DATE", currentDate);
+        try {
+            getActivityOrThrowException().getSupportFragmentManager().setFragmentResult("A", bundle);
+        } catch (NoActivityAttachedExcpetion e) {
+            Debug.log(e);
+        }
+
+    }
+
+    private class OnDateChangedListener implements DatePicker.OnDateChangedListener {
+        @Override
+        public void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+
+            setUseSystemDate(false);
+
+            setDateWithoutNotification(year, monthOfYear, dayOfMonth, false);
+
+        }
+    }
+
     public void setUseSystemDate(boolean useSystemDate) {
 
         if (useSystemDate) {
@@ -111,46 +141,20 @@ public class CalendarFragment extends Fragment {
 
     }
 
-    private void startRetrieveSystemDate() {
+    private void startRetrieveSystemDate()
+    throws HandlerNoPostException {
 
         retrieveSystemDate = new RetrieveSystemDate();
         handler = new Handler(requireActivity().getMainLooper());
         boolean success = handler.post(retrieveSystemDate);
         if (!success) {
-            Debug.error("CalendarFragment no post");
-            setUseSystemDate(false);
+            throw new HandlerNoPostException();
         }
 
     }
 
     private void endRetrieveSystemDate() {
         retrieveSystemDate.end();
-    }
-
-    public void onDateChanged(int year, int monthOfYear, int dayOfMonth, boolean currentDate) {
-
-        Bundle bundle = new Bundle();
-        bundle.putInt("Y", year);
-        bundle.putInt("M", monthOfYear);
-        bundle.putInt("D", dayOfMonth-1);
-        bundle.putBoolean("CURRENT DATE", currentDate);
-        try {
-            requireActivity().getSupportFragmentManager().setFragmentResult("A", bundle);
-        } catch (IllegalStateException e) {
-            Debug.log("CalendarFragment requireActivity exception.");
-        }
-
-    }
-
-    private class OnDateChangedListener implements DatePicker.OnDateChangedListener {
-        @Override
-        public void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-
-            setUseSystemDate(false);
-
-            setDateWithoutNotification(year, monthOfYear, dayOfMonth, false);
-
-        }
     }
 
     private class RetrieveSystemDate implements Runnable {
@@ -171,15 +175,10 @@ public class CalendarFragment extends Fragment {
 
             }
 
-            if (handler == null) {
-                Debug.error("CalendarFragment handler null.");
-                return;
-            }
-
             if (!end) {
                 boolean success = handler.postDelayed(this, 10);
                 if (!success) {
-                    Debug.error("CalendarFragment handler failed post.");
+                    Debug.error(new HandlerNoPostException());
                 }
             }
 
@@ -189,6 +188,28 @@ public class CalendarFragment extends Fragment {
             end = true;
         }
 
+    }
+
+    private FragmentActivity getActivityOrThrowException()
+    throws NoActivityAttachedExcpetion {
+
+        try {
+            return requireActivity();
+        } catch (IllegalStateException e) {
+            throw new NoActivityAttachedExcpetion();
+        }
+
+    }
+
+    private static class HandlerNoPostException extends Debug.Exception {
+        public HandlerNoPostException() {
+            super("Handler failed to post.");
+        }
+    }
+    private static class NoActivityAttachedExcpetion extends Debug.Exception {
+        public NoActivityAttachedExcpetion() {
+            super("No Activity attached.");
+        }
     }
 
 }

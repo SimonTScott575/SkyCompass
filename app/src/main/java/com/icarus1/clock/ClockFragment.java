@@ -1,5 +1,6 @@
 package com.icarus1.clock;
 
+import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.os.Bundle;
@@ -67,7 +68,12 @@ public class ClockFragment extends Fragment {
         );
         setUseSystemTime(viewModel.isUseSystemTime());
 
-        startRetrieveSystemTime();
+        try {
+            startRetrieveSystemTime();
+        } catch (HandlerNoPostException e) {
+            Debug.error(e);
+            setUseSystemTime(false);
+        }
 
     }
 
@@ -132,9 +138,9 @@ public class ClockFragment extends Fragment {
         bundle.putInt("OFFSET", UTCOffset);
         bundle.putString("LOCATION", location);
         try {
-            requireActivity().getSupportFragmentManager().setFragmentResult("C", bundle);
-        } catch (IllegalStateException e) {
-            Debug.log("ClockFragment requireActivity exception.");
+            getActivityOrThrowException().getSupportFragmentManager().setFragmentResult("C", bundle);
+        } catch (NoActivityAttachedExcpetion e) {
+            Debug.log(e);
         }
 
     }
@@ -169,14 +175,14 @@ public class ClockFragment extends Fragment {
         }
     }
 
-    private void startRetrieveSystemTime() {
+    private void startRetrieveSystemTime()
+    throws HandlerNoPostException {
 
         retrieveSystemTime = new RetrieveSystemTime();
         handler = new Handler(requireActivity().getMainLooper());
         boolean success = handler.post(retrieveSystemTime);
         if (!success) {
-            Debug.error("ClockFragment no post");
-            setUseSystemTime(false);
+            throw new HandlerNoPostException();
         }
 
     }
@@ -205,15 +211,10 @@ public class ClockFragment extends Fragment {
 
             }
 
-            if (handler == null) {
-                Debug.error("ClockFragment handler null.");
-                return;
-            }
-
             if (!end) {
                 boolean success = handler.postDelayed(this, 10);
                 if (!success) {
-                    Debug.error("ClockFragment handler failed post.");
+                    Debug.error(new HandlerNoPostException());
                 }
             }
 
@@ -223,6 +224,28 @@ public class ClockFragment extends Fragment {
             end = true;
         }
 
+    }
+
+    private FragmentActivity getActivityOrThrowException()
+    throws NoActivityAttachedExcpetion {
+
+        try {
+            return requireActivity();
+        } catch (IllegalStateException e) {
+            throw new NoActivityAttachedExcpetion();
+        }
+
+    }
+
+    private static class HandlerNoPostException extends Debug.Exception {
+        public HandlerNoPostException() {
+            super("Handler failed to post.");
+        }
+    }
+    private static class NoActivityAttachedExcpetion extends Debug.Exception {
+        public NoActivityAttachedExcpetion() {
+            super("No Activity attached.");
+        }
     }
 
 }

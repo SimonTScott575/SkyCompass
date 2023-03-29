@@ -28,7 +28,7 @@ public class SettingsActivity extends AppCompatActivity {
         Fragment settingsFragment = getSupportFragmentManager().findFragmentById(R.id.settings_fragment_container);
 
         if (settingsFragment == null) {
-            Debug.error(SettingsActivityError.FragmentNotFound.getMsg());
+            Debug.error(new FragmentNotFoundException());
             finish();
             return;
         }
@@ -47,7 +47,7 @@ public class SettingsActivity extends AppCompatActivity {
         NavDestination currentDestination = nav.getCurrentDestination();
 
         if (currentDestination == null) {
-            Debug.error(SettingsActivityError.NavigationDestinationNotFound.getMsg());
+            Debug.error(new NavigationDestinationNotFound());
         } else if (currentDestination.getId() == R.id.navigation_settings_fragment_start) {
             nav.navigate(R.id.navigation_settings_action_start);
         }
@@ -72,7 +72,7 @@ public class SettingsActivity extends AppCompatActivity {
         NavDestination destination = nav.getCurrentDestination();
 
         if (destination == null) {
-            Debug.error(SettingsActivityError.NavigationDestinationNotFound.getMsg());
+            Debug.error(new NavigationDestinationNotFound());
             return;
         }
 
@@ -86,21 +86,16 @@ public class SettingsActivity extends AppCompatActivity {
 
     }
 
-}
 
-enum SettingsActivityError {
-
-    FragmentNotFound("Fragment not found."),
-    NavigationDestinationNotFound("Navigation Destination null.");
-
-    private final String msg;
-
-    SettingsActivityError(String msg) {
-        this.msg = msg;
+    private static class FragmentNotFoundException extends Debug.Exception {
+        private FragmentNotFoundException() {
+            super("Fragment not found.");
+        }
     }
-
-    public String getMsg() {
-        return msg;
+    private static class NavigationDestinationNotFound extends Debug.Exception {
+        private NavigationDestinationNotFound() {
+            super("Navigation Destination null.");
+        }
     }
 
 }
