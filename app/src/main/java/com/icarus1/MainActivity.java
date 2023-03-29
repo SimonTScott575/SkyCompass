@@ -38,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
     private boolean restoredState;
+    private boolean started;
     private final OnObjectSelection onObjectSelection = new OnObjectSelection();
     private final OnChangeLocationListener onChangeLocationListener = new OnChangeLocationListener();
     private final OnChangeDateListener onChangeDateListener = new OnChangeDateListener();
@@ -118,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        if (!restoredState) {
+        if (!restoredState && !started) {
             selectBodiesFragment.setViewable(CelestialBody.SUN, true);
             selectBodiesFragment.setViewable(CelestialBody.MOON, true);
 
@@ -126,6 +127,8 @@ public class MainActivity extends AppCompatActivity {
                 selectBodiesFragment.setViewable(body, false);
             }
         }
+
+        started = true;
 
     }
 
