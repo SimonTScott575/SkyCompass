@@ -39,15 +39,9 @@ public class TimeZonePicker extends ConstraintLayout {
 
         binding = ViewTimeZonePickerBinding.inflate(LayoutInflater.from(context), this, true);
 
-        ShiftNumber addOne = new ShiftNumber(1);
-        ShiftNumber subOne = new ShiftNumber(-1);
-
-        binding.plus.setOnClickListener(addOne);
-        binding.minus.setOnClickListener(subOne);
-
-        RangeWatcher rangeWatcher = new RangeWatcher();
-
-        binding.numberEditText.addTextChangedListener(rangeWatcher);
+        binding.plus.setOnClickListener(new ShiftNumber(1));
+        binding.minus.setOnClickListener(new ShiftNumber(-1));
+        binding.numberEditText.addTextChangedListener(new RangeWatcher());
         binding.numberEditText.setText("0");
 
     }
@@ -111,7 +105,6 @@ public class TimeZonePicker extends ConstraintLayout {
 
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
-
         }
 
         @Override
@@ -142,7 +135,7 @@ public class TimeZonePicker extends ConstraintLayout {
             try {
                 UTCOffset = Integer.parseInt(s.toString());
                 if (onTimeZoneChanged != null) {
-                    onTimeZoneChanged.onUTCOffsetChanged(UTCOffset, null);
+                    onTimeZoneChanged.onUTCOffsetChanged(TimeZonePicker.this, null, UTCOffset);
                 }
             } catch (NumberFormatException e) {
             }
@@ -151,7 +144,7 @@ public class TimeZonePicker extends ConstraintLayout {
     }
 
     public interface OnTimeZoneChanged {
-        void onUTCOffsetChanged(int UTCOffset, String location);
+        void onUTCOffsetChanged(TimeZonePicker timeZonePicker, String location, int UTCOffset);
     }
 
 }

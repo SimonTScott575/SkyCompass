@@ -17,6 +17,7 @@ import android.widget.TimePicker;
 import com.icarus1.databinding.FragmentClockBinding;
 import com.icarus1.util.Debug;
 import com.icarus1.util.Format;
+import com.icarus1.util.Time;
 
 import java.util.TimeZone;
 
@@ -68,13 +69,7 @@ public class ClockFragment extends Fragment {
         );
         setUseSystemTime(viewModel.isUseSystemTime());
 
-        retrieveSystemTime = new RetrieveSystemTime();
-        handler = new Handler(requireActivity().getMainLooper());
-        boolean success = handler.post(retrieveSystemTime);
-        if (!success) {
-            Debug.error("ClockFragment no post");
-            setUseSystemTime(false);
-        }
+        startRetrieveSystemTime();
 
     }
 
@@ -84,16 +79,9 @@ public class ClockFragment extends Fragment {
         binding.timePicker.setOnTimeChangedListener(null);
         binding.timeZonePicker.setOnUTCOffsetChanged(null);
 
-        retrieveSystemTime.end();
+        endRetrieveSystemTime();
 
         super.onPause();
-    }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        viewModel = new ViewModelProvider(this).get(ClockViewModel.class);
-        // TODO: Use the ViewModel
     }
 
     private void setTimeAndTimeZoneWithoutNotification(int hour, int minute, int second, int UTCOffset, @Nullable String location) {
@@ -170,7 +158,7 @@ public class ClockFragment extends Fragment {
 
     public class OnTimeZoneChange implements TimeZonePicker.OnTimeZoneChanged {
         @Override
-        public void onUTCOffsetChanged(int UTCOffset, String location) {
+        public void onUTCOffsetChanged(TimeZonePicker timeZonePicker, String location, int UTCOffset) {
 
             setUseSystemTime(false);
 
@@ -181,6 +169,24 @@ public class ClockFragment extends Fragment {
             );
 
         }
+    }
+
+    private void startRetrieveSystemTime() {
+
+        retrieveSystemTime = new RetrieveSystemTime();
+        handler = new Handler(requireActivity().getMainLooper());
+        boolean success = handler.post(retrieveSystemTime);
+        if (!success) {
+            Debug.error("ClockFragment no post");
+            setUseSystemTime(false);
+        }
+
+    }
+
+    private void endRetrieveSystemTime() {
+
+        retrieveSystemTime.end();
+
     }
 
     private class RetrieveSystemTime implements Runnable {
