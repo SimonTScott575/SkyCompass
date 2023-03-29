@@ -3,10 +3,8 @@ package com.icarus1.views;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
-import android.util.Xml;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 
@@ -17,33 +15,54 @@ import com.icarus1.R;
 
 public class Panel extends CardView {
 
-    private Animation slideUpAnimation;
-    private Animation slideDownAnimation;
+    private Animation slideInAnimation;
+    private Animation slideOutAnimation;
 
     public Panel(Context context) {
         super(context);
-        init();
+        init(Direction.BOTTOM);
     }
 
     public Panel(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        init();
+        init(context, attrs);
     }
 
     public Panel(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init();
+        init(context, attrs);
     }
 
-    private void init() {
+    private void init(Context context, AttributeSet attrs) {
+
+        Direction direction;
+
+        TypedArray a = context.getTheme().obtainStyledAttributes(
+            attrs,
+            R.styleable.Panel,
+            0, 0
+        );
+
+        try {
+            int directionEnumIndex = a.getInteger(R.styleable.Panel_direction, 0);
+            direction = Direction.values()[directionEnumIndex];
+        } finally {
+            a.recycle();
+        }
+
+        init(direction);
+
+    }
+
+    private void init(Direction direction) {
 
         LayoutInflater.from(getContext()).inflate(R.layout.view_panel, this);
 
-        slideUpAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.slide_up);
-        slideDownAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.slide_down);
+        slideInAnimation = AnimationUtils.loadAnimation(getContext(), direction.toAnimIn());
+        slideOutAnimation = AnimationUtils.loadAnimation(getContext(), direction.toAnimOut());
 
-        slideUpAnimation.setAnimationListener(new OnSlideUpAnimation());
-        slideDownAnimation.setAnimationListener(new OnSlideDownAnimation());
+        slideInAnimation.setAnimationListener(new OnSlideInAnimation());
+        slideOutAnimation.setAnimationListener(new OnSlideOutAnimation());
 
         findViewById(R.id.imageButton).setOnClickListener(new OnClickListener() {
             @Override
@@ -55,14 +74,14 @@ public class Panel extends CardView {
     }
 
     public void show() {
-        startAnimation(slideUpAnimation);
+        startAnimation(slideInAnimation);
     }
 
     public void hide() {
-        startAnimation(slideDownAnimation);
+        startAnimation(slideOutAnimation);
     }
 
-    class OnSlideUpAnimation implements Animation.AnimationListener {
+    class OnSlideInAnimation implements Animation.AnimationListener {
 
         @Override
         public void onAnimationStart(Animation animation) {
@@ -80,7 +99,7 @@ public class Panel extends CardView {
 
     }
 
-    class OnSlideDownAnimation implements Animation.AnimationListener {
+    class OnSlideOutAnimation implements Animation.AnimationListener {
 
         @Override
         public void onAnimationStart(Animation animation) {
@@ -94,6 +113,32 @@ public class Panel extends CardView {
 
         @Override
         public void onAnimationRepeat(Animation animation) {
+        }
+
+    }
+
+    private enum Direction {
+
+        BOTTOM,
+        LEFT;
+
+        public int toAnimIn() {
+            switch(this) {
+                case LEFT:
+                    return R.anim.slide_in_right;
+                case BOTTOM:
+                    return R.anim.slide_in_up;
+                default: return 0;
+            }
+        }
+        public int toAnimOut() {
+            switch(this) {
+                case LEFT:
+                    return R.anim.slide_out_left;
+                case BOTTOM:
+                    return R.anim.slide_out_down;
+                default: return 0;
+            }
         }
 
     }

@@ -230,27 +230,28 @@
 
         <com.icarus1.views.Panel
             android:id="@+id/select_bodies_view"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
+            android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
             android:clickable="false"
             android:visibility="invisible"
             app:cardCornerRadius="8dp"
             app:cardElevation="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintDimensionRatio="1:1"
-            tools:visibility="gone">
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/toolbar"
+            custom:direction="left"
+            tools:visibility="invisible">
 
             <androidx.fragment.app.FragmentContainerView
                 android:id="@+id/select_bodies_fragment"
                 android:name="com.icarus1.selectbodies.SelectBodiesFragment"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                tools:layout="@layout/fragment_select_bodies"/>
+                tools:layout="@layout/fragment_select_bodies" />
 
         </com.icarus1.views.Panel>
 
@@ -259,17 +260,18 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
+            android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
             android:clickable="false"
             android:visibility="invisible"
             app:cardCornerRadius="8dp"
             app:cardElevation="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintDimensionRatio="1:1"
-            tools:visibility="gone">
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/toolbar"
+            custom:direction="left"
+            tools:visibility="invisible">
 
             <androidx.fragment.app.FragmentContainerView
                 android:id="@+id/map_fragment_container"
@@ -282,48 +284,50 @@
 
         <com.icarus1.views.Panel
             android:id="@+id/calendar_card_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
             android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
+            android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
-            android:visibility="invisible"
             android:clickable="false"
+            android:visibility="invisible"
             app:cardCornerRadius="8dp"
             app:cardElevation="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            tools:visibility="gone">
+            app:layout_constraintTop_toBottomOf="@id/toolbar"
+            custom:direction="left"
+            tools:visibility="invisible">
 
             <androidx.fragment.app.FragmentContainerView
                 android:id="@+id/calendar_fragment_container"
                 android:name="com.icarus1.calendar.CalendarFragment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                tools:layout="@layout/fragment_calendar"/>
+                app:layout_constraintTop_toTopOf="parent"
+                tools:layout="@layout/fragment_calendar" />
 
         </com.icarus1.views.Panel>
 
         <com.icarus1.views.Panel
             android:id="@+id/clock_card_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
             android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
+            android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
             android:clickable="false"
             android:visibility="invisible"
             app:cardCornerRadius="8dp"
             app:cardElevation="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            tools:visibility="gone">
+            app:layout_constraintTop_toBottomOf="@id/toolbar"
+            custom:direction="left"
+            tools:visibility="invisible">
 
             <androidx.fragment.app.FragmentContainerView
                 android:id="@+id/clock_fragment_container"

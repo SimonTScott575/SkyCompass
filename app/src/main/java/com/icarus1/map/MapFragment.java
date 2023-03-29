@@ -110,6 +110,8 @@ public class MapFragment extends Fragment {
 
     private void setUpMap() {
 
+        binding.mapView.setUp();
+
         binding.mapView.getSetLocationMarker().setOnMarkerDragListener(new Marker.OnMarkerDragListener() {
             @Override
             public void onMarkerDrag(Marker marker) {
