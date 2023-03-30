@@ -25,7 +25,8 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:theme="?attr/actionBarPopupTheme"
-            app:title="@string/app_name"/>
+            app:title="@string/app_name"
+            app:titleTextColor="@color/text_color"/>
 
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/fragment_compass"
