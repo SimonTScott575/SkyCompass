@@ -13,12 +13,11 @@ import com.icarus1.R;
 public class CompassView extends View {
 
     private Background background;
+    private Foreground foreground;
     private Track track;
 
-    private float innerDiameter;
     private float innerRadius;
     private float ringThickness;
-    private final Paint backgroundRingPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
     private CompassModel compass = new CompassModel(0,0);
     private int hour;
@@ -52,10 +51,8 @@ public class CompassView extends View {
     private void init(Context context) {
 
         background = new Background(context, innerRadius);
+        foreground = new Foreground(context, innerRadius, innerRadius + ringThickness);
         track = new Track(innerRadius);
-
-        backgroundRingPaint.setColor(getResources().getColor(R.color.compass_ring, getContext().getTheme()));
-        backgroundRingPaint.setStyle(Paint.Style.STROKE);
 
         drawSunMoon = true;
         drawPlanets = false;
@@ -113,14 +110,13 @@ public class CompassView extends View {
 
         int maxLength = (int)Math.min(ww,hh);
 
-        ringThickness = maxLength / 40f;
-        innerDiameter = maxLength - 2*ringThickness;
+        ringThickness = maxLength / 20f;
+        float innerDiameter = maxLength - 2*ringThickness;
         innerRadius = innerDiameter / 2;
 
         background.setRadius(innerRadius);
+        foreground.setRing(innerRadius, innerRadius + ringThickness);
         track.setRadius(innerRadius);
-
-        backgroundRingPaint.setStrokeWidth(ringThickness);
 
     }
 
@@ -151,16 +147,12 @@ public class CompassView extends View {
 
     private void drawForeground(Canvas canvas) {
 
-        canvas.save();
-        canvas.translate(ringThickness, ringThickness);
+//        canvas.save();
+//        canvas.translate(ringThickness, ringThickness);
 
-        canvas.drawCircle(
-            innerRadius, innerRadius,
-            innerRadius + ringThickness/2,
-            backgroundRingPaint
-        );
+        foreground.draw(canvas);
 
-        canvas.restore();
+//        canvas.restore();
 
     }
 
