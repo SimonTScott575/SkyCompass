@@ -24,8 +24,6 @@ public class CompassView extends View {
     private int minutes;
     private float seconds;
 
-    private boolean drawSunMoon;
-    private boolean drawPlanets;
     private boolean[] drawBody;
 
     public CompassView(Context context) {
@@ -54,8 +52,6 @@ public class CompassView extends View {
         foreground = new Foreground(context, innerRadius, innerRadius + ringThickness);
         track = new Track(innerRadius);
 
-        drawSunMoon = true;
-        drawPlanets = false;
         drawBody = new boolean[CelestialBody.values().length];
 
     }
@@ -69,24 +65,6 @@ public class CompassView extends View {
         this.hour = hour;
         this.minutes = minutes;
         this.seconds = seconds;
-        invalidate();
-    }
-
-    public boolean isDrawSunMoon() {
-        return drawSunMoon;
-    }
-
-    public void setDrawSunMoon(boolean drawSunMoon) {
-        this.drawSunMoon = drawSunMoon;
-        invalidate();
-    }
-
-    public boolean isDrawPlanets() {
-        return drawPlanets;
-    }
-
-    public void setDrawPlanets(boolean drawPlanets) {
-        this.drawPlanets = drawPlanets;
         invalidate();
     }
 
