@@ -72,7 +72,7 @@ public enum CelestialBody {
             body.name = Body.Sun.toString();
             body.body = Body.Sun;
             body.paint = new Paint();
-            body.paint.setColor(Color.argb(0.75f,1f,1f,0f));
+            body.paint.setColor(Color.argb(1f,1f,1f,0f));
             body.paint.setStyle(Paint.Style.FILL);
         }
     }
@@ -83,7 +83,7 @@ public enum CelestialBody {
             body.name = Body.Moon.toString();
             body.body = Body.Moon;
             body.paint = new Paint();
-            body.paint.setColor(Color.argb(0.75f,1f,1f,1f));
+            body.paint.setColor(Color.argb(1f,1f,1f,1f));
             body.paint.setStyle(Paint.Style.FILL);
         }
     }
@@ -94,7 +94,7 @@ public enum CelestialBody {
             body.name = Body.Mercury.toString();
             body.body = Body.Mercury;
             body.paint = new Paint();
-            body.paint.setColor(Color.argb(0.75f,1f,0f,1f));
+            body.paint.setColor(Color.argb(255,193,189,188));
             body.paint.setStyle(Paint.Style.FILL);
         }
     }
@@ -105,7 +105,7 @@ public enum CelestialBody {
             body.name = Body.Venus.toString();
             body.body = Body.Venus;
             body.paint = new Paint();
-            body.paint.setColor(Color.argb(0.75f,1f,0f,1f));
+            body.paint.setColor(Color.argb(255,244,220,196));
             body.paint.setStyle(Paint.Style.FILL);
         }
     }
@@ -116,7 +116,7 @@ public enum CelestialBody {
             body.name = Body.Mars.toString();
             body.body = Body.Mars;
             body.paint = new Paint();
-            body.paint.setColor(Color.argb(0.75f,1f,0f,1f));
+            body.paint.setColor(Color.argb(255,242,122,95));
             body.paint.setStyle(Paint.Style.FILL);
         }
     }
@@ -127,7 +127,7 @@ public enum CelestialBody {
             body.name = Body.Jupiter.toString();
             body.body = Body.Jupiter;
             body.paint = new Paint();
-            body.paint.setColor(Color.argb(0.75f,1f,0f,1f));
+            body.paint.setColor(Color.argb(255,192,130,55));
             body.paint.setStyle(Paint.Style.FILL);
         }
     }
@@ -138,7 +138,7 @@ public enum CelestialBody {
             body.name = Body.Saturn.toString();
             body.body = Body.Saturn;
             body.paint = new Paint();
-            body.paint.setColor(Color.argb(0.75f,1f,0f,1f));
+            body.paint.setColor(Color.argb(255,243,206,136));
             body.paint.setStyle(Paint.Style.FILL);
         }
     }
@@ -149,7 +149,7 @@ public enum CelestialBody {
             body.name = Body.Uranus.toString();
             body.body = Body.Uranus;
             body.paint = new Paint();
-            body.paint.setColor(Color.argb(0.75f,1f,0f,1f));
+            body.paint.setColor(Color.argb(255,208,236,240));
             body.paint.setStyle(Paint.Style.FILL);
         }
     }
@@ -160,7 +160,7 @@ public enum CelestialBody {
             body.name = Body.Neptune.toString();
             body.body = Body.Neptune;
             body.paint = new Paint();
-            body.paint.setColor(Color.argb(0.75f,1f,0f,1f));
+            body.paint.setColor(Color.argb(255,119,158,191));
             body.paint.setStyle(Paint.Style.FILL);
         }
     }
@@ -171,7 +171,7 @@ public enum CelestialBody {
             body.name = Body.Pluto.toString();
             body.body = Body.Pluto;
             body.paint = new Paint();
-            body.paint.setColor(Color.argb(0.75f,1f,0f,1f));
+            body.paint.setColor(Color.argb(255,134,106,84));
             body.paint.setStyle(Paint.Style.FILL);
         }
     }

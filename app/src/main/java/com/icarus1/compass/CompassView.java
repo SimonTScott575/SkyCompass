@@ -125,12 +125,7 @@ public class CompassView extends View {
 
     private void drawForeground(Canvas canvas) {
 
-//        canvas.save();
-//        canvas.translate(ringThickness, ringThickness);
-
         foreground.draw(canvas);
-
-//        canvas.restore();
 
     }
 
