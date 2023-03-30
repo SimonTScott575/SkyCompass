@@ -108,7 +108,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="32dp"
                     android:layout_marginBottom="8dp"
-                    android:text="@string/location"
+                    tools:text="@string/location"
                     android:textSize="12sp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -155,7 +155,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="32dp"
                     android:layout_marginBottom="8dp"
-                    android:text="@string/date"
+                    tools:text="@string/date"
                     android:textSize="12sp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -198,7 +198,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="32dp"
                     android:layout_marginBottom="8dp"
-                    android:text="@string/time"
+                    tools:text="@string/time"
                     android:textSize="12sp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -217,7 +217,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            app:tint="#000000"
+            app:tint="?attr/colorSecondary"
             android:scaleType="fitCenter"
             app:layout_constraintBottom_toBottomOf="@+id/toggle_objects_group"
             app:layout_constraintEnd_toEndOf="parent"
@@ -227,68 +227,72 @@
 
         <com.icarus1.views.Panel
             android:id="@+id/select_bodies_view"
+            style="@style/panel"
             android:layout_width="0dp"
             android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintDimensionRatio="1:1"
-            style="@style/panel">
+            tools:visibility="gone">
 
             <androidx.fragment.app.FragmentContainerView
-                    android:id="@+id/select_bodies_fragment"
-                    android:name="com.icarus1.selectbodies.SelectBodiesFragment"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    tools:layout="@layout/fragment_select_bodies" />
+                android:id="@+id/select_bodies_fragment"
+                android:name="com.icarus1.selectbodies.SelectBodiesFragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:layout="@layout/fragment_select_bodies" />
 
         </com.icarus1.views.Panel>
 
         <com.icarus1.views.Panel
             android:id="@+id/map_card_view"
+            style="@style/panel"
             android:layout_width="0dp"
             android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintDimensionRatio="1:1"
-            style="@style/panel">
+            tools:visibility="gone">
 
             <androidx.fragment.app.FragmentContainerView
-                    android:id="@+id/map_fragment_container"
-                    android:name="com.icarus1.map.MapFragment"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    tools:layout="@layout/fragment_map" />
+                android:id="@+id/map_fragment_container"
+                android:name="com.icarus1.map.MapFragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:layout="@layout/fragment_map" />
 
         </com.icarus1.views.Panel>
 
         <com.icarus1.views.Panel
             android:id="@+id/calendar_card_view"
-            android:layout_height="wrap_content"
+            style="@style/panel"
             android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            style="@style/panel">
+            tools:visibility="gone">
 
             <androidx.fragment.app.FragmentContainerView
-                    android:id="@+id/calendar_fragment_container"
-                    android:name="com.icarus1.calendar.CalendarFragment"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    tools:layout="@layout/fragment_calendar" />
+                android:id="@+id/calendar_fragment_container"
+                android:name="com.icarus1.calendar.CalendarFragment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:layout="@layout/fragment_calendar" />
 
         </com.icarus1.views.Panel>
 
         <com.icarus1.views.Panel
             android:id="@+id/clock_card_view"
-            android:layout_height="wrap_content"
+            style="@style/panel"
             android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            style="@style/panel">
+            tools:visibility="gone">
 
             <androidx.fragment.app.FragmentContainerView
                 android:id="@+id/clock_fragment_container"
