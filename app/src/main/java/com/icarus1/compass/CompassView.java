@@ -2,13 +2,10 @@ package com.icarus1.compass;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.view.View;
 
 import androidx.annotation.Nullable;
-
-import com.icarus1.R;
 
 public class CompassView extends View {
 
@@ -50,7 +47,7 @@ public class CompassView extends View {
 
         background = new Background(context, innerRadius);
         foreground = new Foreground(context, innerRadius, innerRadius + ringThickness);
-        track = new Track(innerRadius);
+        track = new Track(innerRadius, ringThickness, innerRadius+ringThickness);
 
         drawBody = new boolean[CelestialBody.values().length];
 
@@ -94,7 +91,7 @@ public class CompassView extends View {
 
         background.setRadius(innerRadius);
         foreground.setRing(innerRadius, innerRadius + ringThickness);
-        track.setRadius(innerRadius);
+        track.setDimensions(innerRadius, ringThickness, innerRadius+ringThickness);
 
     }
 
@@ -103,11 +100,7 @@ public class CompassView extends View {
         super.onDraw(canvas);
 
         drawBackground(canvas);
-        for (CelestialBody body : CelestialBody.values()) {
-            if (drawBody[body.getIndex()]) {
-                drawTracks(hour,minutes,seconds, body, canvas);
-            }
-        }
+        drawBodies(canvas);
         drawForeground(canvas);
 
     }
@@ -129,12 +122,21 @@ public class CompassView extends View {
 
     }
 
-    private void drawTracks(int hour, int minute, double seconds, CelestialBody body, Canvas canvas) {
+    private void drawBodies(Canvas canvas) {
 
         canvas.save();
         canvas.translate(ringThickness, ringThickness);
 
-        track.draw(canvas, compass, body, hour, minute, seconds);
+        for (CelestialBody body : CelestialBody.values()) {
+            if (drawBody[body.getIndex()]) {
+                track.drawTracks(compass, body, canvas);
+            }
+        }
+        for (CelestialBody body : CelestialBody.values()) {
+            if (drawBody[body.getIndex()]) {
+                track.drawCurrentPosition(hour, minutes, seconds, compass, body, canvas);
+            }
+        }
 
         canvas.restore();
 

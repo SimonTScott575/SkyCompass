@@ -3,101 +3,80 @@ package com.icarus1.compass;
 import android.graphics.Canvas;
 
 public class Track {
+    //TODO speed up inefficient getHorizonCoordinate search algorithm
 
     private float radius;
     private float diameter;
+    private float outerRadius;
+    private float halfThickness;
 
-    public Track(float radius) {
+    public Track(float radius, float thickness, float outerRadius) {
 
+        setDimensions(radius, thickness, outerRadius);
+
+    }
+
+    public final void setDimensions(float radius, float thickness, float outerRadius) {
         this.radius = radius;
         diameter = 2*radius;
-
+        this.outerRadius = outerRadius;
+        halfThickness = thickness/2f;
     }
 
-    public final void setRadius(float radius) {
-        this.radius = radius;
-        diameter = 2*radius;
-    }
+    public void drawTracks(CompassModel compass, CelestialBody body, Canvas canvas) {
 
-    public final float getRadius() {
-        return radius;
-    }
-
-    public void draw(Canvas canvas, CompassModel compass, CelestialBody body, int hour, int minute, double seconds) {
-
-        drawTracks(compass, body, canvas);
-        drawCurrentPosition(hour, minute, seconds, compass, body, canvas);
-
-    }
-
-    private void drawTracks(CompassModel compass, CelestialBody body, Canvas canvas) {
-
-        double[] x = new double[26];
-        double[] y = new double[26];
-        double[] altitude = new double[26];
+        double[] x = new double[25];
+        double[] y = new double[25];
+        double[] altitude = new double[25];
 
         {
-            Coordinate coordinate = compass.getCoordinate(body.getBody(), -1, 0, 0);
+            Coordinate coordinate = compass.getCoordinate(body.getBody(), 0, 0, 0);
             x[0] = coordinate.getX();
             y[0] = coordinate.getY();
             altitude[0] = coordinate.getAltitude();
-            for (int i = 0; i < 25; i++) {
+            for (int hour = 1; hour < 25; hour++) {
 
-                coordinate = compass.getCoordinate(body.getBody(), i, 0, 0);
+                coordinate = compass.getCoordinate(body.getBody(), hour, 0, 0);
 
-                x[i + 1] = coordinate.getX();
-                y[i + 1] = coordinate.getY();
-                altitude[i + 1] = coordinate.getAltitude();
+                x[hour] = coordinate.getX();
+                y[hour] = coordinate.getY();
+                altitude[hour] = coordinate.getAltitude();
 
-                if (altitude[i+1] > 0 && altitude[i] < 0) {
+                if (altitude[hour] > 0 && altitude[hour-1] < 0) {
 
-                    Coordinate c = coordinate;
-                    for (int j = 1; j < 7; j++) {
-                        c = compass.getCoordinate(body.getBody(), i-1, j*10, 0d);
-                        double altitude2 = c.getAltitude();
-                        if (altitude2 > 0) {
-                            break;
-                        }
-                    }
+                    Coordinate c = getHorizonCoordinate(false, hour-1, compass, body);
 
-                    x[i] = c.getX();
-                    y[i] = c.getY();
+                    x[hour-1] = c.getX();
+                    y[hour-1] = c.getY();
 
-                } else if (altitude[i+1] < 0 && altitude[i] > 0) {
+                } else if (altitude[hour] < 0 && altitude[hour-1] > 0) {
 
-                    Coordinate c = coordinate;
-                    for (int j = 1; j < 7; j++) {
-                        c = compass.getCoordinate(body.getBody(), i-1, j*10, 0d);
-                        double altitude2 = c.getAltitude();
-                        if (altitude2 < 0) {
-                            break;
-                        }
-                    }
+                    Coordinate c = getHorizonCoordinate(true, hour-1, compass, body);
 
-                    x[i+1] = c.getX();
-                    y[i+1] = c.getY();
+                    x[hour] = c.getX();
+                    y[hour] = c.getY();
 
                 }
 
             }
         }
 
-        for (int i = 0; i < 25; i++) {
+        for (int hour = 0; hour < 24; hour++) {
 
-            double startX = x[i];
-            double startY = y[i];
-            double endX = x[i+1];
-            double endY = y[i+1];
+            double startX = x[hour];
+            double startY = y[hour];
+            double endX = x[hour+1];
+            double endY = y[hour+1];
 
-            if (altitude[i] < 0 && altitude[i+1] > 0) {
+            if (altitude[hour] < 0 && altitude[hour+1] > 0) {
                 double length = Math.sqrt( Math.pow(startX, 2) + Math.pow(startY, 2) );
                 startX /= length;
                 startY /= length;
-            } else if (altitude[i] > 0 && altitude[i+1] < 0) {
+            } else if (altitude[hour] > 0 && altitude[hour+1] < 0) {
                 double length = Math.sqrt( Math.pow(endX, 2) + Math.pow(endY, 2) );
                 endX /= length;
                 endY /= length;
-            } else if (altitude[i] < 0 && altitude[i+1] < 0) {
+            } else if (altitude[hour] < 0 && altitude[hour+1] < 0) {
                 continue;
             }
 
@@ -107,6 +86,7 @@ public class Track {
             float angle = (float) Math.atan2(endY - startY, endX - startX);
 
             length *= radius;
+
             padding *= radius;
 
             startX *= radius;
@@ -128,7 +108,7 @@ public class Track {
 
     }
 
-    private void drawCurrentPosition(int hour, int minute, double seconds, CompassModel compass, CelestialBody body, Canvas canvas) {
+    public void drawCurrentPosition(int hour, int minute, double seconds, CompassModel compass, CelestialBody body, Canvas canvas) {
 
         Coordinate coordinate = compass.getCoordinate(body.getBody(), hour, minute, seconds);
 
@@ -144,5 +124,24 @@ public class Track {
 
     }
 
+    private static Coordinate getHorizonCoordinate(boolean stopWhenNegativeAltitude, int startingHour, CompassModel compass, CelestialBody body) {
+
+        Coordinate c = null;
+
+        for (int minute = 0; minute < 60; minute += 1) {
+
+            c = compass.getCoordinate(body.getBody(), startingHour, minute, 0d);
+
+            double altitude = c.getAltitude();
+
+            if (stopWhenNegativeAltitude ? altitude < 0 : altitude > 0) {
+                break;
+            }
+
+        }
+
+        return c;
+
+    }
 
 }
