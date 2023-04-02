@@ -129,7 +129,7 @@ public class CompassView extends View {
 
         for (CelestialBody body : CelestialBody.values()) {
             if (drawBody[body.getIndex()]) {
-                track.drawTracks(compass, body, canvas);
+                track.drawTracks(hour, compass, body, canvas);
             }
         }
         for (CelestialBody body : CelestialBody.values()) {

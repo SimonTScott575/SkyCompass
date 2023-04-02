@@ -23,7 +23,7 @@ public class Track {
         halfThickness = thickness/2f;
     }
 
-    public void drawTracks(CompassModel compass, CelestialBody body, Canvas canvas) {
+    public void drawTracks(int currentHour, CompassModel compass, CelestialBody body, Canvas canvas) {
 
         double[] x = new double[25];
         double[] y = new double[25];
@@ -100,7 +100,10 @@ public class Track {
             canvas.save();
             canvas.rotate(-angle*360f/(2*(float)Math.PI), (float) startX, (float) startY); // (float)(startX + (endX - startX)/2f), (float)(startY + (endY - startY)/2f));
 
+            int prevAlpha = body.getPaint().getAlpha();
+            body.getPaint().setAlpha(alphaOfTrack(hour, currentHour));
             canvas.drawRect((float) startX + padding, (float) startY, (float) startX + length - padding, (float) startY + height, body.getPaint());
+            body.getPaint().setAlpha(prevAlpha);
 
             canvas.restore();
 
@@ -141,6 +144,19 @@ public class Track {
         }
 
         return c;
+
+    }
+
+    private static int alphaOfTrack(int trackHour, int currentHour) {
+
+        final int MIN_ALPHA = 127;
+
+        int alpha = Math.abs(currentHour - trackHour);
+        alpha = Math.min(alpha, 5);
+        alpha = 5 - alpha;
+        alpha = MIN_ALPHA + alpha * ((255-MIN_ALPHA)/5);
+
+        return alpha;
 
     }
 
