@@ -58,11 +58,7 @@ public class Panel extends CardView {
 
         LayoutInflater.from(getContext()).inflate(R.layout.view_panel, this);
 
-        slideInAnimation = AnimationUtils.loadAnimation(getContext(), direction.toAnimIn());
-        slideOutAnimation = AnimationUtils.loadAnimation(getContext(), direction.toAnimOut());
-
-        slideInAnimation.setAnimationListener(new OnSlideInAnimation());
-        slideOutAnimation.setAnimationListener(new OnSlideOutAnimation());
+        setDirection(direction);
 
         findViewById(R.id.imageButton).setOnClickListener(new OnClickListener() {
             @Override
@@ -70,6 +66,16 @@ public class Panel extends CardView {
                 hide();
             }
         });
+
+    }
+
+    public void setDirection(Direction direction) {
+
+        slideInAnimation = AnimationUtils.loadAnimation(getContext(), direction.toAnimIn());
+        slideOutAnimation = AnimationUtils.loadAnimation(getContext(), direction.toAnimOut());
+
+        slideInAnimation.setAnimationListener(new OnSlideInAnimation());
+        slideOutAnimation.setAnimationListener(new OnSlideOutAnimation());
 
     }
 
@@ -117,7 +123,7 @@ public class Panel extends CardView {
 
     }
 
-    private enum Direction {
+    public enum Direction {
 
         BOTTOM,
         LEFT;

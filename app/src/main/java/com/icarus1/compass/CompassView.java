@@ -2,31 +2,25 @@ package com.icarus1.compass;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.view.View;
 
 import androidx.annotation.Nullable;
 
-import com.icarus1.R;
-
 public class CompassView extends View {
 
     private Background background;
+    private Foreground foreground;
     private Track track;
 
-    private float innerDiameter;
     private float innerRadius;
     private float ringThickness;
-    private final Paint backgroundRingPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
     private CompassModel compass = new CompassModel(0,0);
     private int hour;
     private int minutes;
     private float seconds;
 
-    private boolean drawSunMoon;
-    private boolean drawPlanets;
     private boolean[] drawBody;
 
     public CompassView(Context context) {
@@ -52,13 +46,9 @@ public class CompassView extends View {
     private void init(Context context) {
 
         background = new Background(context, innerRadius);
-        track = new Track(innerRadius);
+        foreground = new Foreground(context, innerRadius, innerRadius + ringThickness);
+        track = new Track(innerRadius, ringThickness, innerRadius+ringThickness);
 
-        backgroundRingPaint.setColor(getResources().getColor(R.color.compass_ring, getContext().getTheme()));
-        backgroundRingPaint.setStyle(Paint.Style.STROKE);
-
-        drawSunMoon = true;
-        drawPlanets = false;
         drawBody = new boolean[CelestialBody.values().length];
 
     }
@@ -72,24 +62,6 @@ public class CompassView extends View {
         this.hour = hour;
         this.minutes = minutes;
         this.seconds = seconds;
-        invalidate();
-    }
-
-    public boolean isDrawSunMoon() {
-        return drawSunMoon;
-    }
-
-    public void setDrawSunMoon(boolean drawSunMoon) {
-        this.drawSunMoon = drawSunMoon;
-        invalidate();
-    }
-
-    public boolean isDrawPlanets() {
-        return drawPlanets;
-    }
-
-    public void setDrawPlanets(boolean drawPlanets) {
-        this.drawPlanets = drawPlanets;
         invalidate();
     }
 
@@ -113,14 +85,13 @@ public class CompassView extends View {
 
         int maxLength = (int)Math.min(ww,hh);
 
-        ringThickness = maxLength / 40f;
-        innerDiameter = maxLength - 2*ringThickness;
+        ringThickness = maxLength / 20f;
+        float innerDiameter = maxLength - 2*ringThickness;
         innerRadius = innerDiameter / 2;
 
         background.setRadius(innerRadius);
-        track.setRadius(innerRadius);
-
-        backgroundRingPaint.setStrokeWidth(ringThickness);
+        foreground.setRing(innerRadius, innerRadius + ringThickness);
+        track.setDimensions(innerRadius, ringThickness, innerRadius+ringThickness);
 
     }
 
@@ -129,11 +100,7 @@ public class CompassView extends View {
         super.onDraw(canvas);
 
         drawBackground(canvas);
-        for (CelestialBody body : CelestialBody.values()) {
-            if (drawBody[body.getIndex()]) {
-                drawTracks(hour,minutes,seconds, body, canvas);
-            }
-        }
+        drawBodies(canvas);
         drawForeground(canvas);
 
     }
@@ -151,25 +118,25 @@ public class CompassView extends View {
 
     private void drawForeground(Canvas canvas) {
 
-        canvas.save();
-        canvas.translate(ringThickness, ringThickness);
-
-        canvas.drawCircle(
-            innerRadius, innerRadius,
-            innerRadius + ringThickness/2,
-            backgroundRingPaint
-        );
-
-        canvas.restore();
+        foreground.draw(canvas);
 
     }
 
-    private void drawTracks(int hour, int minute, double seconds, CelestialBody body, Canvas canvas) {
+    private void drawBodies(Canvas canvas) {
 
         canvas.save();
         canvas.translate(ringThickness, ringThickness);
 
-        track.draw(canvas, compass, body, hour, minute, seconds);
+        for (CelestialBody body : CelestialBody.values()) {
+            if (drawBody[body.getIndex()]) {
+                track.drawTracks(hour, compass, body, canvas);
+            }
+        }
+        for (CelestialBody body : CelestialBody.values()) {
+            if (drawBody[body.getIndex()]) {
+                track.drawCurrentPosition(hour, minutes, seconds, compass, body, canvas);
+            }
+        }
 
         canvas.restore();
 

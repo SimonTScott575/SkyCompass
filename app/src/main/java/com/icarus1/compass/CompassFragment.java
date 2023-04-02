@@ -64,23 +64,6 @@ public class CompassFragment extends Fragment {
         binding.compassView.setTime(hour, minute, seconds);
 
     }
-
-    public void setDrawSunMoon(boolean drawSunMoon) {
-        binding.compassView.setDrawSunMoon(drawSunMoon);
-    }
-
-    public boolean isDrawSunMoon() {
-        return binding.compassView.isDrawSunMoon();
-    }
-
-    public void setDrawPlanets(boolean drawPlanets) {
-        binding.compassView.setDrawPlanets(drawPlanets);
-    }
-
-    public boolean isDrawPlanets() {
-        return binding.compassView.isDrawPlanets();
-    }
-
     public void setDrawBody(CelestialBody body, boolean draw) {
         binding.compassView.setDrawBody(body, draw);
     }
