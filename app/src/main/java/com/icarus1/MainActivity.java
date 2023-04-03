@@ -21,8 +21,6 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.icarus1.calendar.CalendarFragment;
-import com.icarus1.clock.ClockFragment;
 import com.icarus1.compass.CelestialBody;
 import com.icarus1.compass.CompassFragment;
 import com.icarus1.databinding.ActivityMainBinding;
@@ -35,6 +33,11 @@ import java.util.List;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
+    //TODO hide setting configuration behind splash screen
+
+    private static final SavedState.NightModeListener NIGHT_MODE_LISTENER = new NightModeListener();
+
+    private SavedState savedState;
 
     private ActivityMainBinding binding;
     private boolean restoredState;
@@ -54,6 +57,23 @@ public class MainActivity extends AppCompatActivity {
         initContentViewAndBinding();
         initToolbar();
         initUI();
+
+        // Saved state
+        savedState = SavedState.from(this);
+        savedState.setNightModeListener(NIGHT_MODE_LISTENER);
+
+        SavedState.NightMode savedNightMode = savedState.getNightMode();
+        switch (savedNightMode) {
+            case DAY :
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                break;
+            case NIGHT :
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                break;
+            default :
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+                break;
+        }
 
         // Request permissions
         ActivityResultLauncher<String[]> request = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), new ActivityResultCallback<Map<String,Boolean>>() {
@@ -149,6 +169,14 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onDestroy() {
+
+        savedState.destroy();
+
+        super.onDestroy();
+    }
+
     private void initContentViewAndBinding() {
 
         binding = ActivityMainBinding.inflate(getLayoutInflater(), null, false);
@@ -220,14 +248,37 @@ public class MainActivity extends AppCompatActivity {
 
     private void toggleNightMode() {
 
-        int nightModeFlags = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+        int currentNightMode = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
 
-        if (nightModeFlags == Configuration.UI_MODE_NIGHT_YES) {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-        } else {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        if (currentNightMode == Configuration.UI_MODE_NIGHT_YES) {
+            savedState.stageNightMode(SavedState.NightMode.DAY);
+        } else if (currentNightMode == Configuration.UI_MODE_NIGHT_NO) {
+            savedState.stageNightMode(SavedState.NightMode.NIGHT);
+        } else if (currentNightMode == Configuration.UI_MODE_NIGHT_UNDEFINED) {
+            savedState.stageNightMode(SavedState.NightMode.DAY);
         }
 
+        savedState.apply();
+
+    }
+
+    private static class NightModeListener implements SavedState.NightModeListener {
+        @Override
+        public void onNightModeChanged(com.icarus1.SavedState.NightMode nightMode) {
+
+            switch (nightMode) {
+                case DAY :
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                    break;
+                case NIGHT :
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                    break;
+                default :
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+                    break;
+            }
+
+        }
     }
 
     private void setLocation(double longitude, double latitude, @Nullable String location) {

@@ -3,10 +3,12 @@
 
     <PreferenceCategory android:title="Preferences">
 
-        <SwitchPreference
-            android:defaultValue="true"
-            android:key="switch_preference_1"
-            android:title="Use system specified night mode" />
+        <ListPreference
+            android:defaultValue="1"
+            android:entries="@array/night_modes"
+            android:entryValues="@array/night_mode_keys"
+            android:key="night_mode_preference"
+            android:title="Night mode" />
 
         <EditTextPreference
             android:defaultValue="00&#176;N 00&#176;E"
