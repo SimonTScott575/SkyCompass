@@ -3,21 +3,21 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/test_navigation"
-    app:startDestination="@id/navigation_fragment_compass">
+    app:startDestination="@id/navigation_main_fragment_main">
 
-    <activity
-        android:id="@+id/navigation_fragment_compass"
-        android:name="com.icarus1.MainActivity"
-        android:label="@string/page_compass"
-        tools:layout="@layout/activity_main" >
+    <fragment
+        android:id="@+id/navigation_main_fragment_main"
+        android:name="com.icarus1.MainFragment"
+        android:label="@string/app_name"
+        tools:layout="@layout/fragment_main" >
         <action
-            android:id="@+id/action_nav_main_to_settingsActivity"
-            app:destination="@id/navigation_activity_settings" />
-    </activity>
+            android:id="@+id/navigation_action_main_to_settings"
+            app:destination="@id/navigation_main_fragment_settings" />
+    </fragment>
 
-    <activity
-        android:id="@+id/navigation_activity_settings"
-        android:name="com.icarus1.SettingsActivity"
+    <fragment
+        android:id="@+id/navigation_main_fragment_settings"
+        android:name="com.icarus1.settings.PreferenceFragment"
         android:label="@string/page_settings" />
 
 </navigation>

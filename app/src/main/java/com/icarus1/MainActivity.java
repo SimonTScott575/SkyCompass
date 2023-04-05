@@ -1,12 +1,18 @@
 package com.icarus1;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
-import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.NavDestination;
+import androidx.navigation.fragment.NavHostFragment;
+import androidx.navigation.ui.AppBarConfiguration;
+import androidx.navigation.ui.NavigationUI;
 
-import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.MenuItem;
 
 import com.icarus1.databinding.ActivityMainBinding;
@@ -21,14 +27,15 @@ public class MainActivity extends AppCompatActivity {
     private SavedSettings savedState;
 
     private ActivityMainBinding binding;
+    private NavController nav;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         initContentViewAndBinding();
-        initToolbar();
 
+        //
         savedState = SavedSettings.from(this);
         savedState.setNightModeListener(NIGHT_MODE_LISTENER);
 
@@ -45,6 +52,24 @@ public class MainActivity extends AppCompatActivity {
                 break;
         }
 
+        //
+        Fragment settingsFragment = getSupportFragmentManager().findFragmentById(R.id.main_fragment_container);
+
+        if (settingsFragment == null) {
+            Debug.error(new FragmentNotFoundException());
+            finish();
+            return;
+        }
+
+        NavHostFragment settingsNavHostFragment = (NavHostFragment) settingsFragment;
+
+        nav = settingsNavHostFragment.getNavController();
+
+        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(nav.getGraph()).build();
+        NavigationUI.setupWithNavController(binding.toolbar, nav, appBarConfiguration);
+
+        setSupportActionBar(binding.toolbar);
+
     }
 
     @Override
@@ -59,29 +84,6 @@ public class MainActivity extends AppCompatActivity {
 
         binding = ActivityMainBinding.inflate(getLayoutInflater(), null, false);
         setContentView(binding.getRoot());
-
-    }
-
-    private void initToolbar() {
-
-        binding.toolbar.setOnMenuItemClickListener(new OnMenuClick());
-        binding.toolbar.inflateMenu(R.menu.main);
-
-        MenuItem item = binding.toolbar.getMenu().findItem(R.id.menu_dark_mode);
-        int nightModeFlags = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
-
-        if (nightModeFlags == Configuration.UI_MODE_NIGHT_YES) {
-            item.setIcon(R.drawable.light_mode);
-            item.setTitle(R.string.light_mode);
-        } else if (nightModeFlags == Configuration.UI_MODE_NIGHT_NO) {
-            item.setIcon(R.drawable.dark_mode);
-            item.setTitle(R.string.dark_mode);
-        } else if (nightModeFlags == Configuration.UI_MODE_NIGHT_UNDEFINED) {
-            item.setIcon(R.drawable.dark_mode);
-            item.setTitle(R.string.dark_mode);
-        } else {
-            Debug.log("Unrecognised nightModeFlags.");
-        }
 
     }
 
@@ -120,28 +122,76 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private class OnMenuClick implements Toolbar.OnMenuItemClickListener {
-        @Override
-        public boolean onMenuItemClick(MenuItem item) {
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
 
-            if (item.getItemId() == R.id.menu_settings) {
-                Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
-                startActivity(intent);
-                return true;
+        getMenuInflater().inflate(R.menu.main, menu);
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(@NonNull Menu menu) {
+
+        MenuItem item = menu.findItem(R.id.menu_dark_mode);
+        int nightModeFlags = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+
+        if (nightModeFlags == Configuration.UI_MODE_NIGHT_YES) {
+            item.setIcon(R.drawable.light_mode);
+            item.setTitle(R.string.light_mode);
+        } else if (nightModeFlags == Configuration.UI_MODE_NIGHT_NO) {
+            item.setIcon(R.drawable.dark_mode);
+            item.setTitle(R.string.dark_mode);
+        } else if (nightModeFlags == Configuration.UI_MODE_NIGHT_UNDEFINED) {
+            item.setIcon(R.drawable.dark_mode);
+            item.setTitle(R.string.dark_mode);
+        } else {
+            Debug.log("Unrecognised nightModeFlags.");
+        }
+
+        NavDestination destination = nav.getCurrentDestination();
+        if (destination != null) {
+            if (destination.getId() == R.id.navigation_main_fragment_settings) {
+                menu.setGroupVisible(R.id.menu_all, false);
             }
+        }
 
-            if (item.getItemId() == R.id.menu_about) {
-                //TODO switch to about fragment in MainActivity - requires rewrite of MainActivity
-                return true;
-            }
+        return super.onPrepareOptionsMenu(menu);
+    }
 
-            if (item.getItemId() == R.id.menu_dark_mode) {
-                toggleNightMode();
-                return true;
-            }
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
 
-            return false;
+        int id = item.getItemId();
+
+        if (id == R.id.menu_settings) {
+            nav.navigate(R.id.navigation_action_main_to_settings);
+            return true;
+        }
+
+        if (id == R.id.menu_about) {
+            //TODO switch to about fragment in MainActivity - requires rewrite of MainActivity
+            return true;
+        }
+
+        if (id == R.id.menu_dark_mode) {
+            toggleNightMode();
+            return true;
+        }
+
+        if (id == android.R.id.home) {
+            nav.navigateUp();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    private static class FragmentNotFoundException extends Debug.Exception {
+        private FragmentNotFoundException() {
+            super("Fragment Not Found.");
         }
     }
+
 
 }
