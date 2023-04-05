@@ -6,7 +6,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.os.Handler;
@@ -102,8 +102,8 @@ public class CalendarFragment extends Fragment {
         bundle.putInt("D", dayOfMonth-1);
         bundle.putBoolean("CURRENT DATE", currentDate);
         try {
-            getActivityOrThrowException().getSupportFragmentManager().setFragmentResult("A", bundle);
-        } catch (NoActivityAttachedExcpetion e) {
+            getParentFragmentManagerOrThrowException().setFragmentResult("A", bundle);
+        } catch (NoParentFragmentManagerAttachedException e) {
             Debug.log(e);
         }
 
@@ -190,13 +190,13 @@ public class CalendarFragment extends Fragment {
 
     }
 
-    private FragmentActivity getActivityOrThrowException()
-    throws NoActivityAttachedExcpetion {
+    private FragmentManager getParentFragmentManagerOrThrowException()
+    throws NoParentFragmentManagerAttachedException {
 
         try {
-            return requireActivity();
+            return getParentFragmentManager();
         } catch (IllegalStateException e) {
-            throw new NoActivityAttachedExcpetion();
+            throw new NoParentFragmentManagerAttachedException();
         }
 
     }
@@ -206,9 +206,9 @@ public class CalendarFragment extends Fragment {
             super("Handler failed to post.");
         }
     }
-    private static class NoActivityAttachedExcpetion extends Debug.Exception {
-        public NoActivityAttachedExcpetion() {
-            super("No Activity attached.");
+    private static class NoParentFragmentManagerAttachedException extends Debug.Exception {
+        public NoParentFragmentManagerAttachedException() {
+            super("No parent fragment manager attached.");
         }
     }
 

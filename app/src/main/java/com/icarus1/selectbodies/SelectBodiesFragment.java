@@ -1,5 +1,6 @@
 package com.icarus1.selectbodies;
 
+import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.os.Bundle;
@@ -19,6 +20,7 @@ import com.icarus1.R;
 import com.icarus1.compass.CelestialBody;
 import com.icarus1.databinding.FragmentSelectBodiesBinding;
 import com.icarus1.databinding.ViewSelectableBodyBinding;
+import com.icarus1.util.Debug;
 
 public class SelectBodiesFragment extends Fragment {
 
@@ -94,8 +96,29 @@ public class SelectBodiesFragment extends Fragment {
         bundle.putInt("INDEX", index);
         bundle.putBoolean("CHECKED", isChecked);
 
-        requireActivity().getSupportFragmentManager().setFragmentResult("E_"+body.getName(), bundle);
+        try {
+            getParentFragmentManagerOrThrowException().setFragmentResult("E_" + body.getName(), bundle);
+        } catch (NoParentFragmentManagerAttached e) {
+            Debug.error(e);
+        }
 
+    }
+
+    private FragmentManager getParentFragmentManagerOrThrowException()
+    throws NoParentFragmentManagerAttached {
+
+        try {
+            return getParentFragmentManager();
+        } catch (IllegalStateException e) {
+            throw new NoParentFragmentManagerAttached();
+        }
+
+    }
+
+    private static class NoParentFragmentManagerAttached extends Debug.Exception {
+        public NoParentFragmentManagerAttached() {
+            super("No parent fragment manager attached.");
+        }
     }
 
 }

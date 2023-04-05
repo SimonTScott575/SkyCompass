@@ -1,6 +1,6 @@
 package com.icarus1.clock;
 
-import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.os.Bundle;
@@ -138,8 +138,8 @@ public class ClockFragment extends Fragment {
         bundle.putInt("OFFSET", UTCOffset);
         bundle.putString("LOCATION", location);
         try {
-            getActivityOrThrowException().getSupportFragmentManager().setFragmentResult("C", bundle);
-        } catch (NoActivityAttachedExcpetion e) {
+            getParentFragmentManagerOrThrowException().setFragmentResult("C", bundle);
+        } catch (NoParentFragmentManagerAttachedException e) {
             Debug.log(e);
         }
 
@@ -226,13 +226,13 @@ public class ClockFragment extends Fragment {
 
     }
 
-    private FragmentActivity getActivityOrThrowException()
-    throws NoActivityAttachedExcpetion {
+    private FragmentManager getParentFragmentManagerOrThrowException()
+    throws NoParentFragmentManagerAttachedException {
 
         try {
-            return requireActivity();
+            return getParentFragmentManager();
         } catch (IllegalStateException e) {
-            throw new NoActivityAttachedExcpetion();
+            throw new NoParentFragmentManagerAttachedException();
         }
 
     }
@@ -242,9 +242,9 @@ public class ClockFragment extends Fragment {
             super("Handler failed to post.");
         }
     }
-    private static class NoActivityAttachedExcpetion extends Debug.Exception {
-        public NoActivityAttachedExcpetion() {
-            super("No Activity attached.");
+    private static class NoParentFragmentManagerAttachedException extends Debug.Exception {
+        public NoParentFragmentManagerAttachedException() {
+            super("No parent fragment manager attached.");
         }
     }
 

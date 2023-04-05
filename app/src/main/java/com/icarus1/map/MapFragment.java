@@ -11,6 +11,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.preference.PreferenceManager;
@@ -20,6 +21,7 @@ import android.view.ViewGroup;
 
 import com.icarus1.R;
 import com.icarus1.databinding.FragmentMapBinding;
+import com.icarus1.util.Debug;
 import com.icarus1.util.Format;
 
 import org.osmdroid.config.Configuration;
@@ -89,7 +91,7 @@ public class MapFragment extends Fragment {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults); //TODO call super here or at end ?
 
         ArrayList<String> permissionsToRequest = new ArrayList<>();
@@ -189,8 +191,11 @@ public class MapFragment extends Fragment {
         bundle.putDouble("Longitude", longitude);
         bundle.putDouble("Latitude", latitude);
         bundle.putString("Location", location);
-        requireActivity().getSupportFragmentManager().setFragmentResult("B", bundle);
-
+        try {
+            getParentFragmentManagerOrThrowException().setFragmentResult("B", bundle);
+        } catch (NoParentFragmentManagerAttachedException e) {
+            Debug.log(e);
+        }
     }
 
     private class OnClickSetToLocation implements View.OnClickListener {
@@ -207,6 +212,24 @@ public class MapFragment extends Fragment {
 
             setLocation(longitude, latitude, getResources().getString(R.string.using_system_location));
 
+        }
+    }
+
+    private FragmentManager getParentFragmentManagerOrThrowException()
+    throws NoParentFragmentManagerAttachedException {
+
+        try {
+            return getParentFragmentManager();
+        } catch (IllegalStateException e) {
+            throw new NoParentFragmentManagerAttachedException();
+        }
+
+    }
+
+
+    private static class NoParentFragmentManagerAttachedException extends Debug.Exception {
+        public NoParentFragmentManagerAttachedException() {
+            super("No parent fragment manager attached.");
         }
     }
 

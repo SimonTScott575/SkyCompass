@@ -1,11 +1,11 @@
-package com.icarus1;
+package com.icarus1.settings;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 
 import androidx.preference.PreferenceManager;
 
-public class SavedState {
+public class SavedSettings {
     //TODO apply problematic as implemented in listeners of MainActivity
 
     private static final String NIGHT_MODE_KEY = "night_mode_preference";
@@ -16,7 +16,7 @@ public class SavedState {
 
     private NightModeListener nightModeListener;
 
-    private SavedState(Context context) {
+    private SavedSettings(Context context) {
 
         preferences = PreferenceManager.getDefaultSharedPreferences(context);
         editor = preferences.edit();
@@ -31,8 +31,8 @@ public class SavedState {
         preferences.unregisterOnSharedPreferenceChangeListener(onSharedPreferenceChangeListener);
     }
 
-    public static SavedState from(Context context) {
-        return new SavedState(context);
+    public static SavedSettings from(Context context) {
+        return new SavedSettings(context);
     }
 
     public NightMode getNightMode() {
@@ -71,7 +71,7 @@ public class SavedState {
         }
     }
 
-    enum NightMode {
+    public enum NightMode {
         DAY,
         NIGHT,
         SYSTEM
