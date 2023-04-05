@@ -10,22 +10,6 @@
             android:key="night_mode_preference"
             android:title="Night mode" />
 
-        <EditTextPreference
-            android:defaultValue="00&#176;N 00&#176;E"
-            android:key="edit_text_preference_1"
-            android:selectAllOnFocus="true"
-            android:singleLine="true"
-            android:title="Default location" />
-
-    </PreferenceCategory>
-
-    <PreferenceCategory android:title="Permissions">
-
-        <SwitchPreference
-            android:defaultValue="true"
-            android:key="switch_preference_2"
-            android:title="Ask for location if don't have permission" />
-
     </PreferenceCategory>
 
 </PreferenceScreen>
