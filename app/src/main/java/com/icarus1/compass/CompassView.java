@@ -62,6 +62,7 @@ public class CompassView extends View {
 
     public void setNorthRotation(float rotation) {
         this.northRotation = rotation;
+        invalidate();
     }
 
     public void setTime(int hour, int minutes, float seconds) {
