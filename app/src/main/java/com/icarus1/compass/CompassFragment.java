@@ -44,6 +44,10 @@ public class CompassFragment extends Fragment {
 
     }
 
+    public void setRotation(float rotation) {
+        binding.compassView.setNorthRotation(rotation);
+    }
+
     public void setLocation(double longitude, double latitude) {
 
         compassModel.setLongitude(longitude);

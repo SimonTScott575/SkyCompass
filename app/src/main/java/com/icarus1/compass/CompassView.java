@@ -15,6 +15,8 @@ public class CompassView extends View {
 
     private float innerRadius;
     private float ringThickness;
+    private float northRotation;
+    private float currentRotation;
 
     private CompassModel compass = new CompassModel(0,0);
     private int hour;
@@ -58,6 +60,10 @@ public class CompassView extends View {
         invalidate();
     }
 
+    public void setNorthRotation(float rotation) {
+        this.northRotation = rotation;
+    }
+
     public void setTime(int hour, int minutes, float seconds) {
         this.hour = hour;
         this.minutes = minutes;
@@ -99,9 +105,23 @@ public class CompassView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
+        float diff = northRotation - currentRotation;
+        currentRotation += (northRotation - currentRotation)*0.1f * (Math.abs(diff) > Math.PI ? -1f : 1f);
+        currentRotation = (float) (currentRotation > Math.PI ? currentRotation - 2f*Math.PI: currentRotation);
+        currentRotation = (float) (currentRotation < -Math.PI ? currentRotation + 2f*Math.PI: currentRotation);
+
         drawBackground(canvas);
+
+        canvas.save();
+        canvas.rotate(
+            (float)Math.toDegrees(-currentRotation),
+            innerRadius + ringThickness, innerRadius + ringThickness
+        );
+
         drawBodies(canvas);
         drawForeground(canvas);
+
+        canvas.restore();
 
     }
 

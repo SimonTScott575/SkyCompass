@@ -2,16 +2,15 @@ package com.icarus1;
 
 import static android.content.Context.LOCATION_SERVICE;
 
-import android.Manifest;
 import android.content.Context;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventCallback;
+import android.hardware.SensorManager;
 import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 
-import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -24,6 +23,7 @@ import android.view.ViewGroup;
 
 import com.icarus1.compass.CelestialBody;
 import com.icarus1.compass.CompassFragment;
+import com.icarus1.compass.CompassSensor;
 import com.icarus1.databinding.FragmentMainBinding;
 import com.icarus1.map.MapFragment;
 import com.icarus1.selectbodies.SelectBodiesFragment;
@@ -31,7 +31,6 @@ import com.icarus1.util.Debug;
 import com.icarus1.util.Format;
 
 import java.util.List;
-import java.util.Map;
 
 public class MainFragment extends Fragment {
 
@@ -44,6 +43,7 @@ public class MainFragment extends Fragment {
     private final OnChangeTimeListener onChangeTimeListener = new OnChangeTimeListener();
     private final OnChangeViewListener ON_CHANGE_VIEW_LISTENER = new OnChangeViewListener();
 
+    private CompassSensor sensor;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -62,54 +62,18 @@ public class MainFragment extends Fragment {
         initUI();
 
         // Request permissions
-        ActivityResultLauncher<String[]> request = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), new ActivityResultCallback<Map<String,Boolean>>() {
+        LocationRequester locationRequester = new LocationRequester(new LocationRequester.OnLocationChanged() {
             @Override
-            public void onActivityResult(Map<String,Boolean> result) {
-
-                if (result.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false) == Boolean.TRUE) {
-
-                    //TODO log
-
-                    try {
-
-                        LocationManager lm = (LocationManager)requireActivity().getSystemService(Context.LOCATION_SERVICE);
-                        lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 10000, 10, new LocationListener() {
-                            @Override
-                            public void onLocationChanged(@NonNull Location location) {
-                                try {
-                                    double longitude = location.getLongitude();
-                                    double latitude = location.getLatitude();
-                                    MapFragment mapFragment = getMapFragment();
-                                    mapFragment.setUserLocation(longitude, latitude);
-                                } catch (Debug.Exception e) {
-                                    Debug.log(e);
-                                }
-                            }
-                        });
-
-                        Location location = getLastKnownLocation(); // lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-                        if (location != null) {
-                            try {
-                                double longitude = location.getLongitude();
-                                double latitude = location.getLatitude();
-                                MapFragment mapFragment = getMapFragment();
-                                mapFragment.setUserLocation(longitude, latitude);
-                            } catch (Debug.Exception e) {
-                                Debug.log(e);
-                            }
-                        }
-
-                    } catch (SecurityException e) {
-                        throw e;
-                    }
-
-                } else {
-                    //TODO log
+            public void onLocationChanged(double latitude, double longitude) {
+                try {
+                    MapFragment mapFragment = getMapFragment();
+                    mapFragment.setUserLocation(longitude, latitude);
+                } catch (Debug.Exception e) {
+                    Debug.log(e);
                 }
-
             }
         });
-        request.launch(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION});
+        locationRequester.request(requireActivity());
 
     }
 
@@ -119,19 +83,20 @@ public class MainFragment extends Fragment {
 
         SelectBodiesFragment selectBodiesFragment;
         try {
+
             selectBodiesFragment = getSelectBodiesFragment();
+
+            if (!restoredState && !started) {
+                selectBodiesFragment.setViewable(CelestialBody.SUN, true);
+                selectBodiesFragment.setViewable(CelestialBody.MOON, true);
+
+                for (CelestialBody body : CelestialBody.planets()) {
+                    selectBodiesFragment.setViewable(body, false);
+                }
+            }
+
         } catch (Debug.Exception e) {
             Debug.error(e);
-            return;
-        }
-
-        if (!restoredState && !started) {
-            selectBodiesFragment.setViewable(CelestialBody.SUN, true);
-            selectBodiesFragment.setViewable(CelestialBody.MOON, true);
-
-            for (CelestialBody body : CelestialBody.planets()) {
-                selectBodiesFragment.setViewable(body, false);
-            }
         }
 
         started = true;
@@ -153,6 +118,29 @@ public class MainFragment extends Fragment {
                 .setFragmentResultListener("E_"+body.getName(), this, ON_CHANGE_VIEW_LISTENER);
         }
 
+        sensor = new CompassSensor(new CompassSensor.OnOrientationChanged() {
+            @Override
+            public void onOrientationChanged(float[] orientation) {
+
+                try {
+                    CompassFragment compassFragment = getCompassFragment();
+                    compassFragment.setRotation(orientation[0]);
+                } catch (Debug.Exception e) {
+                    //TODO log
+                }
+
+            }
+        });
+        sensor.request(requireContext());
+
+    }
+
+    @Override
+    public void onPause() {
+
+        sensor.destroy();
+
+        super.onPause();
     }
 
     private void initUI() {

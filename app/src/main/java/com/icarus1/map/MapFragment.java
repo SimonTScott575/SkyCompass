@@ -5,6 +5,7 @@ import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 
@@ -55,11 +56,6 @@ public class MapFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        requestPermissionsIfNecessary(new String[]{
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
-        });
-
         Context ctx = requireActivity();
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
 
@@ -70,44 +66,16 @@ public class MapFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        //this will refresh the osmdroid configuration on resuming.
-        //if you make changes to the configuration, use
-        //SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        //Configuration.getInstance().load(this, PreferenceManager.getDefaultSharedPreferences(this));
         binding.mapView.onResume();
     }
 
     @Override
     public void onPause() {
-        super.onPause();
-        //this will refresh the osmdroid configuration on resuming.
-        //if you make changes to the configuration, use
-        //SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        //Configuration.getInstance().save(this, prefs);
-        binding.mapView.onPause();
 
+        binding.mapView.onPause();
         userLocation = null;
 
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults); //TODO call super here or at end ?
-
-        ArrayList<String> permissionsToRequest = new ArrayList<>();
-
-        for (int i = 0; i < grantResults.length; i++) {
-            permissionsToRequest.add(permissions[i]);
-        }
-
-        if (permissionsToRequest.size() > 0) {
-            ActivityCompat.requestPermissions(
-                requireActivity(),
-                permissionsToRequest.toArray(new String[0]),
-                REQUEST_PERMISSIONS_REQUEST_CODE
-            );
-        }
-
+        super.onPause();
     }
 
     private void setUpMap() {
@@ -139,30 +107,6 @@ public class MapFragment extends Fragment {
         setLocation(viewModel.getLongitude(), viewModel.getLatitude(), viewModel.getLocation());
 
         binding.useLocation.setOnClickListener(new OnClickSetToLocation());
-
-    }
-
-    private void requestPermissionsIfNecessary(String[] permissions) {
-
-        ArrayList<String> permissionsToRequest = new ArrayList<>();
-
-        for (String permission : permissions) {
-
-            int permissionStatus = ContextCompat.checkSelfPermission(requireActivity(), permission);
-
-            if (permissionStatus != PackageManager.PERMISSION_GRANTED) {
-                permissionsToRequest.add(permission);
-            }
-
-        }
-
-        if (permissionsToRequest.size() > 0) {
-            ActivityCompat.requestPermissions(
-                requireActivity(),
-                permissionsToRequest.toArray(new String[0]),
-                REQUEST_PERMISSIONS_REQUEST_CODE
-            );
-        }
 
     }
 
