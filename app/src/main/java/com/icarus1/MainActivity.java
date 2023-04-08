@@ -133,7 +133,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onPrepareOptionsMenu(@NonNull Menu menu) {
 
-        MenuItem item = menu.findItem(R.id.menu_dark_mode);
+        MenuItem item = menu.findItem(R.id.menu_item_dark_mode);
         int nightModeFlags = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
 
         if (nightModeFlags == Configuration.UI_MODE_NIGHT_YES) {
@@ -152,7 +152,8 @@ public class MainActivity extends AppCompatActivity {
         NavDestination destination = nav.getCurrentDestination();
         if (destination != null) {
             if (destination.getId() == R.id.navigation_main_fragment_settings) {
-                menu.setGroupVisible(R.id.menu_all, false);
+                menu.setGroupVisible(R.id.menu_group_compass, false);
+                menu.setGroupVisible(R.id.menu_group_all, false);
             }
         }
 
@@ -164,17 +165,17 @@ public class MainActivity extends AppCompatActivity {
 
         int id = item.getItemId();
 
-        if (id == R.id.menu_settings) {
+        if (id == R.id.menu_item_settings) {
             nav.navigate(R.id.navigation_action_main_to_settings);
             return true;
         }
 
-        if (id == R.id.menu_about) {
+        if (id == R.id.menu_item_about) {
             //TODO switch to about fragment in MainActivity - requires rewrite of MainActivity
             return true;
         }
 
-        if (id == R.id.menu_dark_mode) {
+        if (id == R.id.menu_item_dark_mode) {
             toggleNightMode();
             return true;
         }

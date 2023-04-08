@@ -3,19 +3,28 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <group
-        android:id="@+id/menu_all">
+        android:id="@+id/menu_group_compass">
         <item
-            android:id="@+id/menu_dark_mode"
+            android:id="@+id/menu_item_rotate_to_north"
+            android:icon="@drawable/compass"
+            android:title=""
+            app:showAsAction="ifRoom" />
+    </group>
+
+    <group
+        android:id="@+id/menu_group_all">
+        <item
+            android:id="@+id/menu_item_dark_mode"
             android:icon="@drawable/dark_mode"
             android:title="@string/dark_mode"
             app:showAsAction="ifRoom" />
         <item
-            android:id="@+id/menu_about"
+            android:id="@+id/menu_item_about"
             android:icon="@drawable/settings_about"
             android:title="@string/about"
             app:showAsAction="ifRoom" />
         <item
-            android:id="@+id/menu_settings"
+            android:id="@+id/menu_item_settings"
             android:icon="@drawable/settings"
             android:title="@string/page_settings"
             app:showAsAction="ifRoom" />

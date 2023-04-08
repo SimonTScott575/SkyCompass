@@ -2,11 +2,6 @@ package com.icarus1;
 
 import static android.content.Context.LOCATION_SERVICE;
 
-import android.content.Context;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventCallback;
-import android.hardware.SensorManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -37,13 +32,35 @@ public class MainFragment extends Fragment {
     private FragmentMainBinding binding;
     private boolean restoredState;
     private boolean started;
+
     private final OnObjectSelection onObjectSelection = new OnObjectSelection();
+
+    private CompassSensor sensor;
+    private boolean rotateToNorth;
+
+    private final OnChangeViewListener onChangeViewListener = new OnChangeViewListener();
     private final OnChangeLocationListener onChangeLocationListener = new OnChangeLocationListener();
     private final OnChangeDateListener onChangeDateListener = new OnChangeDateListener();
     private final OnChangeTimeListener onChangeTimeListener = new OnChangeTimeListener();
-    private final OnChangeViewListener ON_CHANGE_VIEW_LISTENER = new OnChangeViewListener();
 
-    private CompassSensor sensor;
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        LocationRequester locationRequester = new LocationRequester(new LocationRequester.OnLocationChanged() {
+            @Override
+            public void onLocationChanged(double latitude, double longitude) {
+                try {
+                    MapFragment mapFragment = getMapFragment();
+                    mapFragment.setUserLocation(longitude, latitude);
+                } catch (Debug.Exception e) {
+                    Debug.log(e);
+                }
+            }
+        });
+        locationRequester.request(requireActivity());
+
+    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -60,20 +77,6 @@ public class MainFragment extends Fragment {
         restoredState = savedInstanceState != null;
 
         initUI();
-
-        // Request permissions
-        LocationRequester locationRequester = new LocationRequester(new LocationRequester.OnLocationChanged() {
-            @Override
-            public void onLocationChanged(double latitude, double longitude) {
-                try {
-                    MapFragment mapFragment = getMapFragment();
-                    mapFragment.setUserLocation(longitude, latitude);
-                } catch (Debug.Exception e) {
-                    Debug.log(e);
-                }
-            }
-        });
-        locationRequester.request(requireActivity());
 
     }
 
@@ -115,20 +118,18 @@ public class MainFragment extends Fragment {
             .setFragmentResultListener("C", this, onChangeTimeListener);
         for (CelestialBody body : CelestialBody.values()) {
             getChildFragmentManager()
-                .setFragmentResultListener("E_"+body.getName(), this, ON_CHANGE_VIEW_LISTENER);
+                .setFragmentResultListener("E_"+body.getName(), this, onChangeViewListener);
         }
 
         sensor = new CompassSensor(new CompassSensor.OnOrientationChanged() {
             @Override
             public void onOrientationChanged(float[] orientation) {
-
                 try {
                     CompassFragment compassFragment = getCompassFragment();
-                    compassFragment.setRotation(orientation[0]);
+                    compassFragment.setNorthRotation(orientation[0]);
                 } catch (Debug.Exception e) {
-                    //TODO log
+                    Debug.log(e);
                 }
-
             }
         });
         sensor.request(requireContext());
@@ -196,6 +197,56 @@ public class MainFragment extends Fragment {
 
         return fragment;
 
+    }
+
+    private void setViewable(CelestialBody body, boolean viewable) {
+
+        CompassFragment compassFragment;
+        SelectBodiesFragment selectBodiesFragment;
+        try {
+            compassFragment = getCompassFragment();
+            selectBodiesFragment = getSelectBodiesFragment();
+        } catch (Debug.Exception e) {
+            Debug.error(e);
+            return;
+        }
+
+        int viewID;
+        CelestialBody[] objects;
+        if (body == CelestialBody.SUN || body == CelestialBody.MOON) {
+            viewID = R.id.toggle_objects_sun_moon;
+            objects = CelestialBody.nonPlanets();
+        } else {
+            viewID = R.id.toggle_objects_planets;
+            objects = CelestialBody.planets();
+        }
+
+        if (!viewable) {
+            binding.toggleObjectsGroup.uncheck(viewID);
+        } else {
+            boolean allViewable = true;
+            for (CelestialBody body2 : objects) {
+                allViewable &= selectBodiesFragment.getViewable(body2);
+            }
+            if (allViewable) {
+                binding.toggleObjectsGroup.check(viewID);
+            }
+        }
+
+        compassFragment.setDrawBody(body, viewable);
+
+    }
+
+    private class OnChangeViewListener implements FragmentResultListener {
+        @Override
+        public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
+
+            int index = result.getInt("INDEX");
+            boolean checked = result.getBoolean("CHECKED");
+
+            setViewable(CelestialBody.values()[index], checked);
+
+        }
     }
 
     private void setLocation(double longitude, double latitude, @Nullable String location) {
@@ -325,56 +376,6 @@ public class MainFragment extends Fragment {
             String location = result.getString("LOCATION");
 
             setTime(hour, minute, seconds, timeZoneID, location);
-
-        }
-    }
-
-    private void setViewable(CelestialBody body, boolean viewable) {
-
-        CompassFragment compassFragment;
-        SelectBodiesFragment selectBodiesFragment;
-        try {
-            compassFragment = getCompassFragment();
-            selectBodiesFragment = getSelectBodiesFragment();
-        } catch (Debug.Exception e) {
-            Debug.error(e);
-            return;
-        }
-
-        int viewID;
-        CelestialBody[] objects;
-        if (body == CelestialBody.SUN || body == CelestialBody.MOON) {
-            viewID = R.id.toggle_objects_sun_moon;
-            objects = CelestialBody.nonPlanets();
-        } else {
-            viewID = R.id.toggle_objects_planets;
-            objects = CelestialBody.planets();
-        }
-
-        if (!viewable) {
-            binding.toggleObjectsGroup.uncheck(viewID);
-        } else {
-            boolean allViewable = true;
-            for (CelestialBody body2 : objects) {
-                allViewable &= selectBodiesFragment.getViewable(body2);
-            }
-            if (allViewable) {
-                binding.toggleObjectsGroup.check(viewID);
-            }
-        }
-
-        compassFragment.setDrawBody(body, viewable);
-
-    }
-
-    private class OnChangeViewListener implements FragmentResultListener {
-        @Override
-        public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
-
-            int index = result.getInt("INDEX");
-            boolean checked = result.getBoolean("CHECKED");
-
-            setViewable(CelestialBody.values()[index], checked);
 
         }
     }

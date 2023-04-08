@@ -32,6 +32,7 @@ import org.osmdroid.views.overlay.Marker;
 import java.util.ArrayList;
 
 public class MapFragment extends Fragment {
+    //TODO create userLocation in MapViewModel
 
     private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 1;
 
