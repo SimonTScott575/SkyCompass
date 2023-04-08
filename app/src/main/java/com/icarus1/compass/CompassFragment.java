@@ -26,6 +26,8 @@ public class CompassFragment extends Fragment {
     private FragmentCompassBinding binding;
     private CompassFragmentViewModel viewModel;
 
+    private final MenuProvider menuProvider = new MenuListener();
+
     public CompassFragment() {
 
         compassModel = new CompassModel(0, 0);
@@ -35,35 +37,6 @@ public class CompassFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        requireActivity().addMenuProvider(new MenuProvider() {
-            @Override
-            public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
-
-            }
-
-            @Override
-            public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
-
-                if (menuItem.getItemId() == R.id.menu_item_rotate_to_north) {
-
-                    boolean rotateToNorth = !viewModel.isRotateToNorth();
-
-                    binding.compassView.setRotateToNorth(rotateToNorth);
-                    viewModel.setRotateToNorth(rotateToNorth);
-
-                    if (viewModel.isRotateToNorth()) {
-                        menuItem.setIcon(R.drawable.compass_off);
-                    } else {
-                        menuItem.setIcon(R.drawable.compass);
-                    }
-
-                    return true;
-                }
-
-                return false;
-            }
-        });
 
     }
 
@@ -88,6 +61,22 @@ public class CompassFragment extends Fragment {
         binding.compassView.setRotateToNorth(viewModel.isRotateToNorth());
         binding.compassView.setNorthRotation(viewModel.getNorthRotation(), true);
 
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        requireActivity().addMenuProvider(menuProvider);
+
+    }
+
+    @Override
+    public void onPause() {
+
+        requireActivity().removeMenuProvider(menuProvider);
+
+        super.onPause();
     }
 
     public void setNorthRotation(float rotation) {
@@ -121,6 +110,46 @@ public class CompassFragment extends Fragment {
 
     public boolean getDrawBody(CelestialBody body) {
         return binding.compassView.getDrawBody(body);
+    }
+
+    private class MenuListener implements MenuProvider {
+
+        @Override
+        public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
+        }
+
+        @Override
+        public void onPrepareMenu(@NonNull Menu menu) {
+
+            MenuItem item = menu.findItem(R.id.menu_item_rotate_to_north);
+
+            item.setVisible(true);
+            item.setIcon(viewModel.isRotateToNorth() ? R.drawable.compass_off : R.drawable.compass);
+
+        }
+
+        @Override
+        public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
+
+            if (menuItem.getItemId() == R.id.menu_item_rotate_to_north) {
+
+                boolean rotateToNorth = !viewModel.isRotateToNorth();
+
+                binding.compassView.setRotateToNorth(rotateToNorth);
+                viewModel.setRotateToNorth(rotateToNorth);
+
+                if (viewModel.isRotateToNorth()) {
+                    menuItem.setIcon(R.drawable.compass_off);
+                } else {
+                    menuItem.setIcon(R.drawable.compass);
+                }
+
+                return true;
+            }
+
+            return false;
+        }
+
     }
 
 }

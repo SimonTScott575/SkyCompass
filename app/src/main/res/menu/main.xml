@@ -3,7 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <group
-        android:id="@+id/menu_group_compass">
+        android:id="@+id/menu_group_compass"
+        android:visible="false">
         <item
             android:id="@+id/menu_item_rotate_to_north"
             android:icon="@drawable/compass"
@@ -12,15 +13,15 @@
     </group>
 
     <group
-        android:id="@+id/menu_group_all">
+        android:id="@+id/menu_group_core">
         <item
             android:id="@+id/menu_item_dark_mode"
             android:icon="@drawable/dark_mode"
             android:title="@string/dark_mode"
             app:showAsAction="ifRoom" />
         <item
-            android:id="@+id/menu_item_about"
-            android:icon="@drawable/settings_about"
+            android:id="@+id/menu_item_help"
+            android:icon="@drawable/help"
             android:title="@string/about"
             app:showAsAction="ifRoom" />
         <item

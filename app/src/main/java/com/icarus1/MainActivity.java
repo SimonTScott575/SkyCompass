@@ -3,9 +3,9 @@ package com.icarus1;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
-import androidx.navigation.NavDestination;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
@@ -13,6 +13,7 @@ import androidx.navigation.ui.NavigationUI;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.icarus1.databinding.ActivityMainBinding;
@@ -27,15 +28,16 @@ public class MainActivity extends AppCompatActivity {
     private SavedSettings savedState;
 
     private ActivityMainBinding binding;
-    private NavController nav;
+    private NavController navigationController;
+    private final MenuListener menuListener = new MenuListener();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        initContentViewAndBinding();
+        initBindingAndContentView();
+        initToolbarAndActionBar();
 
-        //
         savedState = SavedSettings.from(this);
         savedState.setNightModeListener(NIGHT_MODE_LISTENER);
 
@@ -52,23 +54,7 @@ public class MainActivity extends AppCompatActivity {
                 break;
         }
 
-        //
-        Fragment settingsFragment = getSupportFragmentManager().findFragmentById(R.id.main_fragment_container);
-
-        if (settingsFragment == null) {
-            Debug.error(new FragmentNotFoundException());
-            finish();
-            return;
-        }
-
-        NavHostFragment settingsNavHostFragment = (NavHostFragment) settingsFragment;
-
-        nav = settingsNavHostFragment.getNavController();
-
-        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(nav.getGraph()).build();
-        NavigationUI.setupWithNavController(binding.toolbar, nav, appBarConfiguration);
-
-        setSupportActionBar(binding.toolbar);
+        addMenuProvider(menuListener);
 
     }
 
@@ -80,10 +66,90 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
-    private void initContentViewAndBinding() {
+    private void initBindingAndContentView() {
 
         binding = ActivityMainBinding.inflate(getLayoutInflater(), null, false);
         setContentView(binding.getRoot());
+
+    }
+
+    private void initToolbarAndActionBar() {
+
+        Fragment mainFragmentContainer = getSupportFragmentManager().findFragmentById(R.id.main_fragment_container);
+
+        if (mainFragmentContainer == null) {
+            Debug.error(new FragmentNotFoundException());
+            finish();
+            return;
+        }
+
+        NavHostFragment mainNavHostFragment = (NavHostFragment) mainFragmentContainer;
+
+        navigationController = mainNavHostFragment.getNavController();
+
+        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(navigationController.getGraph()).build();
+        NavigationUI.setupWithNavController(binding.toolbar, navigationController, appBarConfiguration);
+        setSupportActionBar(binding.toolbar);
+
+    }
+
+    private class MenuListener implements MenuProvider {
+
+        @Override
+        public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
+            getMenuInflater().inflate(R.menu.main, menu);
+        }
+
+        @Override
+        public void onPrepareMenu(@NonNull Menu menu) {
+
+            menu.setGroupVisible(R.id.menu_group_core, true);
+
+            MenuItem darkModeItem = menu.findItem(R.id.menu_item_dark_mode);
+            int nightModeFlags = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+
+            if (nightModeFlags == Configuration.UI_MODE_NIGHT_YES) {
+                darkModeItem.setIcon(R.drawable.light_mode);
+                darkModeItem.setTitle(R.string.light_mode);
+            } else if (nightModeFlags == Configuration.UI_MODE_NIGHT_NO) {
+                darkModeItem.setIcon(R.drawable.dark_mode);
+                darkModeItem.setTitle(R.string.dark_mode);
+            } else if (nightModeFlags == Configuration.UI_MODE_NIGHT_UNDEFINED) {
+                darkModeItem.setIcon(R.drawable.dark_mode);
+                darkModeItem.setTitle(R.string.dark_mode);
+            } else {
+                Debug.log("Unrecognised nightModeFlags.");
+            }
+
+        }
+
+        @Override
+        public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
+
+            int id = menuItem.getItemId();
+
+            if (id == R.id.menu_item_settings) {
+                navigationController.navigate(R.id.navigation_action_main_to_settings);
+                return true;
+            }
+
+            if (id == R.id.menu_item_help) {
+                //TODO switch to about fragment in MainActivity - requires rewrite of MainActivity
+                return true;
+            }
+
+            if (id == R.id.menu_item_dark_mode) {
+                toggleNightMode();
+                return true;
+            }
+
+            if (id == android.R.id.home) {
+                navigationController.navigateUp();
+                return true;
+            }
+
+            return false;
+        }
 
     }
 
@@ -120,72 +186,6 @@ public class MainActivity extends AppCompatActivity {
             }
 
         }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-
-        getMenuInflater().inflate(R.menu.main, menu);
-
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onPrepareOptionsMenu(@NonNull Menu menu) {
-
-        MenuItem item = menu.findItem(R.id.menu_item_dark_mode);
-        int nightModeFlags = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
-
-        if (nightModeFlags == Configuration.UI_MODE_NIGHT_YES) {
-            item.setIcon(R.drawable.light_mode);
-            item.setTitle(R.string.light_mode);
-        } else if (nightModeFlags == Configuration.UI_MODE_NIGHT_NO) {
-            item.setIcon(R.drawable.dark_mode);
-            item.setTitle(R.string.dark_mode);
-        } else if (nightModeFlags == Configuration.UI_MODE_NIGHT_UNDEFINED) {
-            item.setIcon(R.drawable.dark_mode);
-            item.setTitle(R.string.dark_mode);
-        } else {
-            Debug.log("Unrecognised nightModeFlags.");
-        }
-
-        NavDestination destination = nav.getCurrentDestination();
-        if (destination != null) {
-            if (destination.getId() == R.id.navigation_main_fragment_settings) {
-                menu.setGroupVisible(R.id.menu_group_compass, false);
-                menu.setGroupVisible(R.id.menu_group_all, false);
-            }
-        }
-
-        return super.onPrepareOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-
-        int id = item.getItemId();
-
-        if (id == R.id.menu_item_settings) {
-            nav.navigate(R.id.navigation_action_main_to_settings);
-            return true;
-        }
-
-        if (id == R.id.menu_item_about) {
-            //TODO switch to about fragment in MainActivity - requires rewrite of MainActivity
-            return true;
-        }
-
-        if (id == R.id.menu_item_dark_mode) {
-            toggleNightMode();
-            return true;
-        }
-
-        if (id == android.R.id.home) {
-            nav.navigateUp();
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     private static class FragmentNotFoundException extends Debug.Exception {

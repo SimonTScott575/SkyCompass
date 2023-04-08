@@ -36,7 +36,6 @@ public class MainFragment extends Fragment {
     private final OnObjectSelection onObjectSelection = new OnObjectSelection();
 
     private CompassSensor sensor;
-    private boolean rotateToNorth;
 
     private final OnChangeViewListener onChangeViewListener = new OnChangeViewListener();
     private final OnChangeLocationListener onChangeLocationListener = new OnChangeLocationListener();
