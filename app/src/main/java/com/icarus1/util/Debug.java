@@ -5,10 +5,8 @@ import android.util.Log;
 public class Debug {
 
     private static final boolean ENABLED = true;
-    private static final boolean LOG_PRINT_STACK_TRACE = false;
     private static final boolean LOG_THROW_EXCEPTION = false;
-    private static final boolean ERROR_PRINT_STACK_TRACE = false;
-    private static final boolean ERROR_THROW_EXCEPTION = false;
+    private static final boolean ERROR_THROW_EXCEPTION = true;
 
     private Debug() {
     }
@@ -39,18 +37,14 @@ public class Debug {
 
     private static void postLog(Exception e) {
         Log.d("Icarus", e.getMessage());
-        if (LOG_PRINT_STACK_TRACE) {
-            Log.d("Icarus", e.getMessage());
-        } else if (LOG_THROW_EXCEPTION) {
+        if (LOG_THROW_EXCEPTION) {
             throw new RuntimeException(e);
         }
     }
 
     private static void postError(Exception e) {
         Log.e("Icarus", e.getMessage());
-        if (ERROR_PRINT_STACK_TRACE) {
-            Log.e("Icarus", e.getMessage());
-        } else if (ERROR_THROW_EXCEPTION) {
+        if (ERROR_THROW_EXCEPTION) {
             throw new RuntimeException(e);
         }
     }

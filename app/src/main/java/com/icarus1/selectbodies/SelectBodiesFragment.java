@@ -22,10 +22,23 @@ import com.icarus1.databinding.FragmentSelectBodiesBinding;
 import com.icarus1.databinding.ViewSelectableBodyBinding;
 import com.icarus1.util.Debug;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class SelectBodiesFragment extends Fragment {
 
     private SelectBodiesViewModel viewModel;
     private FragmentSelectBodiesBinding binding;
+    private boolean destroyedView;
+    private boolean restoredState;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        restoredState = savedInstanceState != null;
+
+    }
 
     @Override
     public View onCreateView(
@@ -35,6 +48,9 @@ public class SelectBodiesFragment extends Fragment {
     ) {
         super.onCreateView(inflater, container, savedInstanceState);
 
+        restoredState |= destroyedView;
+
+        viewModel = new ViewModelProvider(this).get(SelectBodiesViewModel.class);
         binding = FragmentSelectBodiesBinding.inflate(inflater, container, false);
 
         return binding.getRoot();
@@ -44,27 +60,43 @@ public class SelectBodiesFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        viewModel = new ViewModelProvider(this).get(SelectBodiesViewModel.class);
+        List<CelestialBody> nonPlanets = Arrays.asList(CelestialBody.nonPlanets());
 
         for (CelestialBody body : CelestialBody.values()) {
 
             ViewSelectableBodyBinding selectableBodyBinding = ViewSelectableBodyBinding.inflate(getLayoutInflater(), binding.bodiesTable, true);
             selectableBodyBinding.name.setText(body.getName());
-            selectableBodyBinding.checkBox.setOnCheckedChangeListener(new OnCheckListener(body.getIndex()));
+            selectableBodyBinding.checkBox.setOnCheckedChangeListener(new OnCheckListener(body));
 
-            setViewable(body, viewModel.getViewable(body));
+            if (!restoredState){
+                setViewable(body, nonPlanets.contains(body));
+            } else {
+                setViewable(body, viewModel.getViewable(body));
+            }
 
         }
 
     }
 
-    public boolean getViewable(CelestialBody body) {
+    @Override
+    public void onDestroyView() {
+
+        destroyedView = true;
+
+        super.onDestroyView();
+    }
+
+    private static int getTableIndex(CelestialBody body) {
+        return body.ordinal();
+    }
+
+    public final boolean getViewable(CelestialBody body) {
         return viewModel.getViewable(body);
     }
 
-    public void setViewable(CelestialBody body, boolean viewable) {
+    public final void setViewable(CelestialBody body, boolean viewable) {
 
-        TableRow row = (TableRow) binding.bodiesTable.getChildAt(body.getIndex()+1);
+        TableRow row = (TableRow) binding.bodiesTable.getChildAt(getTableIndex(body)+1);
         CheckBox checkBox = (CheckBox) row.findViewById(R.id.checkBox);
         checkBox.setChecked(viewable);
 
@@ -72,28 +104,26 @@ public class SelectBodiesFragment extends Fragment {
 
     private class OnCheckListener implements CompoundButton.OnCheckedChangeListener {
 
-        private final int index;
+        private final CelestialBody body;
 
-        public OnCheckListener(int index) {
-            this.index = index;
+        public OnCheckListener(@NonNull CelestialBody body) {
+            this.body = body;
         }
 
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
-            CelestialBody body = CelestialBody.values()[index];
-
             viewModel.setViewable(body, isChecked);
-            onCheckView(body, isChecked, index);
+            onCheckView(body, isChecked);
 
         }
 
     }
 
-    public void onCheckView(CelestialBody body, boolean isChecked, int index) {
+    public void onCheckView(CelestialBody body, boolean isChecked) {
 
         Bundle bundle = new Bundle();
-        bundle.putInt("INDEX", index);
+        bundle.putInt("INDEX", getTableIndex(body));
         bundle.putBoolean("CHECKED", isChecked);
 
         try {

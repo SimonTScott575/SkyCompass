@@ -1,9 +1,5 @@
 package com.icarus1;
 
-import static android.content.Context.LOCATION_SERVICE;
-
-import android.location.Location;
-import android.location.LocationManager;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -25,18 +21,13 @@ import com.icarus1.selectbodies.SelectBodiesFragment;
 import com.icarus1.util.Debug;
 import com.icarus1.util.Format;
 
-import java.util.List;
-
 public class MainFragment extends Fragment {
 
     private FragmentMainBinding binding;
-    private boolean restoredState;
-    private boolean started;
-
-    private final OnObjectSelection onObjectSelection = new OnObjectSelection();
 
     private CompassSensor sensor;
 
+    private final OnObjectSelection onObjectSelection = new OnObjectSelection();
     private final OnChangeViewListener onChangeViewListener = new OnChangeViewListener();
     private final OnChangeLocationListener onChangeLocationListener = new OnChangeLocationListener();
     private final OnChangeDateListener onChangeDateListener = new OnChangeDateListener();
@@ -46,15 +37,12 @@ public class MainFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        LocationRequester locationRequester = new LocationRequester(new LocationRequester.OnLocationChanged() {
-            @Override
-            public void onLocationChanged(double latitude, double longitude) {
-                try {
-                    MapFragment mapFragment = getMapFragment();
-                    mapFragment.setUserLocation(longitude, latitude);
-                } catch (Debug.Exception e) {
-                    Debug.log(e);
-                }
+        LocationRequester locationRequester = new LocationRequester((latitude, longitude) -> {
+            try {
+                MapFragment mapFragment = getMapFragment();
+                mapFragment.setUserLocation(longitude, latitude);
+            } catch (Debug.Exception e) {
+                Debug.log(e);
             }
         });
         locationRequester.request(requireActivity());
@@ -73,35 +61,7 @@ public class MainFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
 
-        restoredState = savedInstanceState != null;
-
         initUI();
-
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-
-        SelectBodiesFragment selectBodiesFragment;
-        try {
-
-            selectBodiesFragment = getSelectBodiesFragment();
-
-            if (!restoredState && !started) {
-                selectBodiesFragment.setViewable(CelestialBody.SUN, true);
-                selectBodiesFragment.setViewable(CelestialBody.MOON, true);
-
-                for (CelestialBody body : CelestialBody.planets()) {
-                    selectBodiesFragment.setViewable(body, false);
-                }
-            }
-
-        } catch (Debug.Exception e) {
-            Debug.error(e);
-        }
-
-        started = true;
 
     }
 
@@ -120,15 +80,12 @@ public class MainFragment extends Fragment {
                 .setFragmentResultListener("E_"+body.getName(), this, onChangeViewListener);
         }
 
-        sensor = new CompassSensor(new CompassSensor.OnOrientationChanged() {
-            @Override
-            public void onOrientationChanged(float[] orientation) {
-                try {
-                    CompassFragment compassFragment = getCompassFragment();
-                    compassFragment.setNorthRotation(orientation[0]);
-                } catch (Debug.Exception e) {
-                    Debug.log(e);
-                }
+        sensor = new CompassSensor(orientation -> {
+            try {
+                CompassFragment compassFragment = getCompassFragment();
+                compassFragment.setNorthRotation(orientation[0]);
+            } catch (Debug.Exception e) {
+                Debug.log(e);
             }
         });
         sensor.request(requireContext());
@@ -153,6 +110,17 @@ public class MainFragment extends Fragment {
 
         binding.toggleObjectsSunMoon.setOnClickListener(onObjectSelection);
         binding.toggleObjectsPlanets.setOnClickListener(onObjectSelection);
+
+    }
+
+    private FragmentManager getChildFragmentManagerOrThrowException()
+            throws NoChildFragmentManagerAttachedException {
+
+        try {
+            return getChildFragmentManager();
+        } catch (IllegalStateException e) {
+            throw new NoChildFragmentManagerAttachedException();
+        }
 
     }
 
@@ -198,12 +166,32 @@ public class MainFragment extends Fragment {
 
     }
 
-    private void setViewable(CelestialBody body, boolean viewable) {
+    private class OnChangeViewListener implements FragmentResultListener {
+        @Override
+        public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
 
-        CompassFragment compassFragment;
+            int index = result.getInt("INDEX");
+            boolean checked = result.getBoolean("CHECKED");
+
+            CelestialBody object = CelestialBody.values()[index];
+
+            setViewableObjectGroupChecked(object, checked);
+
+            CompassFragment compassFragment;
+            try {
+                compassFragment = getCompassFragment();
+                compassFragment.setDrawBody(object, checked);
+            } catch (Debug.Exception e) {
+                Debug.error(e);
+            }
+
+        }
+    }
+
+    private void setViewableObjectGroupChecked(CelestialBody body, boolean viewable) {
+
         SelectBodiesFragment selectBodiesFragment;
         try {
-            compassFragment = getCompassFragment();
             selectBodiesFragment = getSelectBodiesFragment();
         } catch (Debug.Exception e) {
             Debug.error(e);
@@ -214,7 +202,7 @@ public class MainFragment extends Fragment {
         CelestialBody[] objects;
         if (body == CelestialBody.SUN || body == CelestialBody.MOON) {
             viewID = R.id.toggle_objects_sun_moon;
-            objects = CelestialBody.nonPlanets();
+            objects = new CelestialBody[]{CelestialBody.SUN, CelestialBody.MOON};
         } else {
             viewID = R.id.toggle_objects_planets;
             objects = CelestialBody.planets();
@@ -232,18 +220,38 @@ public class MainFragment extends Fragment {
             }
         }
 
-        compassFragment.setDrawBody(body, viewable);
-
     }
 
-    private class OnChangeViewListener implements FragmentResultListener {
+    private class OnObjectSelection implements View.OnClickListener {
         @Override
-        public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
+        public void onClick(View v) {
 
-            int index = result.getInt("INDEX");
-            boolean checked = result.getBoolean("CHECKED");
+            SelectBodiesFragment selectBodiesFragment;
+            try {
+                selectBodiesFragment = getSelectBodiesFragment();
+            } catch (Debug.Exception e) {
+                Debug.error(e);
+                return;
+            }
 
-            setViewable(CelestialBody.values()[index], checked);
+            int viewID = v.getId();
+
+            if (viewID == R.id.toggle_objects_sun_moon) {
+
+                boolean checked = binding.toggleObjectsGroup.getCheckedButtonIds().contains(R.id.toggle_objects_sun_moon);
+
+                selectBodiesFragment.setViewable(CelestialBody.SUN, checked);
+                selectBodiesFragment.setViewable(CelestialBody.MOON, checked);
+
+            } else if (viewID == R.id.toggle_objects_planets) {
+
+                boolean checked = binding.toggleObjectsGroup.getCheckedButtonIds().contains(R.id.toggle_objects_planets);
+
+                for (CelestialBody body : CelestialBody.planets()) {
+                    selectBodiesFragment.setViewable(body, checked);
+                }
+
+            }
 
         }
     }
@@ -281,28 +289,6 @@ public class MainFragment extends Fragment {
             setLocation(longitude, latitude, location);
 
         }
-    }
-
-    private Location getLastKnownLocation() throws SecurityException {
-
-        LocationManager mLocationManager = (LocationManager)requireContext().getSystemService(LOCATION_SERVICE);
-
-        List<String> providers = mLocationManager.getProviders(true);
-        Location bestLocation = null;
-        for (String provider : providers) {
-
-            Location l = mLocationManager.getLastKnownLocation(provider);
-            if (l == null) {
-                continue;
-            }
-            if (bestLocation == null || l.getAccuracy() < bestLocation.getAccuracy()) {
-                bestLocation = l;
-            }
-
-        }
-
-        return bestLocation;
-
     }
 
     private void setDate(int year, int month, int day, boolean currentDate) {
@@ -377,51 +363,6 @@ public class MainFragment extends Fragment {
             setTime(hour, minute, seconds, timeZoneID, location);
 
         }
-    }
-
-    private class OnObjectSelection implements View.OnClickListener {
-        @Override
-        public void onClick(View v) {
-
-            SelectBodiesFragment selectBodiesFragment;
-            try {
-                selectBodiesFragment = getSelectBodiesFragment();
-            } catch (Debug.Exception e) {
-                Debug.error(e);
-                return;
-            }
-
-            int viewID = v.getId();
-
-            if (viewID == R.id.toggle_objects_sun_moon) {
-
-                boolean checked = binding.toggleObjectsGroup.getCheckedButtonIds().contains(R.id.toggle_objects_sun_moon);
-
-                selectBodiesFragment.setViewable(CelestialBody.SUN, checked);
-                selectBodiesFragment.setViewable(CelestialBody.MOON, checked);
-
-            } else if (viewID == R.id.toggle_objects_planets) {
-
-                boolean checked = binding.toggleObjectsGroup.getCheckedButtonIds().contains(R.id.toggle_objects_planets);
-
-                for (CelestialBody body : CelestialBody.planets()) {
-                    selectBodiesFragment.setViewable(body, checked);
-                }
-
-            }
-
-        }
-    }
-
-    private FragmentManager getChildFragmentManagerOrThrowException()
-    throws NoChildFragmentManagerAttachedException {
-
-        try {
-            return getChildFragmentManager();
-        } catch (IllegalStateException e) {
-            throw new NoChildFragmentManagerAttachedException();
-        }
-
     }
 
     private static class FragmentNotFoundException extends Debug.Exception {
