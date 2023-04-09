@@ -27,20 +27,20 @@ public class Track {
 
     }
 
-    public void drawTracks(int currentHour, CompassModel compass, CelestialBody body, Canvas canvas) {
+    public void drawTracks(int currentHour, CompassModel compass, CelestialObject body, Canvas canvas) {
 
         double[] x = new double[25];
         double[] y = new double[25];
         double[] altitude = new double[25];
 
         {
-            Coordinate coordinate = compass.getCoordinate(body.getBody(), 0, 0, 0);
+            Coordinate coordinate = compass.getCoordinate(body, 0, 0, 0);
             x[0] = coordinate.getX();
             y[0] = coordinate.getY();
             altitude[0] = coordinate.getAltitude();
             for (int hour = 1; hour < 25; hour++) {
 
-                coordinate = compass.getCoordinate(body.getBody(), hour, 0, 0);
+                coordinate = compass.getCoordinate(body, hour, 0, 0);
 
                 x[hour] = coordinate.getX();
                 y[hour] = coordinate.getY();
@@ -114,9 +114,9 @@ public class Track {
 
     }
 
-    public void drawCurrentPosition(int hour, int minute, double seconds, CompassModel compass, CelestialBody body, Canvas canvas) {
+    public void drawCurrentPosition(int hour, int minute, double seconds, CompassModel compass, CelestialObject body, Canvas canvas) {
 
-        Coordinate coordinate = compass.getCoordinate(body.getBody(), hour, minute, seconds);
+        Coordinate coordinate = compass.getCoordinate(body, hour, minute, seconds);
 
         if (coordinate.getAltitude() < 0) {
             return;
@@ -130,7 +130,7 @@ public class Track {
 
     }
 
-    private static Coordinate getHorizonCoordinate(boolean stopWhenNegativeAltitude, int startingHour, CompassModel compass, CelestialBody body) {
+    private static Coordinate getHorizonCoordinate(boolean stopWhenNegativeAltitude, int startingHour, CompassModel compass, CelestialObject body) {
 
         HorizonCoordinate firstSweepCoordinate = HorizonCoordinate.get(
             stopWhenNegativeAltitude,
@@ -166,7 +166,7 @@ public class Track {
             int startingHour,
             int startingMinute, int endingMinute, int step,
             CompassModel compass,
-            CelestialBody body
+            CelestialObject body
         ) {
 
             Coordinate coordinate = null;
@@ -174,7 +174,7 @@ public class Track {
 
             for (int minute = startingMinute; minute <= endingMinute; minute += step) {
 
-                coordinate = compass.getCoordinate(body.getBody(), startingHour, minute, 0);
+                coordinate = compass.getCoordinate(body, startingHour, minute, 0);
 
                 double altitude = coordinate.getAltitude();
 

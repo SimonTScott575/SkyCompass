@@ -90,11 +90,11 @@ public class CompassFragment extends Fragment {
         binding.compassView.setTime(hour, minute, seconds);
     }
 
-    public void setDrawBody(CelestialBody body, boolean draw) {
+    public void setDrawBody(CelestialObject body, boolean draw) {
         binding.compassView.setDrawBody(body, draw);
     }
 
-    public boolean getDrawBody(CelestialBody body) {
+    public boolean getDrawBody(CelestialObject body) {
         return binding.compassView.getDrawBody(body);
     }
 

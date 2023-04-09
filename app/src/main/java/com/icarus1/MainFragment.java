@@ -12,7 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.icarus1.compass.CelestialBody;
+import com.icarus1.compass.CelestialObject;
 import com.icarus1.compass.CompassFragment;
 import com.icarus1.compass.CompassSensor;
 import com.icarus1.databinding.FragmentMainBinding;
@@ -75,7 +75,7 @@ public class MainFragment extends Fragment {
             .setFragmentResultListener("B", this, onChangeLocationListener);
         getChildFragmentManager()
             .setFragmentResultListener("C", this, onChangeTimeListener);
-        for (CelestialBody body : CelestialBody.values()) {
+        for (CelestialObject body : CelestialObject.values()) {
             getChildFragmentManager()
                 .setFragmentResultListener("E_"+body.getName(), this, onChangeViewListener);
         }
@@ -173,7 +173,7 @@ public class MainFragment extends Fragment {
             int index = result.getInt("INDEX");
             boolean checked = result.getBoolean("CHECKED");
 
-            CelestialBody object = CelestialBody.values()[index];
+            CelestialObject object = CelestialObject.values()[index];
 
             setViewableObjectGroupChecked(object, checked);
 
@@ -188,7 +188,7 @@ public class MainFragment extends Fragment {
         }
     }
 
-    private void setViewableObjectGroupChecked(CelestialBody body, boolean viewable) {
+    private void setViewableObjectGroupChecked(CelestialObject body, boolean viewable) {
 
         SelectBodiesFragment selectBodiesFragment;
         try {
@@ -199,20 +199,20 @@ public class MainFragment extends Fragment {
         }
 
         int viewID;
-        CelestialBody[] objects;
-        if (body == CelestialBody.SUN || body == CelestialBody.MOON) {
+        CelestialObject[] objects;
+        if (body == CelestialObject.SUN || body == CelestialObject.MOON) {
             viewID = R.id.toggle_objects_sun_moon;
-            objects = new CelestialBody[]{CelestialBody.SUN, CelestialBody.MOON};
+            objects = new CelestialObject[]{CelestialObject.SUN, CelestialObject.MOON};
         } else {
             viewID = R.id.toggle_objects_planets;
-            objects = CelestialBody.planets();
+            objects = CelestialObject.planets();
         }
 
         if (!viewable) {
             binding.toggleObjectsGroup.uncheck(viewID);
         } else {
             boolean allViewable = true;
-            for (CelestialBody body2 : objects) {
+            for (CelestialObject body2 : objects) {
                 allViewable &= selectBodiesFragment.getViewable(body2);
             }
             if (allViewable) {
@@ -240,14 +240,14 @@ public class MainFragment extends Fragment {
 
                 boolean checked = binding.toggleObjectsGroup.getCheckedButtonIds().contains(R.id.toggle_objects_sun_moon);
 
-                selectBodiesFragment.setViewable(CelestialBody.SUN, checked);
-                selectBodiesFragment.setViewable(CelestialBody.MOON, checked);
+                selectBodiesFragment.setViewable(CelestialObject.SUN, checked);
+                selectBodiesFragment.setViewable(CelestialObject.MOON, checked);
 
             } else if (viewID == R.id.toggle_objects_planets) {
 
                 boolean checked = binding.toggleObjectsGroup.getCheckedButtonIds().contains(R.id.toggle_objects_planets);
 
-                for (CelestialBody body : CelestialBody.planets()) {
+                for (CelestialObject body : CelestialObject.planets()) {
                     selectBodiesFragment.setViewable(body, checked);
                 }
 

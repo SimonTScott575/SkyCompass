@@ -17,7 +17,7 @@ import android.widget.CompoundButton;
 import android.widget.TableRow;
 
 import com.icarus1.R;
-import com.icarus1.compass.CelestialBody;
+import com.icarus1.compass.CelestialObject;
 import com.icarus1.databinding.FragmentSelectBodiesBinding;
 import com.icarus1.databinding.ViewSelectableBodyBinding;
 import com.icarus1.util.Debug;
@@ -60,9 +60,9 @@ public class SelectBodiesFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        List<CelestialBody> nonPlanets = Arrays.asList(CelestialBody.nonPlanets());
+        List<CelestialObject> nonPlanets = Arrays.asList(CelestialObject.nonPlanets());
 
-        for (CelestialBody body : CelestialBody.values()) {
+        for (CelestialObject body : CelestialObject.values()) {
 
             ViewSelectableBodyBinding selectableBodyBinding = ViewSelectableBodyBinding.inflate(getLayoutInflater(), binding.bodiesTable, true);
             selectableBodyBinding.name.setText(body.getName());
@@ -86,15 +86,15 @@ public class SelectBodiesFragment extends Fragment {
         super.onDestroyView();
     }
 
-    private static int getTableIndex(CelestialBody body) {
+    private static int getTableIndex(CelestialObject body) {
         return body.ordinal();
     }
 
-    public final boolean getViewable(CelestialBody body) {
+    public final boolean getViewable(CelestialObject body) {
         return viewModel.getViewable(body);
     }
 
-    public final void setViewable(CelestialBody body, boolean viewable) {
+    public final void setViewable(CelestialObject body, boolean viewable) {
 
         TableRow row = (TableRow) binding.bodiesTable.getChildAt(getTableIndex(body)+1);
         CheckBox checkBox = (CheckBox) row.findViewById(R.id.checkBox);
@@ -104,9 +104,9 @@ public class SelectBodiesFragment extends Fragment {
 
     private class OnCheckListener implements CompoundButton.OnCheckedChangeListener {
 
-        private final CelestialBody body;
+        private final CelestialObject body;
 
-        public OnCheckListener(@NonNull CelestialBody body) {
+        public OnCheckListener(@NonNull CelestialObject body) {
             this.body = body;
         }
 
@@ -120,7 +120,7 @@ public class SelectBodiesFragment extends Fragment {
 
     }
 
-    public void onCheckView(CelestialBody body, boolean isChecked) {
+    public void onCheckView(CelestialObject body, boolean isChecked) {
 
         Bundle bundle = new Bundle();
         bundle.putInt("INDEX", getTableIndex(body));

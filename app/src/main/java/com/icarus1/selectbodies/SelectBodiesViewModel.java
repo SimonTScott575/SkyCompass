@@ -2,22 +2,22 @@ package com.icarus1.selectbodies;
 
 import androidx.lifecycle.ViewModel;
 
-import com.icarus1.compass.CelestialBody;
+import com.icarus1.compass.CelestialObject;
 
 public class SelectBodiesViewModel extends ViewModel {
 
     private final boolean[] viewChecks;
 
     public SelectBodiesViewModel() {
-        viewChecks = new boolean[CelestialBody.values().length];
+        viewChecks = new boolean[CelestialObject.values().length];
     }
 
-    public boolean getViewable(CelestialBody body) {
-        return viewChecks[body.getIndex()];
+    public boolean getViewable(CelestialObject body) {
+        return viewChecks[body.ordinal()];
     }
 
-    public void setViewable(CelestialBody body, boolean check) {
-        viewChecks[body.getIndex()] = check;
+    public void setViewable(CelestialObject body, boolean check) {
+        viewChecks[body.ordinal()] = check;
     }
 
 }

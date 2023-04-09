@@ -2,7 +2,6 @@ package com.icarus1.compass;
 
 import io.github.cosinekitty.astronomy.Aberration;
 import io.github.cosinekitty.astronomy.Astronomy;
-import io.github.cosinekitty.astronomy.Body;
 import io.github.cosinekitty.astronomy.EquatorEpoch;
 import io.github.cosinekitty.astronomy.Equatorial;
 import io.github.cosinekitty.astronomy.Observer;
@@ -56,12 +55,12 @@ public class CompassModel {
 
     }
 
-    public Coordinate getCoordinate(Body body, int hour, int minute, double seconds) {
+    public Coordinate getCoordinate(CelestialObject body, int hour, int minute, double seconds) {
 
         Time time = new Time(year, month, dayOfMonth, hour, minute, seconds);
         Observer observer = new Observer(latitude, longitude, 0);
         Equatorial equatorial = Astronomy.equator(
-            body,
+            body.getBody(),
             time,
             observer,
             EquatorEpoch.OfDate,

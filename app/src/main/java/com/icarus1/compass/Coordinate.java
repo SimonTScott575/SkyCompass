@@ -2,8 +2,8 @@ package com.icarus1.compass;
 
 public class Coordinate {
 
-    private double altitude;
-    private double azimuth;
+    private final double altitude;
+    private final double azimuth;
 
     public Coordinate(double altitude, double azimuth) {
         this.altitude = altitude;
