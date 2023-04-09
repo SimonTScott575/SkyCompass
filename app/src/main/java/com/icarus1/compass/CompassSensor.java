@@ -6,6 +6,8 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventCallback;
 import android.hardware.SensorManager;
 
+import com.icarus1.util.Debug;
+
 public class CompassSensor {
 
     private SensorManager sensorManager;
@@ -19,9 +21,17 @@ public class CompassSensor {
         this.onOrientationChanged = onOrientationChanged;
     }
 
+    public void setOnOrientationChanged(OnOrientationChanged onOrientationChanged) {
+        this.onOrientationChanged = onOrientationChanged;
+    }
+
+    public boolean requested() {
+        return sensorManager != null;
+    }
+
     public void request(Context context) {
 
-        if (sensorManager != null) {
+        if (requested()) {
             throw new RuntimeException("Sensor already requested without being destroyed.");
         }
 
@@ -43,7 +53,7 @@ public class CompassSensor {
                 SensorManager.SENSOR_DELAY_UI
             );
         } else {
-            //TODO log
+            Debug.log("Sensor no accessed.");
         }
 
     }
@@ -59,26 +69,25 @@ public class CompassSensor {
 
     private class SensorListener extends SensorEventCallback {
 
-        float[] mGravity = new float[3];
-        float[] mGeomagnetic = new float[3];
+        float[] gravity = new float[3];
+        float[] geomagnetic = new float[3];
 
         @Override
         public void onSensorChanged(SensorEvent event) {
 
             if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER)
-                mGravity = event.values;
+                gravity = event.values;
 
             if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD)
-                mGeomagnetic = event.values;
+                geomagnetic = event.values;
 
-            if (mGravity != null && mGeomagnetic != null) {
+            if (gravity != null && geomagnetic != null) {
 
                 float[] R = new float[9];
                 float[] I = new float[9];
 
-                if (SensorManager.getRotationMatrix(R, I, mGravity, mGeomagnetic)) {
+                if (SensorManager.getRotationMatrix(R, I, gravity, geomagnetic)) {
 
-                    // orientation contains azimut, pitch and roll
                     float[] orientation = new float[3];
                     SensorManager.getOrientation(R, orientation);
 
@@ -93,7 +102,6 @@ public class CompassSensor {
 
         @Override
         public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
         }
 
     }

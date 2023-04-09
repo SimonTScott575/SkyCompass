@@ -11,6 +11,10 @@ public class CompassFragmentViewModel extends ViewModel {
         return rotateToNorth;
     }
 
+    public boolean getRotateToNorth() {
+        return rotateToNorth;
+    }
+
     public void setRotateToNorth(boolean rotateToNorth) {
         this.rotateToNorth = rotateToNorth;
     }

@@ -14,7 +14,6 @@ import android.view.ViewGroup;
 
 import com.icarus1.compass.CelestialObject;
 import com.icarus1.compass.CompassFragment;
-import com.icarus1.compass.CompassSensor;
 import com.icarus1.databinding.FragmentMainBinding;
 import com.icarus1.map.MapFragment;
 import com.icarus1.selectbodies.SelectBodiesFragment;
@@ -24,8 +23,6 @@ import com.icarus1.util.Format;
 public class MainFragment extends Fragment {
 
     private FragmentMainBinding binding;
-
-    private CompassSensor sensor;
 
     private final OnObjectSelection onObjectSelection = new OnObjectSelection();
     private final OnChangeViewListener onChangeViewListener = new OnChangeViewListener();
@@ -80,24 +77,6 @@ public class MainFragment extends Fragment {
                 .setFragmentResultListener("E_"+body.getName(), this, onChangeViewListener);
         }
 
-        sensor = new CompassSensor(orientation -> {
-            try {
-                CompassFragment compassFragment = getCompassFragment();
-                compassFragment.setNorthRotation(orientation[0]);
-            } catch (Debug.Exception e) {
-                Debug.log(e);
-            }
-        });
-        sensor.request(requireContext());
-
-    }
-
-    @Override
-    public void onPause() {
-
-        sensor.destroy();
-
-        super.onPause();
     }
 
     private void initUI() {

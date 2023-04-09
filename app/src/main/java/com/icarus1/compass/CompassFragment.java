@@ -27,8 +27,11 @@ public class CompassFragment extends Fragment {
 
     private final MenuProvider menuProvider;
 
+    private final CompassSensor sensor;
+
     public CompassFragment() {
         compassModel = new CompassModel(0, 0);
+        sensor = new CompassSensor(orientation -> setNorthRotation(orientation[0]));
         menuProvider = new MenuListener();
     }
 
@@ -59,6 +62,10 @@ public class CompassFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
+        if (viewModel.getRotateToNorth() && !sensor.requested()) {
+            sensor.request(requireContext());
+        }
+
         requireActivity().addMenuProvider(menuProvider);
 
     }
@@ -68,7 +75,19 @@ public class CompassFragment extends Fragment {
 
         requireActivity().removeMenuProvider(menuProvider);
 
+        sensor.destroy();
+
         super.onPause();
+    }
+
+    public void setRotateToNorth(boolean rotate) {
+        binding.compassView.setRotateToNorth(rotate);
+        viewModel.setRotateToNorth(rotate);
+        if (rotate && !sensor.requested()) {
+            sensor.request(requireContext());
+        } else if (!rotate) {
+            sensor.destroy();
+        }
     }
 
     public void setNorthRotation(float rotation) {
@@ -121,10 +140,9 @@ public class CompassFragment extends Fragment {
 
                 boolean rotateToNorth = !viewModel.isRotateToNorth();
 
-                binding.compassView.setRotateToNorth(rotateToNorth);
-                viewModel.setRotateToNorth(rotateToNorth);
+                setRotateToNorth(rotateToNorth);
 
-                if (viewModel.isRotateToNorth()) {
+                if (rotateToNorth) {
                     menuItem.setIcon(R.drawable.compass_off);
                 } else {
                     menuItem.setIcon(R.drawable.compass);
