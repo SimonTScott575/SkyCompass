@@ -3,24 +3,28 @@ package com.icarus1.compass;
 import android.graphics.Canvas;
 
 public class Track {
-    //TODO speed up inefficient getHorizonCoordinate search algorithm
 
     private float radius;
     private float diameter;
-    private float outerRadius;
-    private float halfThickness;
 
-    public Track(float radius, float thickness, float outerRadius) {
+    private float width;
+    private static final float fractionBlank = 0.2f;
+    private float objectRadius;
 
-        setDimensions(radius, thickness, outerRadius);
+    public Track(float radius) {
+
+        setDimensions(radius);
 
     }
 
-    public final void setDimensions(float radius, float thickness, float outerRadius) {
+    public final void setDimensions(float radius) {
+
         this.radius = radius;
         diameter = 2*radius;
-        this.outerRadius = outerRadius;
-        halfThickness = thickness/2f;
+
+        width = radius*0.02f;
+        objectRadius = 0.05f*radius;
+
     }
 
     public void drawTracks(int currentHour, CompassModel compass, CelestialBody body, Canvas canvas) {
@@ -80,9 +84,8 @@ public class Track {
                 continue;
             }
 
-            float height = diameter / 150f;
             float length = (float) (Math.sqrt( Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2) ));
-            float padding = length/20f;
+            float padding = length * fractionBlank/2f;
             float angle = (float) Math.atan2(endY - startY, endX - startX);
 
             length *= radius;
@@ -102,7 +105,7 @@ public class Track {
 
             int prevAlpha = body.getPaint().getAlpha();
             body.getPaint().setAlpha(alphaOfTrack(hour, currentHour));
-            canvas.drawRect((float) startX + padding, (float) startY, (float) startX + length - padding, (float) startY + height, body.getPaint());
+            canvas.drawRect((float) startX + padding, (float) startY, (float) startX + length - padding, (float) startY + width, body.getPaint());
             body.getPaint().setAlpha(prevAlpha);
 
             canvas.restore();
@@ -121,7 +124,7 @@ public class Track {
 
         float x = radius + (float) coordinate.getX()*radius;
         float y = diameter - radius - (float) coordinate.getY()*radius;
-        float r = 0.05f*radius;
+        float r = objectRadius;
 
         canvas.drawCircle(x, y, r, body.getPaint());
 
@@ -129,21 +132,63 @@ public class Track {
 
     private static Coordinate getHorizonCoordinate(boolean stopWhenNegativeAltitude, int startingHour, CompassModel compass, CelestialBody body) {
 
-        Coordinate c = null;
+        HorizonCoordinate firstSweepCoordinate = HorizonCoordinate.get(
+            stopWhenNegativeAltitude,
+            startingHour,
+            0, 60, 10,
+            compass,
+            body
+        );
+        HorizonCoordinate secondSweepCoordinate = HorizonCoordinate.get(
+            stopWhenNegativeAltitude,
+            startingHour,
+            firstSweepCoordinate.minute, firstSweepCoordinate.minute + 10, 1,
+            compass,
+            body
+        );
 
-        for (int minute = 0; minute < 60; minute += 1) {
+        return secondSweepCoordinate.coordinate;
 
-            c = compass.getCoordinate(body.getBody(), startingHour, minute, 0d);
+    }
 
-            double altitude = c.getAltitude();
+    private static class HorizonCoordinate {
 
-            if (stopWhenNegativeAltitude ? altitude < 0 : altitude > 0) {
-                break;
-            }
+        public final Coordinate coordinate;
+        public final int minute;
 
+        public HorizonCoordinate(Coordinate coordinate, int minute) {
+            this.coordinate = coordinate;
+            this.minute = minute;
         }
 
-        return c;
+        public static HorizonCoordinate get(
+            boolean stopWhenNegativeAltitude,
+            int startingHour,
+            int startingMinute, int endingMinute, int step,
+            CompassModel compass,
+            CelestialBody body
+        ) {
+
+            Coordinate coordinate = null;
+            int prevMinute = startingMinute;
+
+            for (int minute = startingMinute; minute <= endingMinute; minute += step) {
+
+                coordinate = compass.getCoordinate(body.getBody(), startingHour, minute, 0);
+
+                double altitude = coordinate.getAltitude();
+
+                if (stopWhenNegativeAltitude ? altitude < 0 : altitude > 0) {
+                    break;
+                }
+
+                prevMinute = minute;
+
+            }
+
+            return new HorizonCoordinate(coordinate, prevMinute);
+
+        }
 
     }
 

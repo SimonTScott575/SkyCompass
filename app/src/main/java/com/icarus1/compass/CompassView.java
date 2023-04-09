@@ -17,7 +17,7 @@ public class CompassView extends View {
 
     private final Background background = new Background(innerRadius);
     private final Foreground foreground = new Foreground(innerRadius, innerRadius + ringThickness);
-    private final Track track = new Track(innerRadius, ringThickness, innerRadius + ringThickness);
+    private final Track track = new Track(innerRadius);
 
     private CompassModel compass = new CompassModel(0,0);
     private int hour;
@@ -95,7 +95,7 @@ public class CompassView extends View {
 
         background.setRadius(innerRadius);
         foreground.setRing(innerRadius, innerRadius + ringThickness);
-        track.setDimensions(innerRadius, ringThickness, innerRadius+ringThickness);
+        track.setDimensions(innerRadius);
 
     }
 
