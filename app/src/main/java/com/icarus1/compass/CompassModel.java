@@ -19,8 +19,7 @@ public class CompassModel {
     private int dayOfMonth; // 1 to 31
 
     public CompassModel(double longitude, double latitude) {
-        setLongitude(longitude);
-        setLatitude(latitude);
+        setLocation(latitude, longitude);
         setDate(1970, 0, 0);
     }
 
@@ -32,12 +31,9 @@ public class CompassModel {
         return latitude;
     }
 
-    public void setLongitude(double longitude) {
-        this.longitude = longitude;
-    }
-
-    public void setLatitude(double latitude) {
+    public void setLocation(double latitude, double longitude) {
         this.latitude = latitude;
+        this.longitude = longitude;
     }
 
     public int getYear() {
@@ -82,17 +78,6 @@ public class CompassModel {
 
         double altitude = topocentric.getAltitude() * 2 * Math.PI / 360d;
         double azimuth = topocentric.getAzimuth() * 2 * Math.PI / 360d;
-
-/*
-        double altitude;
-        double azimuth = time.getSolarTime() < 0.5d ? Math.PI*3d/2d : Math.PI/2d;
-
-        if (time.getSolarTime() < 0.5d) {
-            altitude = Math.PI * time.getSolarTime()/0.5d;
-        } else {
-            altitude = Math.PI * (2d - time.getSolarTime()/0.5d);
-        }
-*/
 
         return new Coordinate(altitude, azimuth);
 

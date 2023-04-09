@@ -1,7 +1,5 @@
 package com.icarus1.compass;
 
-import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -17,21 +15,18 @@ class Background {
     private final Paint altitudeTrackPaint;
     private final Paint altitudeTextPaint;
 
-    public Background(Context context, float radius) {
-
-        Resources resources = context.getResources();
-        Resources.Theme theme = context.getTheme();
+    public Background(float radius) {
 
         backgroundPaint = new Paint();
-        backgroundPaint.setColor(resources.getColor(R.color.compass_background, theme));
+        backgroundPaint.setColor(Color.parseColor("#3F4E4F"));
         backgroundPaint.setStyle(Paint.Style.FILL);
 
         altitudeTrackPaint = new Paint();
-        altitudeTrackPaint.setColor(resources.getColor(R.color.compass_deg_tracks, theme));
+        altitudeTrackPaint.setColor(Color.parseColor("#DCD7C9"));
         altitudeTrackPaint.setStyle(Paint.Style.STROKE);
 
         altitudeTextPaint = new Paint();
-        altitudeTextPaint.setColor(resources.getColor(R.color.compass_deg_tracks, theme));
+        altitudeTextPaint.setColor(Color.parseColor("#DCD7C9"));
         altitudeTextPaint.setStyle(Paint.Style.FILL);
         setRadius(radius);
 

@@ -9,55 +9,46 @@ import androidx.annotation.Nullable;
 
 public class CompassView extends View {
 
-    private Background background;
-    private Foreground foreground;
-    private Track track;
-
     private float innerRadius;
     private float ringThickness;
     private boolean rotate;
     private float northRotation;
     private float currentRotation;
 
+    private final Background background = new Background(innerRadius);
+    private final Foreground foreground = new Foreground(innerRadius, innerRadius + ringThickness);
+    private final Track track = new Track(innerRadius, ringThickness, innerRadius + ringThickness);
+
     private CompassModel compass = new CompassModel(0,0);
     private int hour;
     private int minutes;
     private float seconds;
 
-    private boolean[] drawBody;
+    private final boolean[] drawBody = new boolean[CelestialBody.values().length];
 
     public CompassView(Context context) {
         super(context);
-        init(context);
     }
 
     public CompassView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        init(context);
     }
 
     public CompassView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init(context);
     }
 
     public CompassView(Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
-        init(context);
-    }
-
-    private void init(Context context) {
-
-        background = new Background(context, innerRadius);
-        foreground = new Foreground(context, innerRadius, innerRadius + ringThickness);
-        track = new Track(innerRadius, ringThickness, innerRadius+ringThickness);
-
-        drawBody = new boolean[CelestialBody.values().length];
-
     }
 
     public void setCompassModel(CompassModel compassModel) {
         this.compass = compassModel;
+        invalidate();
+    }
+
+    public void setCurrentRotation(float rotation) {
+        this.currentRotation = rotation;
         invalidate();
     }
 
@@ -67,14 +58,7 @@ public class CompassView extends View {
     }
 
     public void setNorthRotation(float rotation) {
-        setNorthRotation(rotation, false);
-    }
-
-    public void setNorthRotation(float rotation, boolean setAsCurrent) {
         this.northRotation = rotation;
-        if (setAsCurrent) {
-            this.currentRotation = rotation;
-        }
         invalidate();
     }
 
@@ -170,6 +154,7 @@ public class CompassView extends View {
                 track.drawTracks(hour, compass, body, canvas);
             }
         }
+
         for (CelestialBody body : CelestialBody.values()) {
             if (drawBody[body.getIndex()]) {
                 track.drawCurrentPosition(hour, minutes, seconds, compass, body, canvas);

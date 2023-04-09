@@ -42,11 +42,4 @@
     <color name="gold">#f0c02e</color>
     <color name="gold_dark">#C58940</color>
 
-    <color name="compass_background">#3F4E4F</color>
-    <color name="compass_ring">#A27B5C</color>
-    <color name="compass_deg_tracks">#DCD7C9</color>
-    <color name="compass_SEW">#F5F5F5</color>
-    <color name="compass_N">#F05454</color>
-    <color name="compass_tracks">#FFFF00FF</color>
-
 </resources>

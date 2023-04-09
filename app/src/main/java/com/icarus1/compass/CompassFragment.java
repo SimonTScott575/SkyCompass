@@ -17,7 +17,6 @@ import android.view.ViewGroup;
 
 import com.icarus1.R;
 import com.icarus1.databinding.FragmentCompassBinding;
-import com.icarus1.util.Debug;
 
 public class CompassFragment extends Fragment {
 
@@ -26,18 +25,11 @@ public class CompassFragment extends Fragment {
     private FragmentCompassBinding binding;
     private CompassFragmentViewModel viewModel;
 
-    private final MenuProvider menuProvider = new MenuListener();
+    private final MenuProvider menuProvider;
 
     public CompassFragment() {
-
         compassModel = new CompassModel(0, 0);
-
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
+        menuProvider = new MenuListener();
     }
 
     @Override
@@ -51,7 +43,6 @@ public class CompassFragment extends Fragment {
         viewModel = new ViewModelProvider(this).get(CompassFragmentViewModel.class);
 
         return binding.getRoot();
-
     }
 
     @Override
@@ -59,7 +50,8 @@ public class CompassFragment extends Fragment {
 
         binding.compassView.setCompassModel(compassModel);
         binding.compassView.setRotateToNorth(viewModel.isRotateToNorth());
-        binding.compassView.setNorthRotation(viewModel.getNorthRotation(), true);
+        binding.compassView.setNorthRotation(viewModel.getNorthRotation());
+        binding.compassView.setCurrentRotation(viewModel.getNorthRotation());
 
     }
 
@@ -85,25 +77,19 @@ public class CompassFragment extends Fragment {
     }
 
     public void setLocation(double longitude, double latitude) {
-
-        compassModel.setLongitude(longitude);
-        compassModel.setLatitude(latitude);
+        compassModel.setLocation(latitude, longitude);
         binding.compassView.invalidate();
-
     }
 
     public void setDate(int year, int month, int dayOfMonth) {
-
         compassModel.setDate(year, month, dayOfMonth);
         binding.compassView.invalidate();
-
     }
 
     public void setTime(int hour, int minute, float seconds) {
-
         binding.compassView.setTime(hour, minute, seconds);
-
     }
+
     public void setDrawBody(CelestialBody body, boolean draw) {
         binding.compassView.setDrawBody(body, draw);
     }
