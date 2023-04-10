@@ -188,14 +188,16 @@ public class ClockFragment extends Fragment {
     }
 
     private void endRetrieveSystemTime() {
-
         retrieveSystemTime.end();
-
     }
 
     private class RetrieveSystemTime implements Runnable {
 
         private boolean end = false;
+        private boolean firstRun = true;
+        private int prevHour;
+        private int prevMinute;
+        private int prevSecond;
 
         @Override
         public void run() {
@@ -207,7 +209,18 @@ public class ClockFragment extends Fragment {
                 int UTCOffset = timeZone.getRawOffset();
                 String location = Format.Location(timeZone);
 
-                setTimeAndTimeZoneWithoutNotification(systemTime.getHour(), systemTime.getMinute(), systemTime.getSecond(), UTCOffset, location);
+                boolean timeChanged = firstRun
+                    || systemTime.getHour() != prevHour
+                    || systemTime.getMinute() != prevMinute
+                    || systemTime.getSecond() != prevSecond;
+
+                if (timeChanged) {
+                    setTimeAndTimeZoneWithoutNotification(systemTime.getHour(), systemTime.getMinute(), systemTime.getSecond(), UTCOffset, location);
+                    firstRun = false;
+                    prevHour = systemTime.getHour();
+                    prevMinute = systemTime.getMinute();
+                    prevSecond = systemTime.getSecond();
+                }
 
             }
 

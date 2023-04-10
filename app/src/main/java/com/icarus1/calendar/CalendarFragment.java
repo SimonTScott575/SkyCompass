@@ -160,6 +160,10 @@ public class CalendarFragment extends Fragment {
     private class RetrieveSystemDate implements Runnable {
 
         private boolean end = false;
+        private boolean firstRun = true;
+        private int prevYear;
+        private int prevMonth;
+        private int prevDayOfMonth;
 
         @Override
         public void run() {
@@ -171,7 +175,18 @@ public class CalendarFragment extends Fragment {
                 int month = calendar.get(Calendar.MONTH);
                 int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
 
-                setDateWithoutNotification(year, month, dayOfMonth, true);
+                boolean dateChanged = firstRun
+                    || prevYear != year
+                    || prevMonth != month
+                    || prevDayOfMonth != dayOfMonth;
+
+                if (dateChanged) {
+                    setDateWithoutNotification(year, month, dayOfMonth, true);
+                    firstRun = false;
+                    prevYear = year;
+                    prevMonth = month;
+                    prevDayOfMonth = dayOfMonth;
+                }
 
             }
 
