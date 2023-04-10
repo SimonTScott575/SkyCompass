@@ -20,7 +20,7 @@
             app:layout_constraintTop_toTopOf="parent"/>
 
         <Button
-            android:id="@+id/use_location"
+            android:id="@+id/my_location"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="32dp"
@@ -32,7 +32,7 @@
             style="@style/button"/>
 
         <TextView
-            android:id="@+id/lat_long"
+            android:id="@+id/marker_location"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"

@@ -31,22 +31,6 @@ public class MainFragment extends Fragment {
     private final OnChangeTimeListener onChangeTimeListener = new OnChangeTimeListener();
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        LocationRequester locationRequester = new LocationRequester((latitude, longitude) -> {
-            try {
-                MapFragment mapFragment = getMapFragment();
-                mapFragment.setUserLocation(longitude, latitude);
-            } catch (Debug.Exception e) {
-                Debug.log(e);
-            }
-        });
-        locationRequester.request(requireActivity());
-
-    }
-
-    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 

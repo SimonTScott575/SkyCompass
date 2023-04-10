@@ -11,18 +11,27 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
 
+import com.icarus1.util.Debug;
+
 import java.util.Map;
 
 public class LocationRequester {
-    //TODO cancel location updates
 
+    private ActivityResultLauncher<String[]> register;
+    private LocationCallback registerCallback;
+    private LocationManager lm;
     private OnLocationChanged onLocationChanged;
-    private final android.location.LocationListener locationListener = new LocationListener();
+    private final android.location.LocationListener locationListener;
 
     public LocationRequester() {
+
+        register = null;
+        locationListener = new LocationListener();
+
     }
 
     public LocationRequester(OnLocationChanged onLocationChanged) {
+        this();
         this.onLocationChanged = onLocationChanged;
     }
 
@@ -30,21 +39,57 @@ public class LocationRequester {
         this.onLocationChanged = onLocationChanged;
     }
 
-    public void request(FragmentActivity activity) {
-        ActivityResultLauncher<String[]> request = activity.registerForActivityResult(
-            new ActivityResultContracts.RequestMultiplePermissions(), new LocationCallback(activity)
+    public void register(FragmentActivity activity) {
+
+        if (register != null) {
+            throw new RuntimeException("Must unregister previous register.");
+        }
+
+        registerCallback = new LocationCallback(activity);
+        register = activity.registerForActivityResult(
+            new ActivityResultContracts.RequestMultiplePermissions(), registerCallback
         );
-        request.launch(new String[]{
+
+    }
+
+    public void unregister() {
+        if (register != null) {
+            register.unregister();
+            register = null;
+            registerCallback = null;
+        }
+    }
+
+    public void request() {
+
+        if (register == null) {
+            throw new RuntimeException("Must register before request.");
+        }
+
+        register.launch(new String[]{
             Manifest.permission.ACCESS_COARSE_LOCATION,
             Manifest.permission.ACCESS_FINE_LOCATION
         });
+
+    }
+
+    public void cancel() {
+        if (lm != null) {
+            lm.removeUpdates(locationListener);
+            lm = null;
+        }
+        if (registerCallback != null) {
+            registerCallback.cancel();
+        }
     }
 
     private class LocationCallback implements ActivityResultCallback<Map<String,Boolean>> {
 
         private final FragmentActivity activity;
+        private boolean canceled;
 
         public LocationCallback(FragmentActivity activity) {
+            canceled = true;
             this.activity = activity;
         }
 
@@ -55,19 +100,25 @@ public class LocationRequester {
 
                 try {
 
-                    LocationManager lm = (LocationManager) activity.getSystemService(Context.LOCATION_SERVICE);
-                    lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 10000, 10, locationListener);
+                    if (canceled) {
+                        lm = (LocationManager) activity.getSystemService(Context.LOCATION_SERVICE);
+                        lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 10000, 10, locationListener);
+                    }
 
                 } catch (SecurityException e) {
-                    //TODO log
-                    throw e;
+                    Debug.error(new Debug.Exception("LocationRequester SecurityException."));
                 }
 
             } else {
-                //TODO log
+                Debug.error("Failed to get permission ACCESS_FINE_LOCATION.");
             }
 
         }
+
+        public void cancel() {
+            canceled = false;
+        }
+
     }
 
     private class LocationListener implements android.location.LocationListener {

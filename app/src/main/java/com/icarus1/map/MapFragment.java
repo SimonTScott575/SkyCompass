@@ -1,12 +1,6 @@
 package com.icarus1.map;
 
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
-import android.Manifest;
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -20,6 +14,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.icarus1.LocationRequester;
+import com.icarus1.MainFragment;
 import com.icarus1.R;
 import com.icarus1.databinding.FragmentMapBinding;
 import com.icarus1.util.Debug;
@@ -29,16 +25,24 @@ import org.osmdroid.config.Configuration;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.overlay.Marker;
 
-import java.util.ArrayList;
-
 public class MapFragment extends Fragment {
     //TODO create userLocation in MapViewModel
 
-    private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 1;
-
     private MapViewModel viewModel;
     private FragmentMapBinding binding;
-    private GeoPoint userLocation;
+    private final LocationRequester locationRequester;
+
+    public MapFragment() {
+        locationRequester = new LocationRequester((latitude, longitude) -> setUserLocation(longitude, latitude));
+    }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+
+        locationRequester.register(requireActivity());
+
+    }
 
     @Override
     public View onCreateView(
@@ -67,23 +71,30 @@ public class MapFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        locationRequester.request();
         binding.mapView.onResume();
     }
 
     @Override
     public void onPause() {
-
         binding.mapView.onPause();
-        userLocation = null;
-
+        locationRequester.cancel();
         super.onPause();
+    }
+
+    @Override
+    public void onDetach() {
+
+        locationRequester.unregister();
+
+        super.onDetach();
     }
 
     private void setUpMap() {
 
         binding.mapView.setUp();
 
-        binding.mapView.getSetLocationMarker().setOnMarkerDragListener(new Marker.OnMarkerDragListener() {
+        binding.mapView.setOnMarkerDragListener(new Marker.OnMarkerDragListener() {
             @Override
             public void onMarkerDrag(Marker marker) {
 
@@ -92,8 +103,8 @@ public class MapFragment extends Fragment {
 
                 setLocation(longitude, latitude, null);
 
-                if (userLocation != null) {
-                    binding.useLocation.setVisibility(View.VISIBLE);
+                if (viewModel.getMyLocation() != null) {
+                    binding.myLocation.setVisibility(View.VISIBLE);
                 }
 
             }
@@ -105,28 +116,21 @@ public class MapFragment extends Fragment {
             }
         });
 
-        setLocation(viewModel.getLongitude(), viewModel.getLatitude(), viewModel.getLocation());
+        binding.myLocation.setOnClickListener(new OnClickSetToLocation());
+        binding.myLocation.setVisibility(viewModel.getMyLocation() != null ? View.VISIBLE : View.INVISIBLE);
 
-        binding.useLocation.setOnClickListener(new OnClickSetToLocation());
+        setLocation(viewModel.getMarkerLongitude(), viewModel.getMarkerLatitude(), viewModel.getMarkerLocationDescription());
 
     }
 
     public void setLocation(double longitude, double latitude, String location) {
 
-        binding.mapView.getSetLocationMarker().setPosition(new GeoPoint(latitude, longitude));
-        binding.mapView.invalidate();
-        binding.latLong.setText(Format.LatitudeLongitude(latitude, longitude));
+        binding.mapView.setMarkerLocation(latitude, longitude);
+        binding.markerLocation.setText(Format.LatitudeLongitude(latitude, longitude));
 
-        viewModel.setLatitudeLongitude(latitude, longitude, location);
+        viewModel.setMarkerLocation(latitude, longitude, location);
 
         onLocationChanged(longitude, latitude, location);
-
-    }
-
-    public void setUserLocation(double longitude, double latitude) {
-
-        userLocation = new GeoPoint(latitude, longitude);
-        binding.useLocation.setVisibility(View.VISIBLE);
 
     }
 
@@ -143,17 +147,25 @@ public class MapFragment extends Fragment {
         }
     }
 
+    public void setUserLocation(double longitude, double latitude) {
+
+        viewModel.setMyLocation(new GeoPoint(latitude, longitude));
+        binding.myLocation.setVisibility(View.VISIBLE);
+
+    }
+
     private class OnClickSetToLocation implements View.OnClickListener {
         @Override
         public void onClick(View v) {
 
-            binding.mapView.getSetLocationMarker().setPosition(userLocation);
-            binding.mapView.invalidate();
+            GeoPoint myLocation = viewModel.getMyLocation();
+
+            binding.mapView.setMarkerLocation(myLocation.getLatitude(), myLocation.getLongitude());
 
             v.setVisibility(View.INVISIBLE);
 
-            double longitude = userLocation.getLongitude();
-            double latitude = userLocation.getLatitude();
+            double longitude = viewModel.getMyLocation().getLongitude();
+            double latitude = viewModel.getMyLocation().getLatitude();
 
             setLocation(longitude, latitude, getResources().getString(R.string.using_system_location));
 

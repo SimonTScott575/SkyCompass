@@ -16,7 +16,7 @@ public class SelectionMapView extends MapView {
 
     private boolean setUp;
     private boolean drawnOnce;
-    private Marker setLocationMarker;
+    private Marker locationMarker;
 
     public SelectionMapView(Context context) {
         super(context);
@@ -46,17 +46,22 @@ public class SelectionMapView extends MapView {
         getController().setCenter(new GeoPoint(0d, 0d));
         setMultiTouchControls(true);
 
-        setLocationMarker = new Marker(this);
-        getSetLocationMarker().setDraggable(true);
-        getSetLocationMarker().setDragOffset(7);
-        getOverlays().add(getSetLocationMarker());
+        locationMarker = new Marker(this);
+        locationMarker.setDraggable(true);
+        locationMarker.setDragOffset(7);
+        getOverlays().add(locationMarker);
 
         setUp = true;
 
     }
 
-    public Marker getSetLocationMarker() {
-        return setLocationMarker;
+    public void setMarkerLocation(double latitude, double longitude) {
+        locationMarker.setPosition(new GeoPoint(latitude, longitude));
+        invalidate();
+    }
+
+    public void setOnMarkerDragListener(Marker.OnMarkerDragListener onMarkerDragListener) {
+        locationMarker.setOnMarkerDragListener(onMarkerDragListener);
     }
 
 }
