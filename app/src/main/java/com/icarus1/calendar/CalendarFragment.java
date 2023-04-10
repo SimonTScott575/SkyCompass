@@ -125,6 +125,7 @@ public class CalendarFragment extends Fragment {
         if (useSystemDate) {
 
             binding.useSystemDate.setVisibility(View.INVISIBLE);
+            binding.useSystemDateText.setVisibility(View.INVISIBLE);
 
             Calendar calendar = Calendar.getInstance();
             int year = calendar.get(Calendar.YEAR);
@@ -135,6 +136,7 @@ public class CalendarFragment extends Fragment {
 
         } else {
             binding.useSystemDate.setVisibility(View.VISIBLE);
+            binding.useSystemDateText.setVisibility(View.VISIBLE);
         }
 
         this.useSystemDate = useSystemDate;

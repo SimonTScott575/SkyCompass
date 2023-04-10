@@ -111,6 +111,7 @@ public class ClockFragment extends Fragment {
         if (useSystemTime) {
 
             binding.useSystemTime.setVisibility(View.INVISIBLE);
+            binding.useSystemTimeText.setVisibility(View.INVISIBLE);
 
             Time systemTime = Time.fromSystem();
             TimeZone timeZone = TimeZone.getDefault();
@@ -122,6 +123,7 @@ public class ClockFragment extends Fragment {
         } else {
 
             binding.useSystemTime.setVisibility(View.VISIBLE);
+            binding.useSystemTimeText.setVisibility(View.VISIBLE);
 
         }
 

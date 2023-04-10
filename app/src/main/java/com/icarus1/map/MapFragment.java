@@ -105,6 +105,7 @@ public class MapFragment extends Fragment {
 
                 if (viewModel.getMyLocation() != null) {
                     binding.myLocation.setVisibility(View.VISIBLE);
+                    binding.myLocationText.setVisibility(View.VISIBLE);
                 }
 
             }
@@ -116,8 +117,10 @@ public class MapFragment extends Fragment {
             }
         });
 
+        int myLocationVisibility = viewModel.getMyLocation() != null ? View.VISIBLE : View.INVISIBLE;
         binding.myLocation.setOnClickListener(new OnClickSetToLocation());
-        binding.myLocation.setVisibility(viewModel.getMyLocation() != null ? View.VISIBLE : View.INVISIBLE);
+        binding.myLocation.setVisibility(myLocationVisibility);
+        binding.myLocationText.setVisibility(myLocationVisibility);
 
         setLocation(viewModel.getMarkerLongitude(), viewModel.getMarkerLatitude(), viewModel.getMarkerLocationDescription());
 
@@ -151,6 +154,7 @@ public class MapFragment extends Fragment {
 
         viewModel.setMyLocation(new GeoPoint(latitude, longitude));
         binding.myLocation.setVisibility(View.VISIBLE);
+        binding.myLocationText.setVisibility(View.VISIBLE);
 
     }
 
@@ -162,7 +166,8 @@ public class MapFragment extends Fragment {
 
             binding.mapView.setMarkerLocation(myLocation.getLatitude(), myLocation.getLongitude());
 
-            v.setVisibility(View.INVISIBLE);
+            binding.myLocation.setVisibility(View.INVISIBLE);
+            binding.myLocationText.setVisibility(View.INVISIBLE);
 
             double longitude = viewModel.getMyLocation().getLongitude();
             double latitude = viewModel.getMyLocation().getLatitude();
