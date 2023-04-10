@@ -8,37 +8,41 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".clock.ClockFragment">
+        tools:context=".clock.ClockFragment"
+        android:paddingEnd="60dp">
 
         <TimePicker
             android:id="@+id/time_picker"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
             android:timePickerMode="spinner"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/use_system_time" />
+            app:layout_constraintTop_toBottomOf="@+id/use_system_time_text" />
 
         <TextView
             android:id="@+id/textView4"
             style="@style/text"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:singleLine="true"
             android:text="@string/time_zone"
+            android:textAlignment="textStart"
             android:textSize="24sp"
             app:layout_constraintStart_toEndOf="@+id/time_picker"
             app:layout_constraintTop_toTopOf="@+id/use_system_time" />
 
         <com.icarus1.clock.TimeZonePicker
             android:id="@+id/time_zone_picker"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginStart="16dp"
             android:layout_marginBottom="16dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="@+id/time_picker"
             app:layout_constraintStart_toEndOf="@+id/time_picker"
-            app:layout_constraintTop_toBottomOf="@+id/textView4" />
+            app:layout_constraintTop_toTopOf="@+id/time_picker" />
 
         <ImageButton
             android:id="@+id/use_system_time"
