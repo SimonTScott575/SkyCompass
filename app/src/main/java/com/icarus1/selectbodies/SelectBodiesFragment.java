@@ -67,6 +67,7 @@ public class SelectBodiesFragment extends Fragment {
             ViewSelectableBodyBinding selectableBodyBinding = ViewSelectableBodyBinding.inflate(getLayoutInflater(), binding.bodiesTable, true);
             selectableBodyBinding.name.setText(body.getName());
             selectableBodyBinding.checkBox.setOnCheckedChangeListener(new OnCheckListener(body));
+            selectableBodyBinding.circle.setColorFilter(body.getPaint().getColor());
 
             if (!restoredState){
                 setViewable(body, nonPlanets.contains(body));

@@ -208,10 +208,9 @@
         <com.icarus1.views.Panel
             android:id="@+id/select_bodies_view"
             style="@style/panel"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             custom:direction="left"
