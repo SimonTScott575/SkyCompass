@@ -1,48 +1,80 @@
 package com.icarus1.clock;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
-import com.icarus1.databinding.ViewTimeZonePickerBinding;
+import com.icarus1.R;
+import com.icarus1.databinding.ViewTimeZonePickerHorizontalBinding;
+import com.icarus1.databinding.ViewTimeZonePickerVerticalBinding;
 
 public class TimeZonePicker extends ConstraintLayout {
 
-    private ViewTimeZonePickerBinding binding;
+    private EditText numberEditText;
+
     private int UTCOffset;
     private String location;
     private OnTimeZoneChanged onTimeZoneChanged;
 
     public TimeZonePicker(@NonNull Context context) {
         super(context);
-        init(context);
+        init(context, null);
     }
 
     public TimeZonePicker(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        init(context);
+        init(context, attrs);
     }
 
     public TimeZonePicker(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init(context);
+        init(context, attrs);
     }
 
-    private void init(Context context) {
+    private void init(Context context, @Nullable AttributeSet attrs) {
 
-        binding = ViewTimeZonePickerBinding.inflate(LayoutInflater.from(context), this, true);
+        int orientation = 0;
 
-        binding.plus.setOnClickListener(new ShiftNumber(1));
-        binding.minus.setOnClickListener(new ShiftNumber(-1));
-        binding.numberEditText.addTextChangedListener(new RangeWatcher());
-        binding.numberEditText.setText("0");
+        if (attrs != null) {
+
+            try(
+                TypedArray b = context.getTheme().obtainStyledAttributes(
+                    attrs, R.styleable.TimeZonePicker, 0, 0
+                )
+            ) {
+                orientation = b.getInt(R.styleable.TimeZonePicker_orientation, 0);
+            }
+
+        }
+
+        View plus;
+        View minus;
+
+        if (orientation == 1) {
+            ViewTimeZonePickerVerticalBinding binding = ViewTimeZonePickerVerticalBinding.inflate(LayoutInflater.from(context), this, true);
+            plus = binding.plus;
+            minus = binding.minus;
+            numberEditText = binding.numberEditText;
+        } else {
+            ViewTimeZonePickerHorizontalBinding binding = ViewTimeZonePickerHorizontalBinding.inflate(LayoutInflater.from(context), this, true);
+            plus = binding.plus;
+            minus = binding.minus;
+            numberEditText = binding.numberEditText;
+        }
+
+        plus.setOnClickListener(new ShiftNumber(1));
+        minus.setOnClickListener(new ShiftNumber(-1));
+        numberEditText.addTextChangedListener(new RangeWatcher());
+        numberEditText.setText("0");
 
     }
 
@@ -55,7 +87,7 @@ public class TimeZonePicker extends ConstraintLayout {
     }
 
     public void setUTCOffset(int UTCOffset) {
-        binding.numberEditText.setText(String.valueOf(UTCOffset));
+        numberEditText.setText(String.valueOf(UTCOffset));
         location = null;
     }
 
@@ -76,7 +108,7 @@ public class TimeZonePicker extends ConstraintLayout {
 
             int n;
             try {
-                n = Integer.parseInt(binding.numberEditText.getText().toString());
+                n = Integer.parseInt(numberEditText.getText().toString());
             } catch (NumberFormatException e) {
                 return;
             }
@@ -88,7 +120,7 @@ public class TimeZonePicker extends ConstraintLayout {
                 n = -12;
             }
 
-            binding.numberEditText.setText(String.valueOf(n));
+            numberEditText.setText(String.valueOf(n));
 
         }
 
