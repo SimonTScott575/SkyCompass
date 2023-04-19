@@ -2,10 +2,8 @@ package com.icarus1.views;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.Color;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 
@@ -13,10 +11,11 @@ import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 
 import com.icarus1.R;
-import com.icarus1.util.Debug;
+import com.icarus1.databinding.ViewPanelBinding;
 
 public class Panel extends CardView {
 
+    private ViewPanelBinding binding;
     private Animation slideInAnimation;
     private Animation slideOutAnimation;
 
@@ -38,7 +37,8 @@ public class Panel extends CardView {
     private void init(Context context, AttributeSet attrs) {
 
         LayoutInflater.from(context).inflate(R.layout.view_panel, this);
-        findViewById(R.id.imageButton).setOnClickListener(v -> hide());
+        binding = ViewPanelBinding.inflate(LayoutInflater.from(context), this, true);
+        binding.viewPanelClose.findViewById(R.id.view_panel_close).setOnClickListener(v -> hide());
 
         if (attrs != null) {
             try(
@@ -52,9 +52,9 @@ public class Panel extends CardView {
             Direction direction = Direction.BOTTOM;
             try(
                 TypedArray a = context.getTheme().obtainStyledAttributes(
-                        attrs,
-                        R.styleable.Panel,
-                        0, 0
+                    attrs,
+                    R.styleable.Panel,
+                    0, 0
                 )
             ) {
                 int directionEnumIndex = a.getInteger(R.styleable.Panel_direction, 0);
@@ -66,6 +66,8 @@ public class Panel extends CardView {
         }
 
     }
+
+
 
     public void setDirection(Direction direction) {
 
@@ -85,16 +87,21 @@ public class Panel extends CardView {
         startAnimation(slideOutAnimation);
     }
 
+    private void blockInteraction(boolean block) {
+        binding.viewPanelClickBlocker.setClickable(block);
+    }
+
     class OnSlideInAnimation implements Animation.AnimationListener {
 
         @Override
         public void onAnimationStart(Animation animation) {
             setVisibility(VISIBLE);
+            blockInteraction(true);
         }
 
         @Override
         public void onAnimationEnd(Animation animation) {
-            setClickable(true);
+            blockInteraction(false);
         }
 
         @Override
@@ -107,12 +114,13 @@ public class Panel extends CardView {
 
         @Override
         public void onAnimationStart(Animation animation) {
-            setClickable(false);
+            blockInteraction(true);
         }
 
         @Override
         public void onAnimationEnd(Animation animation) {
             setVisibility(INVISIBLE);
+            blockInteraction(false);
         }
 
         @Override
