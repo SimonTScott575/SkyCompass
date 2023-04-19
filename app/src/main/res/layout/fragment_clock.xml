@@ -12,37 +12,22 @@
 
         <TimePicker
             android:id="@+id/time_picker"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="48dp"
-            android:layout_marginTop="48dp"
-            android:layout_marginEnd="48dp"
             android:timePickerMode="spinner"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/guideline4"
+            app:layout_constraintStart_toEndOf="@+id/use_system_time"
             app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/textView4"
-            style="@style/text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/time_zone"
-            android:textSize="24sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/time_picker" />
 
         <com.icarus1.clock.TimeZonePicker
             android:id="@+id/time_zone_picker"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
             android:layout_marginBottom="16dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView4" />
+            app:layout_constraintEnd_toEndOf="@+id/time_picker"
+            app:layout_constraintStart_toStartOf="@+id/time_picker"
+            app:layout_constraintTop_toBottomOf="@+id/time_picker" />
 
         <ImageButton
             android:id="@+id/use_system_time"
@@ -71,6 +56,12 @@
             app:layout_constraintTop_toBottomOf="@+id/use_system_time"
             style="@style/text"/>
 
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_end="48dp" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

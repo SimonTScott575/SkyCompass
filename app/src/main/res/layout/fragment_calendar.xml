@@ -6,57 +6,57 @@
 
     <data/>
 
-    <FrameLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".calendar.CalendarFragment">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+        <DatePicker
+            android:id="@+id/date_picker"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:calendarViewShown="false"
+            android:datePickerMode="spinner"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/guideline4"
+            app:layout_constraintStart_toEndOf="@+id/use_system_date"
+            app:layout_constraintTop_toTopOf="parent" />
 
-            <DatePicker
-                android:id="@+id/date_picker"
-                android:layout_width="wrap_content"
-                android:layout_height="212dp"
-                android:layout_marginStart="48dp"
-                android:layout_marginTop="48dp"
-                android:layout_marginEnd="48dp"
-                android:calendarViewShown="false"
-                android:datePickerMode="spinner"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+        <ImageButton
+            android:id="@+id/use_system_date"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:scaleType="fitXY"
+            android:src="@drawable/current_date"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-            <ImageButton
-                android:id="@+id/use_system_date"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:scaleType="fitXY"
-                android:src="@drawable/current_date"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+        <TextView
+            android:id="@+id/use_system_date_text"
+            style="@style/text"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="-16dp"
+            android:layout_marginEnd="-16dp"
+            android:text="@string/use_system_date"
+            android:textAlignment="center"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="@+id/use_system_date"
+            app:layout_constraintStart_toStartOf="@+id/use_system_date"
+            app:layout_constraintTop_toBottomOf="@+id/use_system_date" />
 
-            <TextView
-                android:id="@+id/use_system_date_text"
-                style="@style/text"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="-16dp"
-                android:layout_marginEnd="-16dp"
-                android:text="@string/use_system_date"
-                android:textAlignment="center"
-                android:textSize="14sp"
-                app:layout_constraintEnd_toEndOf="@+id/use_system_date"
-                app:layout_constraintStart_toStartOf="@+id/use_system_date"
-                app:layout_constraintTop_toBottomOf="@+id/use_system_date" />
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_end="48dp" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-    </FrameLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>

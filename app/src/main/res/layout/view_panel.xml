@@ -6,19 +6,15 @@
     <merge
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:custom="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
-        tools:parentTag="androidx.cardview.widget.CardView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:cardBackgroundColor="?attr/backgroundColor"
-        custom:direction="bottom">
+        tools:parentTag="androidx.cardview.widget.CardView">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/view_panel_ui_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:elevation="1dp">
+            android:elevation="1dp"
+            android:clickable="false">
 
             <ImageButton
                 android:id="@+id/view_panel_close"

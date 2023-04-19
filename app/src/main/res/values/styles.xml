@@ -8,6 +8,7 @@
     <style name="view_panel_default">
         <item name="cardBackgroundColor">?attr/backgroundColor</item>
         <item name="tint">?attr/colorOnBackground</item>
+        <item name="direction">bottom</item>
     </style>
 
     <style name="panel">

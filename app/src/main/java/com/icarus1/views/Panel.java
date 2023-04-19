@@ -38,6 +38,8 @@ public class Panel extends CardView {
 
     private void init(Context context, AttributeSet attrs, int defStyleAttr) {
 
+        setClickable(true);
+
         LayoutInflater.from(context).inflate(R.layout.view_panel, this);
         binding = ViewPanelBinding.inflate(LayoutInflater.from(context), this, true);
         binding.viewPanelClose.findViewById(R.id.view_panel_close).setOnClickListener(v -> hide());
@@ -56,7 +58,7 @@ public class Panel extends CardView {
                 TypedArray a = context.getTheme().obtainStyledAttributes(
                     attrs,
                     R.styleable.Panel,
-                    defStyleAttr, R.style.panel
+                    defStyleAttr, R.style.view_panel_default
                 )
             ) {
                 int directionEnumIndex = a.getInteger(R.styleable.Panel_direction, 0);
@@ -98,7 +100,6 @@ public class Panel extends CardView {
         @Override
         public void onAnimationStart(Animation animation) {
             setVisibility(VISIBLE);
-            blockInteraction(true);
         }
 
         @Override
@@ -122,7 +123,6 @@ public class Panel extends CardView {
         @Override
         public void onAnimationEnd(Animation animation) {
             setVisibility(INVISIBLE);
-            blockInteraction(false);
         }
 
         @Override

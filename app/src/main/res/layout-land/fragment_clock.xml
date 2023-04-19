@@ -1,51 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:custom="http://schemas.android.com/apk/res-auto">
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <data/>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".clock.ClockFragment"
-        android:paddingEnd="60dp">
+        tools:context=".clock.ClockFragment">
 
-        <TimePicker
-            android:id="@+id/time_picker"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:timePickerMode="spinner"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/use_system_time_text" />
+            app:layout_constraintEnd_toStartOf="@+id/guideline4"
+            app:layout_constraintStart_toEndOf="@+id/use_system_time"
+            app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
-            android:id="@+id/textView4"
-            style="@style/text"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:singleLine="true"
-            android:text="@string/time_zone"
-            android:textAlignment="textStart"
-            android:textSize="24sp"
-            app:layout_constraintBottom_toTopOf="@+id/time_zone_picker"
-            app:layout_constraintStart_toEndOf="@+id/time_picker" />
+            <TimePicker
+                android:id="@+id/time_picker"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:timePickerMode="spinner"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-        <com.icarus1.clock.TimeZonePicker
-            android:id="@+id/time_zone_picker"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginBottom="16dp"
-            app:layout_constraintBottom_toBottomOf="@+id/time_picker"
-            app:layout_constraintEnd_toEndOf="@+id/textView4"
-            app:layout_constraintStart_toEndOf="@+id/time_picker"
-            app:layout_constraintTop_toTopOf="@+id/time_picker"
-            custom:orientation="vertical" />
+            <com.icarus1.clock.TimeZonePicker
+                android:id="@+id/time_zone_picker"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                app:layout_constraintBottom_toBottomOf="@+id/time_picker"
+                app:layout_constraintStart_toEndOf="@+id/time_picker"
+                app:layout_constraintTop_toTopOf="@+id/time_picker" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <ImageButton
             android:id="@+id/use_system_time"
@@ -73,6 +64,13 @@
             app:layout_constraintStart_toStartOf="@+id/use_system_time"
             app:layout_constraintTop_toBottomOf="@+id/use_system_time"
             style="@style/text"/>
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_end="48dp" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
