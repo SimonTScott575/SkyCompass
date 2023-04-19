@@ -11,7 +11,7 @@
         tools:parentTag="androidx.cardview.widget.CardView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="?attr/backgroundColor"
+        app:cardBackgroundColor="?attr/backgroundColor"
         custom:direction="bottom">
 
         <androidx.constraintlayout.widget.ConstraintLayout

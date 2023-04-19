@@ -21,20 +21,22 @@ public class Panel extends CardView {
 
     public Panel(Context context) {
         super(context);
-        init(context, null);
+        init(context, null, 0);
     }
 
     public Panel(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        init(context, attrs);
+        init(context, attrs, 0);
     }
 
     public Panel(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init(context, attrs);
+        init(context, attrs, defStyleAttr);
     }
 
-    private void init(Context context, AttributeSet attrs) {
+
+
+    private void init(Context context, AttributeSet attrs, int defStyleAttr) {
 
         LayoutInflater.from(context).inflate(R.layout.view_panel, this);
         binding = ViewPanelBinding.inflate(LayoutInflater.from(context), this, true);
@@ -43,7 +45,7 @@ public class Panel extends CardView {
         if (attrs != null) {
             try(
                 TypedArray b = context.getTheme().obtainStyledAttributes(
-                    attrs, new int[]{R.attr.backgroundColor}, 0, 0
+                    attrs, new int[]{R.attr.cardBackgroundColor}, defStyleAttr, R.style.view_panel_default
                 )
             ) {
                 setCardBackgroundColor(b.getColor(0, 0));
@@ -54,7 +56,7 @@ public class Panel extends CardView {
                 TypedArray a = context.getTheme().obtainStyledAttributes(
                     attrs,
                     R.styleable.Panel,
-                    0, 0
+                    defStyleAttr, R.style.panel
                 )
             ) {
                 int directionEnumIndex = a.getInteger(R.styleable.Panel_direction, 0);
