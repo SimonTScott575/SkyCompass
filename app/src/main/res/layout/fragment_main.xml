@@ -247,7 +247,7 @@
 
             <androidx.fragment.app.FragmentContainerView
                 android:id="@+id/map_fragment_container"
-                android:name="com.icarus1.map.MapFragment"
+                android:name="com.icarus1.MapFragment"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 tools:layout="@layout/fragment_map" />
