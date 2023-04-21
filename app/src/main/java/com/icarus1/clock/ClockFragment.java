@@ -91,7 +91,6 @@ public class ClockFragment extends Fragment {
         viewModel.setUseSystemTime(false);
 
         binding.useSystemTime.setVisibility(View.VISIBLE);
-        binding.useSystemTimeText.setVisibility(View.VISIBLE);
 
         binding.timePicker.setOnTimeChangedListener(null);
         binding.timePicker.setHour(time.getHour());
@@ -113,7 +112,6 @@ public class ClockFragment extends Fragment {
         viewModel.setUseSystemTime(false);
 
         binding.useSystemTime.setVisibility(View.VISIBLE);
-        binding.useSystemTimeText.setVisibility(View.VISIBLE);
 
         onTimeAndTimeZoneChanged(time, timeZone);
 
@@ -135,7 +133,6 @@ public class ClockFragment extends Fragment {
         viewModel.setUseSystemTime(true);
 
         binding.useSystemTime.setVisibility(View.INVISIBLE);
-        binding.useSystemTimeText.setVisibility(View.INVISIBLE);
 
         binding.timePicker.setOnTimeChangedListener(null);
         binding.timePicker.setHour(time.getHour());
