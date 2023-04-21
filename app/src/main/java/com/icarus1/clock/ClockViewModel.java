@@ -23,12 +23,10 @@ public class ClockViewModel extends ViewModel {
         this.useSystemTime = useSystemTime;
     }
 
-    public void setTime(int hour, int minute, int second, int UTCOffset, String location) {
+    public void setTime(int hour, int minute, int second) {
         this.hour = hour;
         this.minute = minute;
         this.second = second;
-        this.UTCOffset = UTCOffset;
-        this.location = location;
     }
 
     public int getHour() {
@@ -41,6 +39,11 @@ public class ClockViewModel extends ViewModel {
 
     public int getSecond() {
         return second;
+    }
+
+    public void setTimeZone(int UTCOffset, String location) {
+        this.UTCOffset = UTCOffset;
+        this.location = location;
     }
 
     public int getUTCOffset() {

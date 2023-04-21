@@ -29,11 +29,11 @@ public class ClockFragment extends Fragment {
     private Handler handler;
     private RetrieveSystemTime retrieveSystemTime;
     private final TimePicker.OnTimeChangedListener onTimeChangedListener;
-    private final TimeZonePicker.OnTimeZoneChanged onTimeZoneChanged;
+    private final TimeZonePicker.OnTimeZoneChanged onTimeZoneChangedListener;
 
     public ClockFragment() {
         onTimeChangedListener = new OnTimeChanged();
-        onTimeZoneChanged = new OnTimeZoneChange();
+        onTimeZoneChangedListener = new OnTimeZoneChange();
     }
 
     @Override
@@ -48,10 +48,8 @@ public class ClockFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-
         binding.timePicker.setIs24HourView(true);
-        binding.useSystemTime.setOnClickListener(v -> setUseSystemTime(true));
-
+        binding.useSystemTime.setOnClickListener(v -> setTimeAndTimeZoneFromSystemValues());
     }
 
     @Override
@@ -59,20 +57,22 @@ public class ClockFragment extends Fragment {
         super.onResume();
 
         binding.timePicker.setOnTimeChangedListener(onTimeChangedListener);
-        binding.timeZonePicker.setOnUTCOffsetChanged(onTimeZoneChanged);
+        binding.timeZonePicker.setOnUTCOffsetChanged(onTimeZoneChangedListener);
 
-        setTimeAndTimeZoneWithoutNotification(
-            viewModel.getHour(), viewModel.getMinute(), viewModel.getSecond(),
-            viewModel.getUTCOffset(),
-            viewModel.getLocation()
-        );
-        setUseSystemTime(viewModel.isUseSystemTime());
+        if (viewModel.isUseSystemTime()) {
+            setTimeAndTimeZoneFromSystemValues();
+        } else {
+            setTimeAndTimeZoneAsPickerValues(
+                viewModel.getHour(), viewModel.getMinute(), viewModel.getSecond(),
+                viewModel.getUTCOffset(), viewModel.getLocation()
+            );
+        }
 
         try {
             startRetrieveSystemTime();
         } catch (HandlerNoPostException e) {
             Debug.error(e);
-            setUseSystemTime(false);
+            setTimeAndTimeZoneFromSystemValues();
         }
 
     }
@@ -88,50 +88,57 @@ public class ClockFragment extends Fragment {
         super.onPause();
     }
 
-    private void setTimeAndTimeZoneWithoutNotification(int hour, int minute, int second, int UTCOffset, @Nullable String location) {
+    private void setTimeAndTimeZoneAsPickerValues(int hour, int minute, int second, int UTCOffset, @Nullable String location) {
 
-        binding.timePicker.setOnTimeChangedListener(null);
-        binding.timeZonePicker.setOnUTCOffsetChanged(null);
+        viewModel.setTime(hour, minute, second);
+        viewModel.setTimeZone(UTCOffset, location);
+        viewModel.setUseSystemTime(false);
 
-        binding.timePicker.setHour(hour);
-        binding.timePicker.setMinute(minute);
-        binding.timeZonePicker.setUTCOffset(UTCOffset);
-
-        binding.timePicker.setOnTimeChangedListener(onTimeChangedListener);
-        binding.timeZonePicker.setOnUTCOffsetChanged(onTimeZoneChanged);
-
-        viewModel.setTime(hour, minute, second, UTCOffset, location);
+        binding.useSystemTime.setVisibility(View.VISIBLE);
+        binding.useSystemTimeText.setVisibility(View.VISIBLE);
 
         onTimeAndTimeZoneChanged(hour, minute, second, UTCOffset, location);
 
     }
 
-    public void setUseSystemTime(boolean useSystemTime) {
+    public void setTimeAndTimeZoneFromSystemValues() {
 
-        if (useSystemTime) {
+        Time systemTime = Time.fromSystem();
+        TimeZone timeZone = TimeZone.getDefault();
+        int UTCOffset = timeZone.getRawOffset();
+        String location = Format.Location(timeZone);
 
-            binding.useSystemTime.setVisibility(View.INVISIBLE);
-            binding.useSystemTimeText.setVisibility(View.INVISIBLE);
+        setTimeAndTimeZoneAsSystemValues(
+            systemTime.getHour(), systemTime.getMinute(), systemTime.getSecond(),
+            UTCOffset, location
+        );
 
-            Time systemTime = Time.fromSystem();
-            TimeZone timeZone = TimeZone.getDefault();
-            int UTCOffset = timeZone.getRawOffset();
-            String location = Format.Location(timeZone);
-
-            setTimeAndTimeZoneWithoutNotification(systemTime.getHour(), systemTime.getMinute(), systemTime.getSecond(), UTCOffset, location);
-
-        } else {
-
-            binding.useSystemTime.setVisibility(View.VISIBLE);
-            binding.useSystemTimeText.setVisibility(View.VISIBLE);
-
-        }
-
-        viewModel.setUseSystemTime(useSystemTime);
 
     }
 
-    public void onTimeAndTimeZoneChanged(int hour, int minute, int second, int UTCOffset, String location) {
+    private void setTimeAndTimeZoneAsSystemValues(int hour, int minute, int second, int UTCOffset, @Nullable String location) {
+
+        viewModel.setTime(hour, minute, second);
+        viewModel.setTimeZone(UTCOffset, location);
+        viewModel.setUseSystemTime(true);
+
+        binding.useSystemTime.setVisibility(View.INVISIBLE);
+        binding.useSystemTimeText.setVisibility(View.INVISIBLE);
+
+        binding.timePicker.setOnTimeChangedListener(null);
+        binding.timePicker.setHour(hour);
+        binding.timePicker.setMinute(minute);
+        binding.timePicker.setOnTimeChangedListener(onTimeChangedListener);
+
+        binding.timeZonePicker.setOnUTCOffsetChanged(null);
+        binding.timeZonePicker.setUTCOffset(UTCOffset);
+        binding.timeZonePicker.setOnUTCOffsetChanged(onTimeZoneChangedListener);
+
+        onTimeAndTimeZoneChanged(hour, minute, second, UTCOffset,location);
+
+    }
+
+    public void onTimeAndTimeZoneChanged(int hour, int minute, int second, int UTCOffset, @Nullable String location) {
 
         Bundle bundle = new Bundle();
         bundle.putInt("HOUR", hour);
@@ -150,30 +157,20 @@ public class ClockFragment extends Fragment {
     public class OnTimeChanged implements TimePicker.OnTimeChangedListener {
         @Override
         public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
-
-            setUseSystemTime(false);
-
-            setTimeAndTimeZoneWithoutNotification(
+            setTimeAndTimeZoneAsPickerValues(
                 hourOfDay, minute, 0,
-                binding.timeZonePicker.getUTCOffset(),
-                binding.timeZonePicker.getLocation()
+                viewModel.getUTCOffset(), viewModel.getLocation()
             );
-
         }
     }
 
     public class OnTimeZoneChange implements TimeZonePicker.OnTimeZoneChanged {
         @Override
         public void onUTCOffsetChanged(TimeZonePicker timeZonePicker, String location, int UTCOffset) {
-
-            setUseSystemTime(false);
-
-            setTimeAndTimeZoneWithoutNotification(
-                binding.timePicker.getHour(), binding.timePicker.getMinute(), 0,
-                UTCOffset,
-                location
+            setTimeAndTimeZoneAsPickerValues(
+                viewModel.getHour(), viewModel.getMinute(), viewModel.getSecond(),
+                UTCOffset, location
             );
-
         }
     }
 
@@ -217,7 +214,10 @@ public class ClockFragment extends Fragment {
                     || systemTime.getSecond() != prevSecond;
 
                 if (timeChanged) {
-                    setTimeAndTimeZoneWithoutNotification(systemTime.getHour(), systemTime.getMinute(), systemTime.getSecond(), UTCOffset, location);
+                    setTimeAndTimeZoneAsSystemValues(
+                        systemTime.getHour(), systemTime.getMinute(), systemTime.getSecond(),
+                        UTCOffset, location
+                    );
                     firstRun = false;
                     prevHour = systemTime.getHour();
                     prevMinute = systemTime.getMinute();
