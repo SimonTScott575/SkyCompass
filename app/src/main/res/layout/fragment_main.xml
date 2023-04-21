@@ -266,7 +266,7 @@
 
             <androidx.fragment.app.FragmentContainerView
                 android:id="@+id/calendar_fragment_container"
-                android:name="com.icarus1.calendar.CalendarFragment"
+                android:name="com.icarus1.CalendarFragment"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 tools:layout="@layout/fragment_calendar" />

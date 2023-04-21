@@ -1,4 +1,4 @@
-package com.icarus1.calendar;
+package com.icarus1;
 
 import android.icu.util.Calendar;
 import android.os.Bundle;
@@ -91,7 +91,6 @@ public class CalendarFragment extends Fragment {
         binding.datePicker.setOnDateChangedListener(onDateChangedListener);
 
         binding.useSystemDate.setVisibility(View.VISIBLE);
-        binding.useSystemDateText.setVisibility(View.VISIBLE);
 
         onDateChanged(year, month, dayOfMonth, false);
 
@@ -112,7 +111,6 @@ public class CalendarFragment extends Fragment {
         binding.datePicker.setOnDateChangedListener(onDateChangedListener);
 
         binding.useSystemDate.setVisibility(View.INVISIBLE);
-        binding.useSystemDateText.setVisibility(View.INVISIBLE);
 
         onDateChanged(year, month, dayOfMonth, true);
 
@@ -128,7 +126,6 @@ public class CalendarFragment extends Fragment {
         binding.datePicker.setOnDateChangedListener(onDateChangedListener);
 
         binding.useSystemDate.setVisibility(View.INVISIBLE);
-        binding.useSystemDateText.setVisibility(View.INVISIBLE);
 
         onDateChanged(year, month, dayOfMonth, true);
 
@@ -140,7 +137,6 @@ public class CalendarFragment extends Fragment {
         viewModel.setSystemDate(false);
 
         binding.useSystemDate.setVisibility(View.VISIBLE);
-        binding.useSystemDateText.setVisibility(View.VISIBLE);
 
         onDateChanged(year, month, dayOfMonth, false);
 
