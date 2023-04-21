@@ -48,7 +48,7 @@ public class MapFragment extends Fragment {
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        locationRequester.register(requireActivity());
+        locationRequester.register(this);
     }
 
     @Override
@@ -79,7 +79,7 @@ public class MapFragment extends Fragment {
     public void onResume() {
         super.onResume();
         binding.mapView.onResume();
-        locationRequester.request();
+        locationRequester.request(this);
     }
 
     @Override
