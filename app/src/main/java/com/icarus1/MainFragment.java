@@ -19,6 +19,7 @@ import com.icarus1.selectbodies.SelectBodiesFragment;
 import com.icarus1.util.Debug;
 import com.icarus1.util.Format;
 import com.icarus1.util.Time;
+import com.icarus1.util.TimeZone;
 
 public class MainFragment extends Fragment {
 
@@ -289,7 +290,7 @@ public class MainFragment extends Fragment {
         }
     }
 
-    private void setTime(Time time, int offset, @Nullable String location) {
+    private void setTime(Time time, TimeZone timeZone) {
 
         CompassFragment compassFragment;
         try {
@@ -299,21 +300,21 @@ public class MainFragment extends Fragment {
             return;
         }
 
-        int hourOffset = offset/3600000;
-        int minuteOffset = (offset - hourOffset*3600000)/60000;
-        float secondOffset = (offset - hourOffset*3600000 - minuteOffset*60000)/1000f;
-
         String text = Format.Time(time.getHour(), time.getMinute(), time.getSecond());
-        text += " (" + Format.UTCOffset(hourOffset, minuteOffset) + ")";
+        text += " (" + Format.UTCOffset(timeZone.getUTCHourOffset(), timeZone.getUTCMinuteOffset()) + ")";
 
         binding.timeText.setText(text);
-        if (location != null) {
-            binding.timeLocation.setText(location);
+        if (timeZone.getId() != null) {
+            binding.timeLocation.setText(timeZone.getId());
         } else {
             binding.timeLocation.setText(R.string.tap_to_change_time);
         }
 
-        compassFragment.setTime(time.getHour() - hourOffset, time.getMinute() - minuteOffset, time.getSecond() - secondOffset);
+        compassFragment.setTime(
+            time.getHour() - timeZone.getUTCHourOffset(),
+            time.getMinute() - timeZone.getUTCMinuteOffset(),
+            time.getSecond() - timeZone.getUTCSecondOffset() - timeZone.getUTCMillisecondOffset()/1000f
+        );
 
     }
 
@@ -327,7 +328,7 @@ public class MainFragment extends Fragment {
             int UTCOffset = result.getInt("OFFSET");
             String location = result.getString("LOCATION");
 
-            setTime(new Time(hour, minute, seconds), UTCOffset, location);
+            setTime(new Time(hour, minute, seconds), new TimeZone(UTCOffset, location));
 
         }
     }

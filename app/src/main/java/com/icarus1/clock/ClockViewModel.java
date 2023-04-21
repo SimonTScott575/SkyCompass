@@ -3,13 +3,13 @@ package com.icarus1.clock;
 import androidx.lifecycle.ViewModel;
 
 import com.icarus1.util.Time;
+import com.icarus1.util.TimeZone;
 
 public class ClockViewModel extends ViewModel {
 
     private boolean useSystemTime;
     private Time time;
-    private int UTCOffset;
-    private String location;
+    private TimeZone timeZone;
 
     public ClockViewModel() {
         useSystemTime = true;
@@ -23,10 +23,6 @@ public class ClockViewModel extends ViewModel {
         this.useSystemTime = useSystemTime;
     }
 
-    public void setTime(int hour, int minute, int second) {
-        this.time = new Time(hour, minute, second);
-    }
-
     public void setTime(Time time) {
         this.time = time;
     }
@@ -35,17 +31,12 @@ public class ClockViewModel extends ViewModel {
         return time;
     }
 
-    public void setTimeZone(int UTCOffset, String location) {
-        this.UTCOffset = UTCOffset;
-        this.location = location;
+    public void setTimeZone(TimeZone timeZone) {
+        this.timeZone = timeZone;
     }
 
-    public int getUTCOffset() {
-        return UTCOffset;
-    }
-
-    public String getLocation() {
-        return location;
+    public TimeZone getTimeZone() {
+        return timeZone;
     }
 
 }
