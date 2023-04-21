@@ -23,7 +23,6 @@ public class CalendarFragment extends Fragment {
     private CalendarViewModel viewModel;
     private FragmentCalendarBinding binding;
     private Handler handler;
-    private boolean useSystemDate;
     private RetrieveSystemDate retrieveSystemDate;
     private final OnDateChangedListener onDateChangedListener;
 
@@ -47,7 +46,7 @@ public class CalendarFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
 
-        binding.useSystemDate.setOnClickListener(v -> setUseSystemDate(true));
+        binding.useSystemDate.setOnClickListener(v -> setDateFromSystemDate());
 
     }
 
@@ -57,17 +56,17 @@ public class CalendarFragment extends Fragment {
 
         binding.datePicker.setOnDateChangedListener(onDateChangedListener);
 
-        setDateWithoutNotification(
-            viewModel.getYear(), viewModel.getMonth(), viewModel.getDayOfMonth(),
-            viewModel.isSystemDate()
-        );
-        setUseSystemDate(viewModel.isSystemDate());
+        if (viewModel.isSystemDate()) {
+            setDateFromSystemDate();
+        } else {
+            setDate(viewModel.getYear(), viewModel.getMonth(), viewModel.getDayOfMonth());
+        }
 
         try {
             startRetrieveSystemDate();
         } catch (HandlerNoPostException e) {
             Debug.error(e);
-            setUseSystemDate(false);
+            setDateFromSystemDate();
         }
 
     }
@@ -82,15 +81,68 @@ public class CalendarFragment extends Fragment {
 
     }
 
-    private void setDateWithoutNotification(int year, int month, int dayOfMonth, boolean currentDate) {
+    private void setDate(int year, int month, int dayOfMonth) {
+
+        viewModel.setDate(year, month, dayOfMonth);
+        viewModel.setSystemDate(false);
 
         binding.datePicker.setOnDateChangedListener(null);
         binding.datePicker.updateDate(year, month, dayOfMonth);
         binding.datePicker.setOnDateChangedListener(onDateChangedListener);
 
-        viewModel.setDate(year, month, dayOfMonth, currentDate);
+        binding.useSystemDate.setVisibility(View.VISIBLE);
+        binding.useSystemDateText.setVisibility(View.VISIBLE);
 
-        onDateChanged(year, month, dayOfMonth, currentDate);
+        onDateChanged(year, month, dayOfMonth, false);
+
+    }
+
+    public void setDateFromSystemDate() {
+
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
+
+        viewModel.setDate(year, month, dayOfMonth);
+        viewModel.setSystemDate(true);
+
+        binding.datePicker.setOnDateChangedListener(null);
+        binding.datePicker.updateDate(year, month, dayOfMonth);
+        binding.datePicker.setOnDateChangedListener(onDateChangedListener);
+
+        binding.useSystemDate.setVisibility(View.INVISIBLE);
+        binding.useSystemDateText.setVisibility(View.INVISIBLE);
+
+        onDateChanged(year, month, dayOfMonth, true);
+
+    }
+
+    public void setDateAsSystemDate(int year, int month, int dayOfMonth) {
+
+        viewModel.setDate(year, month, dayOfMonth);
+        viewModel.setSystemDate(true);
+
+        binding.datePicker.setOnDateChangedListener(null);
+        binding.datePicker.updateDate(year, month, dayOfMonth);
+        binding.datePicker.setOnDateChangedListener(onDateChangedListener);
+
+        binding.useSystemDate.setVisibility(View.INVISIBLE);
+        binding.useSystemDateText.setVisibility(View.INVISIBLE);
+
+        onDateChanged(year, month, dayOfMonth, true);
+
+    }
+
+    private void setDateAsDatePickerDate(int year, int month, int dayOfMonth) {
+
+        viewModel.setDate(year, month, dayOfMonth);
+        viewModel.setSystemDate(false);
+
+        binding.useSystemDate.setVisibility(View.VISIBLE);
+        binding.useSystemDateText.setVisibility(View.VISIBLE);
+
+        onDateChanged(year, month, dayOfMonth, false);
 
     }
 
@@ -113,34 +165,9 @@ public class CalendarFragment extends Fragment {
         @Override
         public void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
 
-            setUseSystemDate(false);
-
-            setDateWithoutNotification(year, monthOfYear, dayOfMonth, false);
+            setDateAsDatePickerDate(year, monthOfYear, dayOfMonth);
 
         }
-    }
-
-    public void setUseSystemDate(boolean useSystemDate) {
-
-        if (useSystemDate) {
-
-            binding.useSystemDate.setVisibility(View.INVISIBLE);
-            binding.useSystemDateText.setVisibility(View.INVISIBLE);
-
-            Calendar calendar = Calendar.getInstance();
-            int year = calendar.get(Calendar.YEAR);
-            int month = calendar.get(Calendar.MONTH);
-            int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
-
-            setDateWithoutNotification(year, month, dayOfMonth, true);
-
-        } else {
-            binding.useSystemDate.setVisibility(View.VISIBLE);
-            binding.useSystemDateText.setVisibility(View.VISIBLE);
-        }
-
-        this.useSystemDate = useSystemDate;
-
     }
 
     private void startRetrieveSystemDate()
@@ -170,7 +197,7 @@ public class CalendarFragment extends Fragment {
         @Override
         public void run() {
 
-            if (useSystemDate) {
+            if (viewModel.isSystemDate()) {
 
                 Calendar calendar = Calendar.getInstance();
                 int year = calendar.get(Calendar.YEAR);
@@ -183,7 +210,7 @@ public class CalendarFragment extends Fragment {
                     || prevDayOfMonth != dayOfMonth;
 
                 if (dateChanged) {
-                    setDateWithoutNotification(year, month, dayOfMonth, true);
+                    setDateAsSystemDate(year, month, dayOfMonth);
                     firstRun = false;
                     prevYear = year;
                     prevMonth = month;
