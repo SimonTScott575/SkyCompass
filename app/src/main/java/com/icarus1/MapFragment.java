@@ -29,6 +29,7 @@ public class MapFragment extends Fragment {
     private MapViewModel viewModel;
     private FragmentMapBinding binding;
     private final LocationRequester locationRequester;
+    private boolean previouslyRequested;
 
     public MapFragment() {
 
@@ -59,9 +60,13 @@ public class MapFragment extends Fragment {
                     )
                 );
 
-                askUserForDeniedLocationPermission();
+                if (previouslyRequested) {
+                    askUserForDeniedLocationPermission();
+                }
 
             }
+
+            previouslyRequested = true;
 
         });
 
