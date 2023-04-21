@@ -4,9 +4,9 @@ import java.util.Calendar;
 
 public class Time {
 
-    private int hour; // Range 0 - 23
-    private int minute; // Range 0 - 59
-    private int second; // Range 0 - 59
+    private final int hour; // Range 0 - 23
+    private final int minute; // Range 0 - 59
+    private final int second; // Range 0 - 59
 
     public Time(int hour, int minute, int second) {
         this.hour = hour;
@@ -14,28 +14,16 @@ public class Time {
         this.second = second;
     }
 
-    public int getHour() {
+    public final int getHour() {
         return hour;
     }
 
-    public void setHour(int hour) {
-        this.hour = hour;
-    }
-
-    public int getMinute() {
+    public final int getMinute() {
         return minute;
     }
 
-    public void setMinute(int minute) {
-        this.minute = minute;
-    }
-
-    public int getSecond() {
+    public final int getSecond() {
         return second;
-    }
-
-    public void setSecond(int second) {
-        this.second = second;
     }
 
     public static Time fromSystem() {

@@ -19,7 +19,7 @@
             app:layout_constraintStart_toEndOf="@+id/use_system_time"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <com.icarus1.clock.TimeZonePicker
+        <com.icarus1.views.TimeZonePicker
             android:id="@+id/time_zone_picker"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

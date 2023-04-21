@@ -2,12 +2,12 @@ package com.icarus1.clock;
 
 import androidx.lifecycle.ViewModel;
 
+import com.icarus1.util.Time;
+
 public class ClockViewModel extends ViewModel {
 
     private boolean useSystemTime;
-    private int hour;
-    private int minute;
-    private int second;
+    private Time time;
     private int UTCOffset;
     private String location;
 
@@ -24,21 +24,15 @@ public class ClockViewModel extends ViewModel {
     }
 
     public void setTime(int hour, int minute, int second) {
-        this.hour = hour;
-        this.minute = minute;
-        this.second = second;
+        this.time = new Time(hour, minute, second);
     }
 
-    public int getHour() {
-        return hour;
+    public void setTime(Time time) {
+        this.time = time;
     }
 
-    public int getMinute() {
-        return minute;
-    }
-
-    public int getSecond() {
-        return second;
+    public Time getTime() {
+        return time;
     }
 
     public void setTimeZone(int UTCOffset, String location) {

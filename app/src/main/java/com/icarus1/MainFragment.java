@@ -18,6 +18,7 @@ import com.icarus1.databinding.FragmentMainBinding;
 import com.icarus1.selectbodies.SelectBodiesFragment;
 import com.icarus1.util.Debug;
 import com.icarus1.util.Format;
+import com.icarus1.util.Time;
 
 public class MainFragment extends Fragment {
 
@@ -288,7 +289,7 @@ public class MainFragment extends Fragment {
         }
     }
 
-    private void setTime(int hour, int minute, int seconds, int offset, @Nullable String location) {
+    private void setTime(Time time, int offset, @Nullable String location) {
 
         CompassFragment compassFragment;
         try {
@@ -302,7 +303,7 @@ public class MainFragment extends Fragment {
         int minuteOffset = (offset - hourOffset*3600000)/60000;
         float secondOffset = (offset - hourOffset*3600000 - minuteOffset*60000)/1000f;
 
-        String text = Format.Time(hour, minute, seconds);
+        String text = Format.Time(time.getHour(), time.getMinute(), time.getSecond());
         text += " (" + Format.UTCOffset(hourOffset, minuteOffset) + ")";
 
         binding.timeText.setText(text);
@@ -312,7 +313,7 @@ public class MainFragment extends Fragment {
             binding.timeLocation.setText(R.string.tap_to_change_time);
         }
 
-        compassFragment.setTime(hour - hourOffset, minute - minuteOffset, seconds - secondOffset);
+        compassFragment.setTime(time.getHour() - hourOffset, time.getMinute() - minuteOffset, time.getSecond() - secondOffset);
 
     }
 
@@ -326,7 +327,7 @@ public class MainFragment extends Fragment {
             int UTCOffset = result.getInt("OFFSET");
             String location = result.getString("LOCATION");
 
-            setTime(hour, minute, seconds, UTCOffset, location);
+            setTime(new Time(hour, minute, seconds), UTCOffset, location);
 
         }
     }

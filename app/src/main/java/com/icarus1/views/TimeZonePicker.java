@@ -1,4 +1,4 @@
-package com.icarus1.clock;
+package com.icarus1.views;
 
 import android.content.Context;
 import android.content.res.TypedArray;
