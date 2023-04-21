@@ -298,8 +298,12 @@ public class MainFragment extends Fragment {
             return;
         }
 
+        int hourOffset = offset/3600000;
+        int minuteOffset = (offset - hourOffset*3600000)/60000;
+        float secondOffset = (offset - hourOffset*3600000 - minuteOffset*60000)/1000f;
+
         String text = Format.Time(hour, minute, seconds);
-        text += " (" + Format.UTCOffset(offset, 0) + ")";
+        text += " (" + Format.UTCOffset(hourOffset, minuteOffset) + ")";
 
         binding.timeText.setText(text);
         if (location != null) {
@@ -308,7 +312,7 @@ public class MainFragment extends Fragment {
             binding.timeLocation.setText(R.string.tap_to_change_time);
         }
 
-        compassFragment.setTime(hour - offset, minute, seconds);
+        compassFragment.setTime(hour - hourOffset, minute - minuteOffset, seconds - secondOffset);
 
     }
 
@@ -319,10 +323,10 @@ public class MainFragment extends Fragment {
             int hour = result.getInt("HOUR");
             int minute = result.getInt("MINUTE");
             int seconds = result.getInt("SECOND");
-            int timeZoneID = result.getInt("OFFSET");
+            int UTCOffset = result.getInt("OFFSET");
             String location = result.getString("LOCATION");
 
-            setTime(hour, minute, seconds, timeZoneID, location);
+            setTime(hour, minute, seconds, UTCOffset, location);
 
         }
     }

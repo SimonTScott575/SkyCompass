@@ -20,6 +20,7 @@ import com.icarus1.util.Debug;
 import com.icarus1.util.Format;
 import com.icarus1.util.Time;
 
+import java.util.Calendar;
 import java.util.TimeZone;
 
 public class ClockFragment extends Fragment {
@@ -62,7 +63,7 @@ public class ClockFragment extends Fragment {
         if (viewModel.isUseSystemTime()) {
             setTimeAndTimeZoneFromSystemValues();
         } else {
-            setTimeAndTimeZoneAsPickerValues(
+            setTimeAndTimeZone(
                 viewModel.getHour(), viewModel.getMinute(), viewModel.getSecond(),
                 viewModel.getUTCOffset(), viewModel.getLocation()
             );
@@ -88,7 +89,35 @@ public class ClockFragment extends Fragment {
         super.onPause();
     }
 
-    private void setTimeAndTimeZoneAsPickerValues(int hour, int minute, int second, int UTCOffset, @Nullable String location) {
+    public void setTimeAndTimeZone(
+        int hour, int minute, int second,
+        int UTCOffset, @Nullable String location
+    ) {
+
+        viewModel.setTime(hour, minute, second);
+        viewModel.setTimeZone(UTCOffset, location);
+        viewModel.setUseSystemTime(false);
+
+        binding.useSystemTime.setVisibility(View.VISIBLE);
+        binding.useSystemTimeText.setVisibility(View.VISIBLE);
+
+        binding.timePicker.setOnTimeChangedListener(null);
+        binding.timePicker.setHour(hour);
+        binding.timePicker.setMinute(minute);
+        binding.timePicker.setOnTimeChangedListener(onTimeChangedListener);
+
+        binding.timeZonePicker.setOnUTCOffsetChanged(null);
+        binding.timeZonePicker.setUTCOffset(UTCOffset);
+        binding.timeZonePicker.setOnUTCOffsetChanged(onTimeZoneChangedListener);
+
+        onTimeAndTimeZoneChanged(hour, minute, second, UTCOffset, location);
+
+    }
+
+    private void setTimeAndTimeZoneAsPickerValues(
+        int hour, int minute, int second,
+        int UTCOffset, @Nullable String location
+    ) {
 
         viewModel.setTime(hour, minute, second);
         viewModel.setTimeZone(UTCOffset, location);
@@ -104,15 +133,14 @@ public class ClockFragment extends Fragment {
     public void setTimeAndTimeZoneFromSystemValues() {
 
         Time systemTime = Time.fromSystem();
-        TimeZone timeZone = TimeZone.getDefault();
-        int UTCOffset = timeZone.getRawOffset();
+        TimeZone timeZone = Calendar.getInstance().getTimeZone(); // TimeZone.getDefault();
+        int UTCOffset = timeZone.getRawOffset()*3600000 + Calendar.getInstance().get(Calendar.DST_OFFSET);
         String location = Format.Location(timeZone);
 
         setTimeAndTimeZoneAsSystemValues(
             systemTime.getHour(), systemTime.getMinute(), systemTime.getSecond(),
             UTCOffset, location
         );
-
 
     }
 
@@ -131,10 +159,10 @@ public class ClockFragment extends Fragment {
         binding.timePicker.setOnTimeChangedListener(onTimeChangedListener);
 
         binding.timeZonePicker.setOnUTCOffsetChanged(null);
-        binding.timeZonePicker.setUTCOffset(UTCOffset);
+        binding.timeZonePicker.setUTCOffset(UTCOffset/3600000);
         binding.timeZonePicker.setOnUTCOffsetChanged(onTimeZoneChangedListener);
 
-        onTimeAndTimeZoneChanged(hour, minute, second, UTCOffset,location);
+        onTimeAndTimeZoneChanged(hour, minute, second, UTCOffset, location);
 
     }
 
@@ -169,7 +197,7 @@ public class ClockFragment extends Fragment {
         public void onUTCOffsetChanged(TimeZonePicker timeZonePicker, String location, int UTCOffset) {
             setTimeAndTimeZoneAsPickerValues(
                 viewModel.getHour(), viewModel.getMinute(), viewModel.getSecond(),
-                UTCOffset, location
+                UTCOffset*3600000, location
             );
         }
     }
@@ -205,7 +233,7 @@ public class ClockFragment extends Fragment {
 
                 Time systemTime = Time.fromSystem();
                 TimeZone timeZone = TimeZone.getDefault();
-                int UTCOffset = timeZone.getRawOffset();
+                int UTCOffset = timeZone.getRawOffset()*3600000 + Calendar.getInstance().get(Calendar.DST_OFFSET);
                 String location = Format.Location(timeZone);
 
                 boolean timeChanged = firstRun
