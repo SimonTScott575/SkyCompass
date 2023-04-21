@@ -14,6 +14,7 @@ import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.icarus1.databinding.FragmentMapBinding;
 import com.icarus1.util.Debug;
@@ -30,6 +31,7 @@ public class MapFragment extends Fragment {
     private final LocationRequester locationRequester;
 
     public MapFragment() {
+
         locationRequester = new LocationRequester((latitude, longitude) -> {
 
             setMyLocation(longitude, latitude);
@@ -43,6 +45,26 @@ public class MapFragment extends Fragment {
             }
 
         });
+
+        locationRequester.setOnPermissionResult(granted -> {
+
+            if (granted) {
+                setAutoSetAsMyLocation(true);
+                setLocationAsMyLocation();
+            } else {
+
+                binding.myLocation.setImageDrawable(
+                    ResourcesCompat.getDrawable(
+                        getResources(), R.drawable.no_location, requireActivity().getTheme()
+                    )
+                );
+
+                askUserForDeniedLocationPermission();
+
+            }
+
+        });
+
     }
 
     @Override
@@ -79,12 +101,10 @@ public class MapFragment extends Fragment {
     public void onResume() {
         super.onResume();
         binding.mapView.onResume();
-        locationRequester.request(this);
     }
 
     @Override
     public void onPause() {
-        locationRequester.cancel();
         binding.mapView.onPause();
         super.onPause();
     }
@@ -213,11 +233,35 @@ public class MapFragment extends Fragment {
         );
     }
 
+    private void askUserForDeniedLocationPermission() {
+
+        try {
+            Toast toast = Toast.makeText(requireContext(), "Allow location access in permission settings.", Toast.LENGTH_LONG);
+            toast.show();
+        } catch (IllegalStateException e) {
+            Debug.log("No context associated with MapFragment.");
+        }
+
+    }
+
     private class OnClickSetToMyLocation implements View.OnClickListener {
         @Override
         public void onClick(View v) {
-            setAutoSetAsMyLocation(true);
-            setLocationAsMyLocation();
+
+            LocationRequester.PermissionState state = locationRequester.permissionState();
+
+            switch (state) {
+                case UNREQUESTED:
+                    locationRequester.request(MapFragment.this);
+                    break;
+                case GRANTED:
+                    setLocationAsMyLocation();
+                    break;
+                case DENIED:
+                    askUserForDeniedLocationPermission();
+                    break;
+            }
+
         }
     }
 

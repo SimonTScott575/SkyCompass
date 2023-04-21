@@ -21,15 +21,20 @@ import java.util.Map;
 public class LocationRequester {
 
     private ActivityResultLauncher<String[]> register;
-    private LocationCallback registerCallback;
-    private LocationManager lm;
+    private ResultCallback resultCallback;
+    private LocationManager locationManager;
     private LocationListener locationListener;
+    private OnPermissionResult onPermissionResult;
     private OnLocationChanged onLocationChanged;
 
-    private boolean requested;
+    private PermissionState state = PermissionState.UNREQUESTED;
 
     public LocationRequester(OnLocationChanged onLocationChanged) {
         this.onLocationChanged = onLocationChanged;
+    }
+
+    public void setOnPermissionResult(OnPermissionResult onPermissionResult) {
+        this.onPermissionResult = onPermissionResult;
     }
 
     public void setOnLocationChanged(OnLocationChanged onLocationChanged) {
@@ -42,9 +47,9 @@ public class LocationRequester {
             throw new RuntimeException("Must unregister previous register.");
         }
 
-        registerCallback = new LocationCallback(fragment.requireActivity());
+        resultCallback = new ResultCallback(fragment.requireActivity());
         register = fragment.registerForActivityResult(
-            new ActivityResultContracts.RequestMultiplePermissions(), registerCallback
+            new ActivityResultContracts.RequestMultiplePermissions(), resultCallback
         );
 
     }
@@ -57,7 +62,7 @@ public class LocationRequester {
 
         register.unregister();
         register = null;
-        registerCallback = null;
+        resultCallback = null;
 
     }
 
@@ -66,13 +71,13 @@ public class LocationRequester {
         if (register == null) {
             throw new RuntimeException("Must register before request.");
         }
-        if (requested) {
-            throw new RuntimeException("Must cancel previous request.");
+        if (state != PermissionState.UNREQUESTED) {
+            throw new RuntimeException("Already requested.");
         }
 
-        requested = true;
+        state = PermissionState.REQUESTED;
 
-        if (!permissionsGranted(fragment.requireContext()) || lm == null) {
+        if (!permissionsGranted(fragment.requireContext()) || locationManager == null) {
             register.launch(new String[]{
                 Manifest.permission.ACCESS_COARSE_LOCATION,
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -83,18 +88,8 @@ public class LocationRequester {
 
     }
 
-    public void cancel() {
-
-        if (!requested) {
-            throw new RuntimeException("Must request before cancel.");
-        }
-
-        requested = false;
-
-        if (lm != null) {
-            cancelLocationUpdatesFromLocationManager();
-        }
-
+    public PermissionState permissionState() {
+        return state;
     }
 
     private boolean permissionsGranted(Context context) {
@@ -115,24 +110,18 @@ public class LocationRequester {
                 locationListener.cancel();
             }
             locationListener = new LocationListener();
-            lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 10000, 10, locationListener);
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 10000, 10, locationListener);
         } catch (SecurityException e) {
             Debug.error(new Debug.Exception("LocationRequester SecurityException."));
         }
 
     }
 
-    private void cancelLocationUpdatesFromLocationManager() {
-        lm.removeUpdates(locationListener);
-        locationListener.cancel();
-        locationListener = null;
-    }
-
-    private class LocationCallback implements ActivityResultCallback<Map<String,Boolean>> {
+    private class ResultCallback implements ActivityResultCallback<Map<String,Boolean>> {
 
         private final FragmentActivity activity;
 
-        public LocationCallback(FragmentActivity activity) {
+        public ResultCallback(FragmentActivity activity) {
             this.activity = activity;
         }
 
@@ -144,7 +133,13 @@ public class LocationRequester {
 
                 try {
 
-                    lm = (LocationManager) activity.getSystemService(Context.LOCATION_SERVICE);
+                    state = PermissionState.GRANTED;
+
+                    if (onPermissionResult != null) {
+                        onPermissionResult.onResult(true);
+                    }
+
+                    locationManager = (LocationManager) activity.getSystemService(Context.LOCATION_SERVICE);
                     requestLocationUpdatesFromLocationManager();
 
                 } catch (SecurityException e) {
@@ -152,6 +147,12 @@ public class LocationRequester {
                 }
 
             } else {
+                state = PermissionState.DENIED;
+
+                if (onPermissionResult != null) {
+                    onPermissionResult.onResult(false);
+                }
+
                 Debug.log("Failed to get permission ACCESS_FINE_LOCATION.");
             }
 
@@ -166,7 +167,7 @@ public class LocationRequester {
         @Override
         public void onLocationChanged(@NonNull Location location) {
 
-            if (!requested || cancelled) {
+            if (cancelled) {
                 return;
             }
 
@@ -180,6 +181,17 @@ public class LocationRequester {
             cancelled = true;
         }
 
+    }
+
+    public enum PermissionState {
+        UNREQUESTED,
+        REQUESTED,
+        GRANTED,
+        DENIED
+    }
+
+    public interface OnPermissionResult {
+        void onResult(boolean granted);
     }
 
     public interface OnLocationChanged {
