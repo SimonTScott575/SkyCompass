@@ -20,7 +20,7 @@
 
             <ImageButton
                 android:id="@+id/minus"
-                style="@style/button"
+                style="@style/image_button"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
@@ -58,7 +58,7 @@
 
             <ImageButton
                 android:id="@+id/plus"
-                style="@style/button"
+                style="@style/image_button"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:background="?attr/selectableItemBackgroundBorderless"

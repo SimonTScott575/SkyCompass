@@ -196,14 +196,14 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginTop="8dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
             android:scaleType="fitCenter"
             app:layout_constraintBottom_toBottomOf="@+id/toggle_objects_group"
             app:layout_constraintEnd_toStartOf="@+id/fragment_compass"
             app:layout_constraintStart_toEndOf="@+id/toggle_objects_group"
             app:layout_constraintTop_toTopOf="@+id/toggle_objects_group"
             app:tint="?attr/colorSecondary"
-            custom:srcCompat="@drawable/view" />
+            custom:srcCompat="@drawable/view"
+            style="@style/image_button" />
 
         <com.icarus1.views.Panel
             android:id="@+id/select_bodies_view"

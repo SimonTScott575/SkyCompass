@@ -19,7 +19,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:theme="?attr/actionBarPopupTheme"
             app:title="@string/app_name"
-            app:titleTextColor="@color/text_color"/>
+            app:titleTextColor="@color/black"/>
 
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/main_fragment_container"

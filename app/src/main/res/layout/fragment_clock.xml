@@ -32,7 +32,7 @@
 
         <ImageButton
             android:id="@+id/use_system_time"
-            style="@style/button"
+            style="@style/image_button"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginStart="24dp"
