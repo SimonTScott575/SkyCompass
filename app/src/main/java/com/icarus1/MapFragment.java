@@ -29,20 +29,21 @@ public class MapFragment extends Fragment {
     private MapViewModel viewModel;
     private FragmentMapBinding binding;
     private final LocationRequester locationRequester;
-    private boolean previouslyRequested;
 
     public MapFragment() {
 
         locationRequester = new LocationRequester((latitude, longitude) -> {
 
-            setMyLocation(longitude, latitude);
+            boolean differentLatitude = true;
+            boolean differentLongitude = true;
+            if (viewModel.getMyLocation() != null) {
+                differentLatitude = viewModel.getMyLocation().getLatitude() != latitude;
+                differentLongitude = viewModel.getMyLocation().getLongitude() != longitude;
+            }
 
-            if (viewModel.getMyLocation() != null && viewModel.autoSetAsMyLocation()) {
-                boolean differentLatitude = viewModel.getMyLocation().getLatitude() != viewModel.getMarkerLatitude();
-                boolean differentLongitude = viewModel.getMyLocation().getLongitude() != viewModel.getMarkerLongitude();
-                if (differentLatitude || differentLongitude) {
-                    setLocationAsMyLocation();
-                }
+            if (differentLatitude || differentLongitude) {
+                setMyLocation(longitude, latitude);
+                setLocationAsMyLocation(latitude, longitude);
             }
 
         });
@@ -50,8 +51,7 @@ public class MapFragment extends Fragment {
         locationRequester.setOnPermissionResult(granted -> {
 
             if (granted) {
-                setAutoSetAsMyLocation(true);
-                setLocationAsMyLocation();
+                setLocationFromMyLocation();
             } else {
 
                 binding.myLocation.setImageDrawable(
@@ -60,13 +60,13 @@ public class MapFragment extends Fragment {
                     )
                 );
 
-                if (previouslyRequested) {
-                    askUserForDeniedLocationPermission();
-                }
+                notifyUserLocationPermissionDenied();
 
             }
 
-            previouslyRequested = true;
+            if (locationRequester.on() == LocationRequester.EnabledState.DISABLED) {
+                notifyUserLocationDisabled();
+            }
 
         });
 
@@ -106,10 +106,12 @@ public class MapFragment extends Fragment {
     public void onResume() {
         super.onResume();
         binding.mapView.onResume();
+        locationRequester.resume();
     }
 
     @Override
     public void onPause() {
+        locationRequester.pause();
         binding.mapView.onPause();
         super.onPause();
     }
@@ -131,7 +133,7 @@ public class MapFragment extends Fragment {
                 double longitude = marker.getPosition().getLongitude();
                 double latitude = marker.getPosition().getLatitude();
 
-                setLocationFromMapMarker(latitude, longitude, null);
+                setLocationAsMapMarker(latitude, longitude, null);
 
             }
             @Override
@@ -144,25 +146,28 @@ public class MapFragment extends Fragment {
 
         binding.myLocation.setOnClickListener(new OnClickSetToMyLocation());
 
-        boolean autoSetAsMyLocation = viewModel.autoSetAsMyLocation();
-        setLocation(
-            viewModel.getMarkerLongitude(), viewModel.getMarkerLatitude(),
-            viewModel.getMarkerLocationDescription()
-        );
-        setAutoSetAsMyLocation(autoSetAsMyLocation);
+        if (viewModel.autoSetAsMyLocation()) {
+            setLocationFromMyLocation();
+        } else {
+            setLocation(
+                viewModel.getMarkerLongitude(), viewModel.getMarkerLatitude(),
+                viewModel.getMarkerLocationDescription()
+            );
+        }
 
     }
 
     public void setLocation(double longitude, double latitude, String location) {
 
         binding.mapView.setMarkerLocation(latitude, longitude);
-        setLocationFromMapMarker(latitude, longitude, location);
+        setLocationAsMapMarker(latitude, longitude, location);
 
     }
 
-    private void setLocationFromMapMarker(double latitude, double longitude, String location) {
+    private void setLocationAsMapMarker(double latitude, double longitude, String location) {
 
-        setAutoSetAsMyLocation(false);
+        viewModel.setAutoSetAsMyLocation(false);
+        viewModel.setMarkerLocation(latitude, longitude, location);
 
         binding.markerLocation.setText(Format.LatitudeLongitude(latitude, longitude));
         if (viewModel.getMyLocation() != null) {
@@ -173,21 +178,26 @@ public class MapFragment extends Fragment {
             );
         }
 
-        viewModel.setMarkerLocation(latitude, longitude, location);
-
         onLocationChanged(longitude, latitude, location);
 
     }
 
-    public void setLocationAsMyLocation() {
+    public void setLocationFromMyLocation() {
+
+        viewModel.setAutoSetAsMyLocation(true);
 
         if (viewModel.getMyLocation() == null) {
             return;
         }
+        setLocationAsMyLocation(viewModel.getMyLocation().getLatitude(), viewModel.getMyLocation().getLongitude());
 
-        double latitude = viewModel.getMyLocation().getLatitude();
-        double longitude = viewModel.getMyLocation().getLongitude();
+    }
+
+    private void setLocationAsMyLocation(double latitude, double longitude) {
+
         String description = getResources().getString(R.string.using_system_location);
+
+        viewModel.setMarkerLocation(latitude, longitude, description);
 
         binding.mapView.setMarkerLocation(latitude, longitude);
         binding.markerLocation.setText(Format.LatitudeLongitude(latitude, longitude));
@@ -197,14 +207,8 @@ public class MapFragment extends Fragment {
             )
         );
 
-        viewModel.setMarkerLocation(latitude, longitude, description);
-
         onLocationChanged(longitude, latitude, description);
 
-    }
-
-    public void setAutoSetAsMyLocation(boolean auto) {
-        viewModel.setAutoSetAsMyLocation(auto);
     }
 
     public void onLocationChanged(double longitude, double latitude, String location) {
@@ -229,19 +233,21 @@ public class MapFragment extends Fragment {
         );
     }
 
-    public void unsetMyLocation() {
-        viewModel.setMyLocation(null);
-        binding.myLocation.setImageDrawable(
-            ResourcesCompat.getDrawable(
-                getResources(), R.drawable.no_location, requireActivity().getTheme()
-            )
-        );
-    }
-
-    private void askUserForDeniedLocationPermission() {
+    private void notifyUserLocationPermissionDenied() {
 
         try {
-            Toast toast = Toast.makeText(requireContext(), "Allow location access in permission settings.", Toast.LENGTH_LONG);
+            Toast toast = Toast.makeText(requireContext(), "Location access denied in permission settings", Toast.LENGTH_LONG);
+            toast.show();
+        } catch (IllegalStateException e) {
+            Debug.log("No context associated with MapFragment.");
+        }
+
+    }
+
+    private void notifyUserLocationDisabled() {
+
+        try {
+            Toast toast = Toast.makeText(requireContext(), "Location updates disabled in settings", Toast.LENGTH_LONG);
             toast.show();
         } catch (IllegalStateException e) {
             Debug.log("No context associated with MapFragment.");
@@ -256,15 +262,18 @@ public class MapFragment extends Fragment {
             LocationRequester.PermissionState state = locationRequester.permissionState();
 
             switch (state) {
-                case UNREQUESTED:
-                    locationRequester.request(MapFragment.this);
+                case REQUESTED:
                     break;
                 case GRANTED:
-                    setLocationAsMyLocation();
+                    setLocationFromMyLocation();
                     break;
-                case DENIED:
-                    askUserForDeniedLocationPermission();
+                default:
+                    locationRequester.request(MapFragment.this);
                     break;
+            }
+
+            if (locationRequester.on() == LocationRequester.EnabledState.DISABLED) {
+                notifyUserLocationDisabled();
             }
 
         }

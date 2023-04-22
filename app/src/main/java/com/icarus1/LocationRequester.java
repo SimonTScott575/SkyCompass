@@ -28,9 +28,24 @@ public class LocationRequester {
     private OnLocationChanged onLocationChanged;
 
     private PermissionState state = PermissionState.UNREQUESTED;
+    private boolean resumed;
 
     public LocationRequester(OnLocationChanged onLocationChanged) {
         this.onLocationChanged = onLocationChanged;
+    }
+
+    public void resume() {
+        resumed = true;
+        if (locationManager != null) {
+            requestLocationUpdatesFromLocationManager();
+        }
+    }
+
+    public void pause() {
+        resumed = false;
+        if (locationManager != null) {
+            cancelLocationUpdatesFromLocationManager();
+        }
     }
 
     public void setOnPermissionResult(OnPermissionResult onPermissionResult) {
@@ -71,9 +86,6 @@ public class LocationRequester {
         if (register == null) {
             throw new RuntimeException("Must register before request.");
         }
-        if (state != PermissionState.UNREQUESTED) {
-            throw new RuntimeException("Already requested.");
-        }
 
         state = PermissionState.REQUESTED;
 
@@ -86,6 +98,15 @@ public class LocationRequester {
             requestLocationUpdatesFromLocationManager();
         }
 
+    }
+
+    public EnabledState on() {
+        if (locationManager != null) {
+            return locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+                ? EnabledState.ENABLED : EnabledState.DISABLED;
+        } else {
+            return EnabledState.UNKNOWN;
+        }
     }
 
     public PermissionState permissionState() {
@@ -106,13 +127,21 @@ public class LocationRequester {
     private void requestLocationUpdatesFromLocationManager() {
 
         try {
-            if (locationListener != null) {
-                locationListener.cancel();
-            }
+            cancelLocationUpdatesFromLocationManager();
             locationListener = new LocationListener();
             locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 10000, 10, locationListener);
         } catch (SecurityException e) {
             Debug.error(new Debug.Exception("LocationRequester SecurityException."));
+        }
+
+    }
+
+    private void cancelLocationUpdatesFromLocationManager() {
+
+        if (locationListener != null) {
+            locationListener.cancel();
+            locationManager.removeUpdates(locationListener);
+            locationListener = null;
         }
 
     }
@@ -135,11 +164,12 @@ public class LocationRequester {
 
                     state = PermissionState.GRANTED;
 
+                    locationManager = (LocationManager) activity.getSystemService(Context.LOCATION_SERVICE);
+
                     if (onPermissionResult != null) {
                         onPermissionResult.onResult(true);
                     }
 
-                    locationManager = (LocationManager) activity.getSystemService(Context.LOCATION_SERVICE);
                     requestLocationUpdatesFromLocationManager();
 
                 } catch (SecurityException e) {
@@ -167,7 +197,7 @@ public class LocationRequester {
         @Override
         public void onLocationChanged(@NonNull Location location) {
 
-            if (cancelled) {
+            if (cancelled || !resumed) {
                 return;
             }
 
@@ -188,6 +218,12 @@ public class LocationRequester {
         REQUESTED,
         GRANTED,
         DENIED
+    }
+
+    public enum EnabledState {
+        DISABLED,
+        ENABLED,
+        UNKNOWN
     }
 
     public interface OnPermissionResult {

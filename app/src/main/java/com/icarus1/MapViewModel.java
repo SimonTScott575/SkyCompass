@@ -12,10 +12,6 @@ public class MapViewModel extends ViewModel {
     private GeoPoint myLocation;
     private boolean autoSetAsMyLocation;
 
-    public MapViewModel() {
-        autoSetAsMyLocation = true;
-    }
-
     public double getMarkerLatitude() {
         return markerLatitude;
     }
