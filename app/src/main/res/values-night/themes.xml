@@ -2,13 +2,13 @@
     <!-- Base application theme. -->
     <style name="Theme.Icarus1" parent="Theme.MaterialComponents.DayNight.NoActionBar">
 
-        <item name="colorPrimary">@color/blue</item>
-        <item name="colorPrimaryVariant">@color/blue_dark</item>
-        <item name="colorOnPrimary">@color/grey_light_2</item>
+        <item name="colorPrimary">@color/grey_dark</item>
+        <item name="colorPrimaryVariant">@color/grey_dark</item>
+        <item name="colorOnPrimary">@color/red_darker</item>
 
-        <item name="colorSecondary">@color/red</item>
-        <item name="colorSecondaryVariant">@color/red_dark</item>
-        <item name="colorOnSecondary">@color/blue</item>
+        <item name="colorSecondary">@color/orange_1</item>
+        <item name="colorSecondaryVariant">@color/orange_1</item>
+        <item name="colorOnSecondary">@color/red_darker</item>
 
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
 
