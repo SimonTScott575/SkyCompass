@@ -1,4 +1,4 @@
-package com.icarus1.compass;
+package com.icarus1;
 
 import android.os.Bundle;
 
@@ -15,7 +15,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.icarus1.R;
+import com.icarus1.compass.CelestialObject;
+import com.icarus1.compass.CompassModel;
+import com.icarus1.compass.CompassSensor;
 import com.icarus1.databinding.FragmentCompassBinding;
 
 public class CompassFragment extends Fragment {

@@ -13,9 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.icarus1.compass.CelestialObject;
-import com.icarus1.compass.CompassFragment;
 import com.icarus1.databinding.FragmentMainBinding;
-import com.icarus1.selectbodies.SelectBodiesFragment;
 import com.icarus1.util.Debug;
 import com.icarus1.util.Format;
 import com.icarus1.util.Time;

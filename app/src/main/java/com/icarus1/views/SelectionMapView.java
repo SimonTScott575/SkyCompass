@@ -1,4 +1,4 @@
-package com.icarus1.map;
+package com.icarus1.views;
 
 import android.content.Context;
 import android.graphics.Rect;
