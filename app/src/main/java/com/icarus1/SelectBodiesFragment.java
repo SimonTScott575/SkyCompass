@@ -1,4 +1,4 @@
-package com.icarus1.selectbodies;
+package com.icarus1;
 
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
@@ -16,7 +16,6 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.TableRow;
 
-import com.icarus1.R;
 import com.icarus1.compass.CelestialObject;
 import com.icarus1.databinding.FragmentSelectBodiesBinding;
 import com.icarus1.databinding.ViewSelectableBodyBinding;

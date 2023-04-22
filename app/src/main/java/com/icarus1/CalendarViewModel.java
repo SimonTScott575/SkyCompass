@@ -1,4 +1,4 @@
-package com.icarus1.calendar;
+package com.icarus1;
 
 import androidx.lifecycle.ViewModel;
 
@@ -20,6 +20,10 @@ public class CalendarViewModel extends ViewModel {
         return systemDate;
     }
 
+    public void setSystemDate(boolean systemDate) {
+        this.systemDate = systemDate;
+    }
+
     public int getYear() {
         return year;
     }
@@ -32,8 +36,7 @@ public class CalendarViewModel extends ViewModel {
         return dayOfMonth;
     }
 
-    public void setDate(int year, int month, int dayOfMonth, boolean systemDate) {
-        this.systemDate = systemDate;
+    public void setDate(int year, int month, int dayOfMonth) {
         this.year = year;
         this.month = month;
         this.dayOfMonth = dayOfMonth;

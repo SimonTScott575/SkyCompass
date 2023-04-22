@@ -1,4 +1,4 @@
-package com.icarus1.map;
+package com.icarus1;
 
 import androidx.lifecycle.ViewModel;
 
@@ -10,10 +10,7 @@ public class MapViewModel extends ViewModel {
     private double markerLongitude;
     private String markerLocationDescription;
     private GeoPoint myLocation;
-
-    public MapViewModel() {
-        markerLatitude = markerLongitude = 0d;
-    }
+    private boolean autoSetAsMyLocation;
 
     public double getMarkerLatitude() {
         return markerLatitude;
@@ -39,6 +36,14 @@ public class MapViewModel extends ViewModel {
 
     public void setMyLocation(GeoPoint userLocation) {
         this.myLocation = userLocation;
+    }
+
+    public boolean autoSetAsMyLocation() {
+        return autoSetAsMyLocation;
+    }
+
+    public void setAutoSetAsMyLocation(boolean autoSetAsMyLocation) {
+        this.autoSetAsMyLocation = autoSetAsMyLocation;
     }
 
 }

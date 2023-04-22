@@ -18,7 +18,7 @@
 
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/fragment_compass"
-            android:name="com.icarus1.compass.CompassFragment"
+            android:name="com.icarus1.CompassFragment"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginStart="8dp"
@@ -227,7 +227,7 @@
 
             <androidx.fragment.app.FragmentContainerView
                 android:id="@+id/select_bodies_fragment"
-                android:name="com.icarus1.selectbodies.SelectBodiesFragment"
+                android:name="com.icarus1.SelectBodiesFragment"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 tools:layout="@layout/fragment_select_bodies" />
@@ -247,7 +247,7 @@
 
             <androidx.fragment.app.FragmentContainerView
                 android:id="@+id/map_fragment_container"
-                android:name="com.icarus1.map.MapFragment"
+                android:name="com.icarus1.MapFragment"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 tools:layout="@layout/fragment_map" />
@@ -266,7 +266,7 @@
 
             <androidx.fragment.app.FragmentContainerView
                 android:id="@+id/calendar_fragment_container"
-                android:name="com.icarus1.calendar.CalendarFragment"
+                android:name="com.icarus1.CalendarFragment"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 tools:layout="@layout/fragment_calendar" />
@@ -285,7 +285,7 @@
 
             <androidx.fragment.app.FragmentContainerView
                 android:id="@+id/clock_fragment_container"
-                android:name="com.icarus1.clock.ClockFragment"
+                android:name="com.icarus1.ClockFragment"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 tools:layout="@layout/fragment_clock" />

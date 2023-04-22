@@ -1,4 +1,4 @@
-package com.icarus1.map;
+package com.icarus1.views;
 
 import android.content.Context;
 import android.graphics.Rect;
@@ -49,6 +49,7 @@ public class SelectionMapView extends MapView {
         locationMarker = new Marker(this);
         locationMarker.setDraggable(true);
         locationMarker.setDragOffset(7);
+        locationMarker.setInfoWindow(null);
         getOverlays().add(locationMarker);
 
         setUp = true;

@@ -13,12 +13,11 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.icarus1.compass.CelestialObject;
-import com.icarus1.compass.CompassFragment;
 import com.icarus1.databinding.FragmentMainBinding;
-import com.icarus1.map.MapFragment;
-import com.icarus1.selectbodies.SelectBodiesFragment;
 import com.icarus1.util.Debug;
 import com.icarus1.util.Format;
+import com.icarus1.util.Time;
+import com.icarus1.util.TimeZone;
 
 public class MainFragment extends Fragment {
 
@@ -289,7 +288,7 @@ public class MainFragment extends Fragment {
         }
     }
 
-    private void setTime(int hour, int minute, int seconds, int offset, @Nullable String location) {
+    private void setTime(Time time, TimeZone timeZone) {
 
         CompassFragment compassFragment;
         try {
@@ -299,17 +298,21 @@ public class MainFragment extends Fragment {
             return;
         }
 
-        String text = Format.Time(hour, minute, seconds);
-        text += " (" + Format.UTCOffset(offset, 0) + ")";
+        String text = Format.Time(time.getHour(), time.getMinute(), time.getSecond());
+        text += " (" + Format.UTCOffset(timeZone.getUTCHourOffset(), timeZone.getUTCMinuteOffset()) + ")";
 
         binding.timeText.setText(text);
-        if (location != null) {
-            binding.timeLocation.setText(location);
+        if (timeZone.getId() != null) {
+            binding.timeLocation.setText(timeZone.getId());
         } else {
             binding.timeLocation.setText(R.string.tap_to_change_time);
         }
 
-        compassFragment.setTime(hour - offset, minute, seconds);
+        compassFragment.setTime(
+            time.getHour() - timeZone.getUTCHourOffset(),
+            time.getMinute() - timeZone.getUTCMinuteOffset(),
+            time.getSecond() - timeZone.getUTCSecondOffset() - timeZone.getUTCMillisecondOffset()/1000f
+        );
 
     }
 
@@ -320,10 +323,10 @@ public class MainFragment extends Fragment {
             int hour = result.getInt("HOUR");
             int minute = result.getInt("MINUTE");
             int seconds = result.getInt("SECOND");
-            int timeZoneID = result.getInt("OFFSET");
+            int UTCOffset = result.getInt("OFFSET");
             String location = result.getString("LOCATION");
 
-            setTime(hour, minute, seconds, timeZoneID, location);
+            setTime(new Time(hour, minute, seconds), new TimeZone(UTCOffset, location));
 
         }
     }
