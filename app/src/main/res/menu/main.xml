@@ -8,6 +8,7 @@
         <item
             android:id="@+id/menu_item_rotate_to_north"
             android:icon="@drawable/compass"
+            app:iconTint="?attr/colorOnPrimary"
             android:title=""
             app:showAsAction="ifRoom" />
     </group>
@@ -17,16 +18,19 @@
         <item
             android:id="@+id/menu_item_dark_mode"
             android:icon="@drawable/dark_mode"
+            app:iconTint="?attr/colorOnPrimary"
             android:title="@string/dark_mode"
             app:showAsAction="ifRoom" />
         <item
             android:id="@+id/menu_item_help"
             android:icon="@drawable/help"
+            app:iconTint="?attr/colorOnPrimary"
             android:title="@string/about"
             app:showAsAction="ifRoom" />
         <item
             android:id="@+id/menu_item_settings"
             android:icon="@drawable/settings"
+            app:iconTint="?attr/colorOnPrimary"
             android:title="@string/page_settings"
             app:showAsAction="ifRoom" />
     </group>

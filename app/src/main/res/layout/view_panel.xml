@@ -27,7 +27,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/close"
-                app:tint="?attr/colorOnBackground"/>
+                style="@style/image_button"/>
 
             <View
                 android:id="@+id/view_panel_click_blocker"

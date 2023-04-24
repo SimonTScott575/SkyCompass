@@ -38,5 +38,9 @@
         <item name="backgroundTint">@color/grey_dark</item>
     </style>
 
+    <style name="MyDatePicker">
+        <item name="android:textColorPrimary">@color/red_light</item>
+        <item name="colorControlNormal">@color/red_light</item>
+    </style>
 
 </resources>
