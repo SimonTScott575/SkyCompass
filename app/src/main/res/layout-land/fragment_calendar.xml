@@ -21,11 +21,11 @@
             android:layout_marginBottom="16dp"
             android:calendarViewShown="false"
             android:datePickerMode="spinner"
+            android:theme="@style/picker"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:theme="@style/MyDatePicker" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <ImageButton
             android:id="@+id/use_system_date"

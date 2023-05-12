@@ -37,14 +37,14 @@
 
             <Button
                 android:id="@+id/toggle_objects_sun_moon"
-                style="?attr/materialButtonOutlinedStyle"
+                style="@style/button_toggle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/sun_moon" />
 
             <Button
                 android:id="@+id/toggle_objects_planets"
-                style="?attr/materialButtonOutlinedStyle"
+                style="@style/button_toggle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/planets" />

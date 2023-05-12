@@ -16,10 +16,10 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:timePickerMode="spinner"
+            android:theme="@style/picker"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:theme="@style/MyDatePicker"/>
+            app:layout_constraintTop_toTopOf="parent"/>
 
         <com.icarus1.views.TimeZonePicker
             android:id="@+id/time_zone_picker"
