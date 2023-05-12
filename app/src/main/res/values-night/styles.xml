@@ -43,4 +43,9 @@
         <item name="colorControlNormal">@color/red_light</item>
     </style>
 
+    <style name="button_toggle" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="strokeColor">@color/red_checked_selector</item>
+        <item name="android:textColor">@color/red_checked_selector</item>
+    </style>
+
 </resources>

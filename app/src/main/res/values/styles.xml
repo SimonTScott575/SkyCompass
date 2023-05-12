@@ -48,4 +48,6 @@
         <item name="backgroundTint">@color/cream_dark</item>
     </style>
 
+    <style name="button_toggle" parent="Widget.MaterialComponents.Button.OutlinedButton"/>
+
 </resources>
