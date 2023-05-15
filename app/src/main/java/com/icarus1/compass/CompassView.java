@@ -24,8 +24,6 @@ public class CompassView extends View {
     private int minutes;
     private float seconds;
 
-    private final boolean[] drawBody = new boolean[CelestialObject.values().length];
-
     public CompassView(Context context) {
         super(context);
     }
@@ -67,15 +65,6 @@ public class CompassView extends View {
         this.minutes = minutes;
         this.seconds = seconds;
         invalidate();
-    }
-
-    public void setDrawBody(CelestialObject body, boolean draw) {
-        drawBody[body.ordinal()] = draw;
-        invalidate();
-    }
-
-    public boolean getDrawBody(CelestialObject body) {
-        return drawBody[body.ordinal()];
     }
 
     @Override
@@ -149,16 +138,14 @@ public class CompassView extends View {
         canvas.save();
         canvas.translate(ringThickness, ringThickness);
 
-        for (CelestialObject body : CelestialObject.values()) {
-            if (drawBody[body.ordinal()]) {
-                track.drawTracks(hour, compass, body, canvas);
-            }
+        CelestialObject[] bodies = new CelestialObject[]{CelestialObject.SUN, CelestialObject.MOON};
+
+        for (CelestialObject body : bodies) {
+            track.drawTracks(hour, compass, body, canvas);
         }
 
-        for (CelestialObject body : CelestialObject.values()) {
-            if (drawBody[body.ordinal()]) {
-                track.drawCurrentPosition(hour, minutes, seconds, compass, body, canvas);
-            }
+        for (CelestialObject body : bodies) {
+            track.drawCurrentPosition(hour, minutes, seconds, compass, body, canvas);
         }
 
         canvas.restore();

@@ -15,7 +15,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.icarus1.compass.CelestialObject;
 import com.icarus1.compass.CompassModel;
 import com.icarus1.compass.CompassSensor;
 import com.icarus1.databinding.FragmentCompassBinding;
@@ -109,14 +108,6 @@ public class CompassFragment extends Fragment {
 
     public void setTime(int hour, int minute, float seconds) {
         binding.compassView.setTime(hour, minute, seconds);
-    }
-
-    public void setDrawBody(CelestialObject body, boolean draw) {
-        binding.compassView.setDrawBody(body, draw);
-    }
-
-    public boolean getDrawBody(CelestialObject body) {
-        return binding.compassView.getDrawBody(body);
     }
 
     private class MenuListener implements MenuProvider {
