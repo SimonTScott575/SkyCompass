@@ -100,7 +100,7 @@ public class LocationRequester {
 
     }
 
-    public EnabledState on() {
+    public EnabledState enabled() {
         if (locationManager != null) {
             return locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
                 ? EnabledState.ENABLED : EnabledState.DISABLED;

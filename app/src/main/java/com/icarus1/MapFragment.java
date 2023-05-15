@@ -64,7 +64,7 @@ public class MapFragment extends Fragment {
 
             }
 
-            if (locationRequester.on() == LocationRequester.EnabledState.DISABLED) {
+            if (locationRequester.enabled() == LocationRequester.EnabledState.DISABLED) {
                 notifyUserLocationDisabled();
             }
 
@@ -146,7 +146,7 @@ public class MapFragment extends Fragment {
 
         binding.myLocation.setOnClickListener(new OnClickSetToMyLocation());
 
-        if (viewModel.autoSetAsMyLocation()) {
+        if (viewModel.autoSetAsMyLocation() && viewModel.getMyLocation() != null) {
             setLocationFromMyLocation();
         } else {
             setLocation(
@@ -272,7 +272,7 @@ public class MapFragment extends Fragment {
                     break;
             }
 
-            if (locationRequester.on() == LocationRequester.EnabledState.DISABLED) {
+            if (locationRequester.enabled() == LocationRequester.EnabledState.DISABLED) {
                 notifyUserLocationDisabled();
             }
 
