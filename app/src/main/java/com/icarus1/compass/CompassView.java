@@ -1,5 +1,7 @@
 package com.icarus1.compass;
 
+import static com.icarus1.compass.Values.BORDER_THICKNESS_FRACTION;
+
 import android.content.Context;
 import android.graphics.Canvas;
 import android.util.AttributeSet;
@@ -89,9 +91,8 @@ public class CompassView extends View {
 
         int maxLength = (int)Math.min(ww,hh);
 
-        ringThickness = maxLength / 20f;
-        float innerDiameter = maxLength - 2*ringThickness;
-        innerRadius = innerDiameter / 2;
+        innerRadius = maxLength * BORDER_THICKNESS_FRACTION / 2f;
+        ringThickness = maxLength/2f - innerRadius;
 
         background.setRadius(innerRadius);
         foreground.setRing(innerRadius, innerRadius + ringThickness);

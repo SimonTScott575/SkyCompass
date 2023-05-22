@@ -12,7 +12,7 @@ public class Foreground {
 
     private float innerRadius;
     private float outerRadius;
-    private float ringThickness;
+    private float outlineThickness;
     private float NSEWPadding;
     private final Paint ringPaint;
     private final Paint NSEWPaint;
@@ -39,16 +39,16 @@ public class Foreground {
 
         this.innerRadius = innerRadius;
         this.outerRadius = outerRadius;
-        ringThickness = outerRadius - innerRadius;
-        NSEWPadding = 0;
-        ringPaint.setStrokeWidth(ringThickness); // NSEWPadding);
-        NSEWPaint.setTextSize(ringThickness - NSEWPadding);
+        outlineThickness = (outerRadius - innerRadius) * Values.OUTLINE_THICKNESS_FRACTION;
+        NSEWPadding = outlineThickness;
+        ringPaint.setStrokeWidth(outlineThickness);
+        NSEWPaint.setTextSize((outerRadius - innerRadius) - NSEWPadding);
 
     }
 
     public void draw(Canvas canvas) {
 
-        canvas.drawCircle(outerRadius, outerRadius, innerRadius + ringThickness/2f, ringPaint);
+        canvas.drawCircle(outerRadius, outerRadius, innerRadius + outlineThickness /2f, ringPaint);
         drawNSEW(canvas);
 
     }
@@ -69,7 +69,7 @@ public class Foreground {
         canvas.drawText(
             text[0],
             outerRadius - textWidth[0]/2f,
-            ringThickness - NSEWPadding,
+            (outerRadius - innerRadius) - NSEWPadding,
             NSEWPaint
         );
 
@@ -83,7 +83,7 @@ public class Foreground {
             canvas.drawText(
                 text[i],
                 outerRadius - textWidth[i] / 2f,
-                ringThickness - NSEWPadding,
+                (outerRadius - innerRadius) - NSEWPadding,
                 NSEWPaint
             );
 
