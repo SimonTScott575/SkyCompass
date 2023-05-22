@@ -1,14 +1,27 @@
 package com.icarus1.compass;
 
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.RadialGradient;
+import android.graphics.Shader;
 
 public class Track {
+
+    private static final float FRACTION_BLANK = 0.2f;
+    private static final float FRACTION_WIDTH = 0.03f;
+    private static final float FRACTION_RADIUS = 0.075f;
+
+    private static final Paint GLOW_PAINT = new Paint(CelestialObject.SUN.getPaint().getColor());
+    static {
+        GLOW_PAINT.setStyle(Paint.Style.FILL);
+        GLOW_PAINT.setShader(new RadialGradient(0,0,1000,GLOW_PAINT.getColor(), Color.parseColor("#FF00FF"), Shader.TileMode.CLAMP));
+    }
 
     private float radius;
     private float diameter;
 
     private float width;
-    private static final float fractionBlank = 0.2f;
     private float objectRadius;
 
     public Track(float radius) {
@@ -22,8 +35,8 @@ public class Track {
         this.radius = radius;
         diameter = 2*radius;
 
-        width = radius*0.02f;
-        objectRadius = 0.05f*radius;
+        width = radius * FRACTION_WIDTH;
+        objectRadius = FRACTION_RADIUS * radius;
 
     }
 
@@ -85,7 +98,7 @@ public class Track {
             }
 
             float length = (float) (Math.sqrt( Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2) ));
-            float padding = length * fractionBlank/2f;
+            float padding = length * FRACTION_BLANK / 2f;
             float angle = (float) Math.atan2(endY - startY, endX - startX);
 
             length *= radius;
@@ -125,6 +138,26 @@ public class Track {
         float x = radius + (float) coordinate.getX()*radius;
         float y = diameter - radius - (float) coordinate.getY()*radius;
         float r = objectRadius;
+
+        if (body == CelestialObject.SUN || body == CelestialObject.MOON) {
+
+            int[] paints = new int[]{50, 25, 12, 0};
+            for (int i = 0; i < 4; i++) {
+                Paint paint = new Paint(body.getPaint());
+                paint.setAlpha(paints[i]);
+                paints[i] = paint.getColor();
+            }
+
+            GLOW_PAINT.setShader(new RadialGradient(
+                x, y, r*6,
+                paints,
+                new float[]{0,1/4f,1/2f,1f},
+                Shader.TileMode.CLAMP
+            ));
+
+            canvas.drawCircle(x, y, r*6, GLOW_PAINT);
+
+        }
 
         canvas.drawCircle(x, y, r, body.getPaint());
 
