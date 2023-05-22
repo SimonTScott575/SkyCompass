@@ -1,7 +1,6 @@
 package com.icarus1.views;
 
 import android.content.Context;
-import android.content.res.TypedArray;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
@@ -13,9 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
-import com.icarus1.R;
-import com.icarus1.databinding.ViewTimeZonePickerHorizontalBinding;
-import com.icarus1.databinding.ViewTimeZonePickerVerticalBinding;
+import com.icarus1.databinding.ViewTimeZonePickerBinding;
 import com.icarus1.util.TimeZone;
 
 public class TimeZonePicker extends ConstraintLayout {
@@ -44,37 +41,11 @@ public class TimeZonePicker extends ConstraintLayout {
 
         timeZone = new TimeZone(0);
 
-        int orientation = 0;
+        ViewTimeZonePickerBinding binding = ViewTimeZonePickerBinding.inflate(LayoutInflater.from(context), this, true);
+        numberEditText = binding.numberEditText;
 
-        if (attrs != null) {
-
-            try(
-                TypedArray b = context.getTheme().obtainStyledAttributes(
-                    attrs, R.styleable.TimeZonePicker, 0, 0
-                )
-            ) {
-                orientation = b.getInt(R.styleable.TimeZonePicker_orientation, 0);
-            }
-
-        }
-
-        View plus;
-        View minus;
-
-        if (orientation == 1) {
-            ViewTimeZonePickerVerticalBinding binding = ViewTimeZonePickerVerticalBinding.inflate(LayoutInflater.from(context), this, true);
-            plus = binding.plus;
-            minus = binding.minus;
-            numberEditText = binding.numberEditText;
-        } else {
-            ViewTimeZonePickerHorizontalBinding binding = ViewTimeZonePickerHorizontalBinding.inflate(LayoutInflater.from(context), this, true);
-            plus = binding.plus;
-            minus = binding.minus;
-            numberEditText = binding.numberEditText;
-        }
-
-        plus.setOnClickListener(new ShiftNumber(1));
-        minus.setOnClickListener(new ShiftNumber(-1));
+        binding.plus.setOnClickListener(new ShiftNumber(1));
+        binding.minus.setOnClickListener(new ShiftNumber(-1));
         numberEditText.addTextChangedListener(new RangeWatcher());
         numberEditText.setText("0");
 
