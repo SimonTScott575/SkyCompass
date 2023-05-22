@@ -1,7 +1,6 @@
 package com.icarus1.compass;
 
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 
 public class Foreground {
@@ -13,23 +12,24 @@ public class Foreground {
 
     private float innerRadius;
     private float outerRadius;
-    private float ringThickness;
-    private final Paint backgroundRingPaint;
+    private float outlineThickness;
+    private float NSEWPadding;
+    private final Paint ringPaint;
     private final Paint NSEWPaint;
     private final int NColor;
 
     public Foreground(float innerRadius, float outerRadius) {
 
-        backgroundRingPaint = new Paint();
-        backgroundRingPaint.setColor(Color.parseColor("#A27B5C"));
-        backgroundRingPaint.setStyle(Paint.Style.STROKE);
+        ringPaint = new Paint();
+        ringPaint.setColor(Values.RING.toArgb());
+        ringPaint.setStyle(Paint.Style.STROKE);
 
         NSEWPaint = new Paint();
-        NSEWPaint.setColor(Color.parseColor("#F5F5F5"));
+        NSEWPaint.setColor(Values.DIRECTION_SEW.toArgb());
         NSEWPaint.setStyle(Paint.Style.FILL);
         NSEWPaint.setFakeBoldText(true);
 
-        NColor = Color.parseColor("#F05454");
+        NColor = Values.DIRECTION_N.toArgb();
 
         setRing(innerRadius, outerRadius);
 
@@ -39,23 +39,21 @@ public class Foreground {
 
         this.innerRadius = innerRadius;
         this.outerRadius = outerRadius;
-        ringThickness = outerRadius - innerRadius;
-        backgroundRingPaint.setStrokeWidth(ringThickness);
-        NSEWPaint.setTextSize(ringThickness);
+        outlineThickness = (outerRadius - innerRadius) * Values.OUTLINE_THICKNESS_FRACTION;
+        NSEWPadding = outlineThickness;
+        ringPaint.setStrokeWidth(outlineThickness);
+        NSEWPaint.setTextSize((outerRadius - innerRadius) - NSEWPadding);
 
     }
 
     public void draw(Canvas canvas) {
 
-        canvas.drawCircle(outerRadius, outerRadius, innerRadius+ ringThickness /2f, backgroundRingPaint);
+        canvas.drawCircle(outerRadius, outerRadius, innerRadius + outlineThickness /2f, ringPaint);
         drawNSEW(canvas);
 
     }
 
     private void drawNSEW(Canvas canvas) {
-
-        float textSize = NSEWPaint.getTextSize();
-        float halfThickness = ringThickness/2f;
 
         String[] text = new String[]{TEXT_N, TEXT_E, TEXT_S, TEXT_W};
         float[] textWidth = new float[]{
@@ -69,10 +67,10 @@ public class Foreground {
         NSEWPaint.setColor(NColor);
 
         canvas.drawText(
-                text[0],
-                outerRadius - textWidth[0]/2f,
-                halfThickness + textSize/2f,
-                NSEWPaint
+            text[0],
+            outerRadius - textWidth[0]/2f,
+            (outerRadius - innerRadius) - NSEWPadding,
+            NSEWPaint
         );
 
         NSEWPaint.setColor(SEWColor);
@@ -85,7 +83,7 @@ public class Foreground {
             canvas.drawText(
                 text[i],
                 outerRadius - textWidth[i] / 2f,
-                2*halfThickness,
+                (outerRadius - innerRadius) - NSEWPadding,
                 NSEWPaint
             );
 

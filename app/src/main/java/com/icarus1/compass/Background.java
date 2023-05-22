@@ -18,15 +18,15 @@ class Background {
     public Background(float radius) {
 
         backgroundPaint = new Paint();
-        backgroundPaint.setColor(Color.parseColor("#3F4E4F"));
+        backgroundPaint.setColor(Values.BACKGROUND.toArgb());
         backgroundPaint.setStyle(Paint.Style.FILL);
 
         altitudeTrackPaint = new Paint();
-        altitudeTrackPaint.setColor(Color.parseColor("#DCD7C9"));
+        altitudeTrackPaint.setColor(Values.TRACK.toArgb());
         altitudeTrackPaint.setStyle(Paint.Style.STROKE);
 
         altitudeTextPaint = new Paint();
-        altitudeTextPaint.setColor(Color.parseColor("#DCD7C9"));
+        altitudeTextPaint.setColor(Values.TRACK.toArgb());
         altitudeTextPaint.setStyle(Paint.Style.FILL);
         setRadius(radius);
 
