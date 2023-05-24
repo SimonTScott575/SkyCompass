@@ -12,7 +12,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.icarus1.compass.CelestialObject;
 import com.icarus1.databinding.FragmentMainBinding;
 import com.icarus1.util.Debug;
 import com.icarus1.util.Format;
@@ -23,8 +22,6 @@ public class MainFragment extends Fragment {
 
     private FragmentMainBinding binding;
 
-    private final OnObjectSelection onObjectSelection = new OnObjectSelection();
-    private final OnChangeViewListener onChangeViewListener = new OnChangeViewListener();
     private final OnChangeLocationListener onChangeLocationListener = new OnChangeLocationListener();
     private final OnChangeDateListener onChangeDateListener = new OnChangeDateListener();
     private final OnChangeTimeListener onChangeTimeListener = new OnChangeTimeListener();
@@ -55,23 +52,14 @@ public class MainFragment extends Fragment {
             .setFragmentResultListener("B", this, onChangeLocationListener);
         getChildFragmentManager()
             .setFragmentResultListener("C", this, onChangeTimeListener);
-        for (CelestialObject body : CelestialObject.values()) {
-            getChildFragmentManager()
-                .setFragmentResultListener("E_"+body.getName(), this, onChangeViewListener);
-        }
 
     }
 
     private void initUI() {
 
-        binding.viewBodies.setOnClickListener(view -> binding.selectBodiesView.show());
-
         binding.changeLocation.setOnClickListener(view -> binding.mapCardView.show());
         binding.changeDate.setOnClickListener(view -> binding.calendarCardView.show());
         binding.changeTime.setOnClickListener(view -> binding.clockCardView.show());
-
-        binding.toggleObjectsSunMoon.setOnClickListener(onObjectSelection);
-        binding.toggleObjectsPlanets.setOnClickListener(onObjectSelection);
 
     }
 
@@ -112,110 +100,6 @@ public class MainFragment extends Fragment {
 
         return fragment;
 
-    }
-
-    private SelectBodiesFragment getSelectBodiesFragment()
-    throws FragmentNotFoundException, NoChildFragmentManagerAttachedException {
-
-        SelectBodiesFragment fragment = (SelectBodiesFragment) getChildFragmentManagerOrThrowException()
-            .findFragmentById(R.id.select_bodies_fragment);
-
-        if (fragment == null) {
-            throw new FragmentNotFoundException();
-        }
-
-        return fragment;
-
-    }
-
-    private class OnChangeViewListener implements FragmentResultListener {
-        @Override
-        public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
-
-            int index = result.getInt("INDEX");
-            boolean checked = result.getBoolean("CHECKED");
-
-            CelestialObject object = CelestialObject.values()[index];
-
-            setViewableObjectGroupChecked(object, checked);
-
-            CompassFragment compassFragment;
-            try {
-                compassFragment = getCompassFragment();
-                compassFragment.setDrawBody(object, checked);
-            } catch (Debug.Exception e) {
-                Debug.error(e);
-            }
-
-        }
-    }
-
-    private void setViewableObjectGroupChecked(CelestialObject body, boolean viewable) {
-
-        SelectBodiesFragment selectBodiesFragment;
-        try {
-            selectBodiesFragment = getSelectBodiesFragment();
-        } catch (Debug.Exception e) {
-            Debug.error(e);
-            return;
-        }
-
-        int viewID;
-        CelestialObject[] objects;
-        if (body == CelestialObject.SUN || body == CelestialObject.MOON) {
-            viewID = R.id.toggle_objects_sun_moon;
-            objects = new CelestialObject[]{CelestialObject.SUN, CelestialObject.MOON};
-        } else {
-            viewID = R.id.toggle_objects_planets;
-            objects = CelestialObject.planets();
-        }
-
-        if (!viewable) {
-            binding.toggleObjectsGroup.uncheck(viewID);
-        } else {
-            boolean allViewable = true;
-            for (CelestialObject body2 : objects) {
-                allViewable &= selectBodiesFragment.getViewable(body2);
-            }
-            if (allViewable) {
-                binding.toggleObjectsGroup.check(viewID);
-            }
-        }
-
-    }
-
-    private class OnObjectSelection implements View.OnClickListener {
-        @Override
-        public void onClick(View v) {
-
-            SelectBodiesFragment selectBodiesFragment;
-            try {
-                selectBodiesFragment = getSelectBodiesFragment();
-            } catch (Debug.Exception e) {
-                Debug.error(e);
-                return;
-            }
-
-            int viewID = v.getId();
-
-            if (viewID == R.id.toggle_objects_sun_moon) {
-
-                boolean checked = binding.toggleObjectsGroup.getCheckedButtonIds().contains(R.id.toggle_objects_sun_moon);
-
-                selectBodiesFragment.setViewable(CelestialObject.SUN, checked);
-                selectBodiesFragment.setViewable(CelestialObject.MOON, checked);
-
-            } else if (viewID == R.id.toggle_objects_planets) {
-
-                boolean checked = binding.toggleObjectsGroup.getCheckedButtonIds().contains(R.id.toggle_objects_planets);
-
-                for (CelestialObject body : CelestialObject.planets()) {
-                    selectBodiesFragment.setViewable(body, checked);
-                }
-
-            }
-
-        }
     }
 
     private void setLocation(double longitude, double latitude, @Nullable String location) {
