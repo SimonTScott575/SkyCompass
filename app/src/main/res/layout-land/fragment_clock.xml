@@ -34,7 +34,7 @@
 
             <com.icarus1.views.TimeZonePicker
                 android:id="@+id/time_zone_picker"
-                android:layout_width="wrap_content"
+                android:layout_width="200sp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 app:layout_constraintBottom_toBottomOf="@+id/time_picker"

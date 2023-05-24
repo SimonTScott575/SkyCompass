@@ -6,19 +6,20 @@ import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.icarus1.databinding.ViewTimeZonePickerBinding;
 import com.icarus1.util.TimeZone;
 
 public class TimeZonePicker extends ConstraintLayout {
 
-    private EditText numberEditText;
-
+    private ViewTimeZonePickerBinding binding;
     private TimeZone timeZone;
     private OnTimeZoneChanged onTimeZoneChanged;
 
@@ -41,19 +42,23 @@ public class TimeZonePicker extends ConstraintLayout {
 
         timeZone = new TimeZone(0);
 
-        ViewTimeZonePickerBinding binding = ViewTimeZonePickerBinding.inflate(LayoutInflater.from(context), this, true);
-        numberEditText = binding.numberEditText;
+        binding = ViewTimeZonePickerBinding.inflate(LayoutInflater.from(context), this, true);
 
         binding.plus.setOnClickListener(new ShiftNumber(1));
         binding.minus.setOnClickListener(new ShiftNumber(-1));
-        numberEditText.addTextChangedListener(new RangeWatcher());
-        numberEditText.setText("0");
+        binding.numberEditText.addTextChangedListener(new RangeWatcher());
+        binding.numberEditText.setText("0");
+
+        TimeZonePickerAdapter adapter = new TimeZonePickerAdapter();
+        binding.textSuggestions.setAdapter(adapter);
+        binding.textSuggestions.setLayoutManager(new LinearLayoutManager(context));
+
 
     }
 
     public void setTimeZone(TimeZone timeZone) {
         this.timeZone = timeZone;
-        numberEditText.setText(String.valueOf(timeZone.getUTCOffset()/3600000));
+        binding.numberEditText.setText(String.valueOf(timeZone.getUTCOffset()/3600000));
         if (onTimeZoneChanged != null) {
             onTimeZoneChanged.onTimeZoneChanged(this, timeZone);
         }
@@ -76,7 +81,7 @@ public class TimeZonePicker extends ConstraintLayout {
 
             int n;
             try {
-                n = Integer.parseInt(numberEditText.getText().toString());
+                n = Integer.parseInt(binding.numberEditText.getText().toString());
             } catch (NumberFormatException e) {
                 return;
             }
@@ -88,7 +93,7 @@ public class TimeZonePicker extends ConstraintLayout {
                 n = -12;
             }
 
-            numberEditText.setText(String.valueOf(n));
+            binding.numberEditText.setText(String.valueOf(n));
 
         }
 
