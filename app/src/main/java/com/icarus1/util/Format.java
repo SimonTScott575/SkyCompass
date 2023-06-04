@@ -1,13 +1,5 @@
 package com.icarus1.util;
 
-import android.content.Context;
-import android.location.Address;
-import android.location.Geocoder;
-import android.util.Log;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.Locale;
 import java.util.TimeZone;
 
 public class Format {
@@ -32,7 +24,12 @@ public class Format {
 
     }
 
-    public static String UTCOffset(int hoursOffset, int minutesOffset) {
+    public static String UTCOffset(int offset) {
+
+        com.icarus1.util.TimeZone timeZone = new com.icarus1.util.TimeZone(offset);
+
+        int hoursOffset = timeZone.getRawHourOffset();
+        int minutesOffset = timeZone.getRawMinuteOffset();
 
         StringBuilder result = new StringBuilder("UTC");
 
@@ -52,7 +49,6 @@ public class Format {
         result.append(minutes);
 
         return result.toString();
-
     }
 
     public static String Date(int year, int month, int dayOfMonth) {

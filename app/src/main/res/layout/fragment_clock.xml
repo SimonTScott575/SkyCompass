@@ -14,23 +14,22 @@
             android:id="@+id/time_picker"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:timePickerMode="spinner"
             android:theme="@style/picker"
+            android:timePickerMode="spinner"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/time_zone_picker"/>
+            app:layout_constraintTop_toTopOf="parent" />
 
         <com.icarus1.views.TimeZonePicker
             android:id="@+id/time_zone_picker"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
-            android:layout_marginBottom="16dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/time_picker" />
 
         <ImageButton
             android:id="@+id/use_system_time"

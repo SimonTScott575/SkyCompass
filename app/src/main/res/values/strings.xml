@@ -37,6 +37,10 @@
     <string name="plus">+</string>
     <string name="minus">-</string>
     <string name="text_search_hint">Time zone</string>
+    <string name="use_dst">Use daylight savings?</string>
+    <string name="use_dst_date">Using date</string>
+    <string name="use_dst_always">Always</string>
+    <string name="use_dst_never">Never</string>
 
     <string name="about_blurb">Thanks to:
  - OpenStreetMap.org

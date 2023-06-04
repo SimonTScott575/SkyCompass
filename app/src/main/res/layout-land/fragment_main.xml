@@ -189,11 +189,12 @@
         <com.icarus1.views.Panel
             android:id="@+id/clock_card_view"
             style="@style/panel"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             custom:direction="left"
             tools:visibility="gone">
 

@@ -4,12 +4,14 @@ import androidx.lifecycle.ViewModel;
 
 import com.icarus1.util.Time;
 import com.icarus1.util.TimeZone;
+import com.icarus1.views.TimeZonePicker;
 
 public class ClockViewModel extends ViewModel {
 
     private boolean useSystemTime;
     private Time time;
     private TimeZone timeZone;
+    private TimeZonePicker.UseDST useDST;
 
     public ClockViewModel() {
         useSystemTime = true;
@@ -39,4 +41,11 @@ public class ClockViewModel extends ViewModel {
         return timeZone;
     }
 
+    public TimeZonePicker.UseDST getUseDST() {
+        return useDST;
+    }
+
+    public void setUseDST(TimeZonePicker.UseDST useDST) {
+        this.useDST = useDST;
+    }
 }

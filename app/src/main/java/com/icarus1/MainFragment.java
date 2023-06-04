@@ -88,11 +88,11 @@ public class MainFragment extends Fragment {
 
     }
 
-    private MapFragment getMapFragment()
+    private ClockFragment getClockFragment()
     throws FragmentNotFoundException, NoChildFragmentManagerAttachedException {
 
-        MapFragment fragment = (MapFragment) getChildFragmentManagerOrThrowException()
-            .findFragmentById(R.id.map_fragment_container);
+        ClockFragment fragment = (ClockFragment) getChildFragmentManagerOrThrowException()
+            .findFragmentById(R.id.clock_fragment_container);
 
         if (fragment == null) {
             throw new FragmentNotFoundException();
@@ -140,8 +140,10 @@ public class MainFragment extends Fragment {
     private void setDate(int year, int month, int day, boolean currentDate) {
 
         CompassFragment compassFragment;
+        ClockFragment clockFragment;
         try {
             compassFragment = getCompassFragment();
+            clockFragment = getClockFragment();
         } catch (Debug.Exception e) {
             Debug.error(e);
             return;
@@ -155,6 +157,7 @@ public class MainFragment extends Fragment {
         }
 
         compassFragment.setDate(year, month, day);
+        clockFragment.setDate(year, month, day);
 
     }
 
@@ -172,31 +175,36 @@ public class MainFragment extends Fragment {
         }
     }
 
-    private void setTime(Time time, TimeZone timeZone) {
+    private void setTime(Time time, int offset, String location) {
 
         CompassFragment compassFragment;
+        ClockFragment clockFragment;
         try {
             compassFragment = getCompassFragment();
+            clockFragment = getClockFragment();
         } catch (Debug.Exception e) {
             Debug.error(e);
             return;
         }
 
         String text = Format.Time(time.getHour(), time.getMinute(), time.getSecond());
-        text += " (" + Format.UTCOffset(timeZone.getUTCHourOffset(), timeZone.getUTCMinuteOffset()) + ")";
+        text += " (" + Format.UTCOffset(offset) + ")";
 
         binding.timeText.setText(text);
-        if (timeZone.getId() != null) {
-            binding.timeLocation.setText(timeZone.getId());
+        if (location != null) {
+            binding.timeLocation.setText(location);
         } else {
             binding.timeLocation.setText(R.string.tap_to_change_time);
         }
 
+        TimeZone timeZone = new TimeZone(offset);
         compassFragment.setTime(
-            time.getHour() - timeZone.getUTCHourOffset(),
-            time.getMinute() - timeZone.getUTCMinuteOffset(),
-            time.getSecond() - timeZone.getUTCSecondOffset() - timeZone.getUTCMillisecondOffset()/1000f
+            time.getHour() - timeZone.getRawHourOffset(),
+            time.getMinute() - timeZone.getRawMinuteOffset(),
+            time.getSecond() - timeZone.getRawSecondOffset() - timeZone.getRawMillisecondOffset()/1000f
         );
+
+        clockFragment.setTime(time.getHour(), time.getMinute(), time.getSecond());
 
     }
 
@@ -210,7 +218,7 @@ public class MainFragment extends Fragment {
             int UTCOffset = result.getInt("OFFSET");
             String location = result.getString("LOCATION");
 
-            setTime(new Time(hour, minute, seconds), new TimeZone(UTCOffset, location));
+            setTime(new Time(hour, minute, seconds), UTCOffset, location);
 
         }
     }

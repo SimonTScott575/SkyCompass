@@ -1,5 +1,7 @@
 package com.icarus1;
 
+import static com.icarus1.views.TimeZonePicker.UseDST.DATE;
+
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -23,10 +25,12 @@ import com.icarus1.views.TimeZonePicker;
 
 public class ClockFragment extends Fragment {
 
-    private ClockViewModel viewModel;
     private FragmentClockBinding binding;
+
+    private ClockViewModel viewModel;
     private Handler handler;
     private RetrieveSystemTime retrieveSystemTime;
+
     private final TimePicker.OnTimeChangedListener onTimeChangedListener;
     private final TimeZonePicker.OnTimeZoneChanged onTimeZoneChangedListener;
 
@@ -84,6 +88,13 @@ public class ClockFragment extends Fragment {
         super.onPause();
     }
 
+    public void setDate(int year, int month, int dayOfMonth) {
+        binding.timeZonePicker.setDate(year, month, dayOfMonth);
+    }
+    public void setTime(int hour, int minute, int second) {
+        binding.timeZonePicker.setTime(hour, minute, second);
+    }
+
     public void setTimeAndTimeZone(Time time, TimeZone timeZone) {
 
         viewModel.setTime(time);
@@ -98,7 +109,7 @@ public class ClockFragment extends Fragment {
         binding.timePicker.setOnTimeChangedListener(onTimeChangedListener);
 
         binding.timeZonePicker.setOnTimeZoneChangedListener(null);
-        binding.timeZonePicker.setTimeZone(timeZone);
+        binding.timeZonePicker.setTimeZone(timeZone, viewModel.getUseDST());
         binding.timeZonePicker.setOnTimeZoneChangedListener(onTimeZoneChangedListener);
 
         onTimeAndTimeZoneChanged(time, timeZone);
@@ -130,6 +141,7 @@ public class ClockFragment extends Fragment {
 
         viewModel.setTime(time);
         viewModel.setTimeZone(timeZone);
+        viewModel.setUseDST(DATE);
         viewModel.setUseSystemTime(true);
 
         binding.useSystemTime.setVisibility(View.INVISIBLE);
@@ -140,7 +152,7 @@ public class ClockFragment extends Fragment {
         binding.timePicker.setOnTimeChangedListener(onTimeChangedListener);
 
         binding.timeZonePicker.setOnTimeZoneChangedListener(null);
-        binding.timeZonePicker.setTimeZone(timeZone);
+        binding.timeZonePicker.setTimeZone(timeZone, viewModel.getUseDST());
         binding.timeZonePicker.setOnTimeZoneChangedListener(onTimeZoneChangedListener);
 
         onTimeAndTimeZoneChanged(time, timeZone);
@@ -153,8 +165,8 @@ public class ClockFragment extends Fragment {
         bundle.putInt("HOUR", time.getHour());
         bundle.putInt("MINUTE", time.getMinute());
         bundle.putInt("SECOND", time.getSecond());
-        bundle.putInt("OFFSET", timeZone.getUTCOffset());
-        bundle.putString("LOCATION", timeZone.getId());
+        bundle.putInt("OFFSET", timeZone.getOffset());
+        bundle.putString("LOCATION", timeZone.getID());
         try {
             getParentFragmentManagerOrThrowException().setFragmentResult("C", bundle);
         } catch (NoParentFragmentManagerAttachedException e) {
@@ -173,6 +185,7 @@ public class ClockFragment extends Fragment {
     public class OnTimeZoneChange implements TimeZonePicker.OnTimeZoneChanged {
         @Override
         public void onTimeZoneChanged(TimeZonePicker timeZonePicker, TimeZone timeZone) {
+            viewModel.setUseDST(binding.timeZonePicker.getUseDST());
             setTimeAndTimeZoneAsPickerValues(viewModel.getTime(), timeZone);
         }
     }

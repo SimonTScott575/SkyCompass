@@ -4,53 +4,108 @@ import java.util.Calendar;
 
 public class TimeZone {
 
-    private final int UTCOffset;
-    private final String id;
+    private final int rawOffset;
+    private final java.util.TimeZone timeZone;
+    private final boolean useDST;
+
+    public static final int MILLISECONDS_IN_HOUR = 60*60*1000;
+    public static final int MILLISECONDS_IN_MINUTE = 60*1000;
+    public static final int MILLISECONDS_IN_SECOND = 1000;
 
     public TimeZone(int UTCOffset) {
-        this.UTCOffset = UTCOffset;
-        this.id = null;
+        this.useDST = false;
+        this.timeZone = null;
+        this.rawOffset = UTCOffset;
     }
 
-    public TimeZone(int UTCOffset, String id) {
-        this.UTCOffset = UTCOffset;
-        this.id = id;
+    public TimeZone(TimeZone timeZone, boolean useDST) {
+        this.useDST = useDST;
+        this.timeZone = timeZone.timeZone;
+        this.rawOffset = timeZone.getRawOffset();
     }
 
-    public final int getUTCOffset() {
-        return UTCOffset;
+    public TimeZone(String id, boolean useDST) {
+        if (id == null) {
+            throw new IllegalArgumentException("TimeZone constructor argument id can not be null.");
+        }
+        this.useDST = useDST;
+        this.timeZone = java.util.TimeZone.getTimeZone(id);
+        this.rawOffset = timeZone.getRawOffset();
     }
 
-    public final int getUTCHourOffset() {
-        return UTCOffset/3600000;
+    public final int getOffset() {
+        if (timeZone == null) {
+            return rawOffset;
+        }
+        return timeZone.getRawOffset() + (useDST ? timeZone.getDSTSavings() : 0);
     }
 
-    public final int getUTCMinuteOffset() {
-        return (UTCOffset - getUTCHourOffset()*3600000)/60000;
+    public static int getDSTOffset(
+        java.util.TimeZone timeZone,
+        int year, int month, int dayOfMonth,
+        int hour, int minute, int second
+    ) {
+
+        Calendar cal = Calendar.getInstance(timeZone);
+        cal.set(Calendar.YEAR, year);
+        cal.set(Calendar.MONTH, month);
+        cal.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+
+        cal.set(Calendar.AM_PM, hour >= 12 ? Calendar.PM : Calendar.AM);
+        cal.set(Calendar.HOUR, hour >= 12 ? hour - 12 : hour);
+        cal.set(Calendar.MINUTE, minute);
+        cal.set(Calendar.SECOND, second);
+
+        return cal.get(Calendar.DST_OFFSET);
+
     }
 
-    public final int getUTCSecondOffset() {
-        return (UTCOffset - getUTCHourOffset()*3600000 - getUTCMinuteOffset()*60000)/1000;
+    public final int getRawOffset() {
+        return rawOffset;
     }
 
-    public final int getUTCMillisecondOffset() {
-        return (UTCOffset - getUTCHourOffset()*3600000 - getUTCMinuteOffset()*60000 - getUTCSecondOffset()*1000);
+    public final int getRawHourOffset() {
+        return rawOffset / MILLISECONDS_IN_HOUR;
     }
 
-    public final String getId() {
-        return id;
+    public final int getRawMinuteOffset() {
+        return (rawOffset - getRawHourOffset()*MILLISECONDS_IN_HOUR) / MILLISECONDS_IN_MINUTE;
+    }
+
+    public final int getRawSecondOffset() {
+        int result = rawOffset;
+        result -= getRawHourOffset() * MILLISECONDS_IN_HOUR;
+        result -= getRawMinuteOffset() * MILLISECONDS_IN_MINUTE;
+        return result/MILLISECONDS_IN_SECOND;
+    }
+
+    public final int getRawMillisecondOffset() {
+        int result = rawOffset;
+        result -= getRawHourOffset() * MILLISECONDS_IN_HOUR;
+        result -= getRawMinuteOffset() * MILLISECONDS_IN_MINUTE;
+        return result;
+    }
+
+    //TODO make not nullable - eg with exception
+    public final String getID() {
+        if (timeZone != null) {
+            return timeZone.getID();
+        }
+        return null;
+    }
+
+    public int getDST() {
+        if (timeZone == null) {
+            return 0;
+        }
+        return timeZone.getDSTSavings();
     }
 
     public static TimeZone fromSystem() {
-
-        java.util.TimeZone timeZone = java.util.TimeZone.getDefault();
-        int DSTOffset = Calendar.getInstance().get(Calendar.DST_OFFSET);
-        int UTCOffset = timeZone.getRawOffset() + DSTOffset;
-
-        String location = timeZone.getID();
-
-        return new TimeZone(UTCOffset, location);
-
+        return new TimeZone(
+            java.util.TimeZone.getDefault().getID(),
+            java.util.TimeZone.getDefault().inDaylightTime(Calendar.getInstance().getTime())
+        );
     }
 
 }
