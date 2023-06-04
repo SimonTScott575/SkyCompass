@@ -129,12 +129,20 @@ public class MainActivity extends AppCompatActivity {
             int id = menuItem.getItemId();
 
             if (id == R.id.menu_item_settings) {
-                navigationController.navigate(R.id.navigation_action_main_to_settings);
+                try {
+                    if(navigationController.getCurrentDestination().getId() == R.id.navigation_main_fragment_main) {
+                        navigationController.navigate(R.id.navigation_action_main_to_settings);
+                    } else if(navigationController.getCurrentDestination().getId() == R.id.navigation_main_fragment_help) {
+                        navigationController.navigate(R.id.navigation_action_help_to_settings);
+                    }
+                } catch (NullPointerException e){
+                    Debug.log(e.getMessage());
+                }
                 return true;
             }
 
             if (id == R.id.menu_item_help) {
-                //TODO switch to about fragment in MainActivity - requires rewrite of MainActivity
+                navigationController.navigate(R.id.navigation_action_main_to_help);
                 return true;
             }
 
