@@ -1,5 +1,6 @@
 package com.icarus1;
 
+import android.database.Cursor;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -12,6 +13,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.icarus1.database.DatabaseHelper;
+import com.icarus1.database.DatabaseManager;
 import com.icarus1.databinding.FragmentMainBinding;
 import com.icarus1.util.Debug;
 import com.icarus1.util.Format;
@@ -39,6 +42,13 @@ public class MainFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
 
         initUI();
+
+        DatabaseManager db = new DatabaseManager(requireContext());
+        db.open();
+        db.insert("test", "ddd");
+        Cursor cursor = db.fetch();
+        Debug.log(cursor.getString(1));
+        db.close();
 
     }
 
