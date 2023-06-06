@@ -109,7 +109,7 @@ public class ClockFragment extends Fragment {
         binding.timePicker.setOnTimeChangedListener(onTimeChangedListener);
 
         binding.timeZonePicker.setOnTimeZoneChangedListener(null);
-        binding.timeZonePicker.setTimeZone(timeZone, viewModel.getUseDST());
+        binding.timeZonePicker.setTimeZoneAndUseDST(timeZone, viewModel.getUseDST());
         binding.timeZonePicker.setOnTimeZoneChangedListener(onTimeZoneChangedListener);
 
         onTimeAndTimeZoneChanged(time, timeZone);
@@ -152,7 +152,7 @@ public class ClockFragment extends Fragment {
         binding.timePicker.setOnTimeChangedListener(onTimeChangedListener);
 
         binding.timeZonePicker.setOnTimeZoneChangedListener(null);
-        binding.timeZonePicker.setTimeZone(timeZone, viewModel.getUseDST());
+        binding.timeZonePicker.setTimeZoneAndUseDST(timeZone, viewModel.getUseDST());
         binding.timeZonePicker.setOnTimeZoneChangedListener(onTimeZoneChangedListener);
 
         onTimeAndTimeZoneChanged(time, timeZone);
