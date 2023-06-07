@@ -63,6 +63,12 @@ public class TimeZonePicker extends ConstraintLayout {
         binding.numberEditText.setText("00:00");
 
         adapter = new TimeZonePickerAdapter();
+        adapter.setSelectTimeZoneListener(new TimeZonePickerAdapter.SelectTimeZoneListener() {
+            @Override
+            public void onSelectTimeZone(String id) {
+                setTimeZone(new TimeZone(id, false));
+            }
+        });
         binding.textSuggestions.setAdapter(adapter);
         binding.textSuggestions.setLayoutManager(new LinearLayoutManager(context));
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(context, DividerItemDecoration.VERTICAL);

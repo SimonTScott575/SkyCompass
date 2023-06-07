@@ -9,13 +9,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.icarus1.R;
-import com.icarus1.database.Database;
 import com.icarus1.util.Format;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.List;
 import java.util.TimeZone;
 
 public class TimeZonePickerAdapter extends RecyclerView.Adapter<TimeZonePickerAdapter.ViewHolder> {
@@ -25,8 +20,14 @@ public class TimeZonePickerAdapter extends RecyclerView.Adapter<TimeZonePickerAd
     private int hour = 12, minute = 0, second = 0;
     private TimeZonePicker.UseDST useDST = TimeZonePicker.UseDST.NEVER;
 
+    private SelectTimeZoneListener selectTimeZoneListener;
+
     public TimeZonePickerAdapter() {
         timeZones = TimeZone.getAvailableIDs();
+    }
+
+    public void setSelectTimeZoneListener(SelectTimeZoneListener selectTimeZoneListener) {
+        this.selectTimeZoneListener = selectTimeZoneListener;
     }
 
     public void setTimeZones(String[] timeZones) {
@@ -89,15 +90,26 @@ public class TimeZonePickerAdapter extends RecyclerView.Adapter<TimeZonePickerAd
         return timeZones.length;
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder {
 
         private final TextView timeZoneName;
         private final TextView timeZoneOffset;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
+
             timeZoneName = itemView.findViewById(R.id.time_zone_name);
             timeZoneOffset = itemView.findViewById(R.id.time_zone_offset);
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (selectTimeZoneListener != null) {
+                        selectTimeZoneListener.onSelectTimeZone(timeZoneName.getText().toString());
+                    }
+                }
+            });
+
         }
 
         public TextView getTimeZoneName() {
@@ -107,6 +119,11 @@ public class TimeZonePickerAdapter extends RecyclerView.Adapter<TimeZonePickerAd
         public TextView getTimeZoneOffset() {
             return timeZoneOffset;
         }
+
+    }
+
+    public interface SelectTimeZoneListener {
+        void onSelectTimeZone(String id);
     }
 
 }
