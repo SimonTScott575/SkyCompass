@@ -42,13 +42,9 @@
     <string name="use_dst_always">Always</string>
     <string name="use_dst_never">Never</string>
 
-    <string name="about_blurb">Thanks to:
- - OpenStreetMap.org
- - Astronomy Engine</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-
     <string name="sun_moon">Sun &amp; Moon</string>
     <string name="planets">Planets</string>
+
+    <string name="help">Help</string>
 
 </resources>

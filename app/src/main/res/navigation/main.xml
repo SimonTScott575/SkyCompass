@@ -13,6 +13,18 @@
         <action
             android:id="@+id/navigation_action_main_to_settings"
             app:destination="@id/navigation_main_fragment_settings" />
+        <action
+            android:id="@+id/navigation_action_main_to_help"
+            app:destination="@id/navigation_main_fragment_help" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_main_fragment_help"
+        android:name="com.icarus1.HelpFragment"
+        android:label="@string/help" >
+        <action
+            android:id="@+id/navigation_action_help_to_settings"
+            app:destination="@id/navigation_main_fragment_settings" />
     </fragment>
 
     <fragment
