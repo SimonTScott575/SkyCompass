@@ -57,12 +57,7 @@ public class TimeZonePicker extends ConstraintLayout {
 
         binding = ViewTimeZonePickerBinding.inflate(LayoutInflater.from(context), this, true);
 
-        binding.plus.setOnClickListener(new ShiftNumber(1));
-        binding.minus.setOnClickListener(new ShiftNumber(-1));
-        binding.numberEditText.addTextChangedListener(watcher = new RangeWatcher());
-        binding.numberEditText.setText("00:00");
-
-        adapter = new TimeZonePickerAdapter();
+        adapter = new TimeZonePickerAdapter(context);
         adapter.setSelectTimeZoneListener(new TimeZonePickerAdapter.SelectTimeZoneListener() {
             @Override
             public void onSelectTimeZone(String id) {
@@ -74,6 +69,11 @@ public class TimeZonePicker extends ConstraintLayout {
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(context, DividerItemDecoration.VERTICAL);
         binding.textSuggestions.addItemDecoration(dividerItemDecoration);
         binding.textSearch.addTextChangedListener(searchWatcher = new SearchWatcher());
+
+        binding.plus.setOnClickListener(new ShiftNumber(1));
+        binding.minus.setOnClickListener(new ShiftNumber(-1));
+        binding.numberEditText.addTextChangedListener(watcher = new RangeWatcher());
+        binding.numberEditText.setText("00:00");
 
         binding.useDst.setOnCheckedChangeListener(onCheckedListener);
         binding.useDst.check(binding.useDstDate.getId());
@@ -150,11 +150,14 @@ public class TimeZonePicker extends ConstraintLayout {
                 this.timeZone = new TimeZone(timeZone, false);
         }
 
+        adapter.setSelectedID(timeZone.getID());
+
         if (!Format.UTCOffsetTime(offset).equals(binding.numberEditText.getText().toString())) {
             binding.numberEditText.removeTextChangedListener(watcher);
             binding.numberEditText.setText(Format.UTCOffsetTime(offset));
             binding.numberEditText.addTextChangedListener(watcher);
         }
+
         if (onTimeZoneChanged != null) {
             onTimeZoneChanged.onTimeZoneChanged(this, this.timeZone);
         }
@@ -169,6 +172,8 @@ public class TimeZonePicker extends ConstraintLayout {
     private void setTimeZoneAsEditText(TimeZone timeZone) {
 
         this.timeZone = timeZone;
+
+        adapter.setSelectedID(timeZone.getID());
 
         if (onTimeZoneChanged != null) {
             onTimeZoneChanged.onTimeZoneChanged(this, timeZone);

@@ -1,5 +1,8 @@
 package com.icarus1.views;
 
+import android.content.Context;
+import android.graphics.Color;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +17,9 @@ import com.icarus1.util.Format;
 import java.util.TimeZone;
 
 public class TimeZonePickerAdapter extends RecyclerView.Adapter<TimeZonePickerAdapter.ViewHolder> {
+    //TODO background color when selected should respond to Day/Night theme and fit with rest of app.
+
+    private final Context context;
 
     private String[] timeZones;
     private int year = 1970, month = 0, day = 0;
@@ -21,13 +27,26 @@ public class TimeZonePickerAdapter extends RecyclerView.Adapter<TimeZonePickerAd
     private TimeZonePicker.UseDST useDST = TimeZonePicker.UseDST.NEVER;
 
     private SelectTimeZoneListener selectTimeZoneListener;
+    private int selected = -1;
+    private String selectedID = "";
 
-    public TimeZonePickerAdapter() {
+    public TimeZonePickerAdapter(Context context) {
+        this.context = context;
         timeZones = TimeZone.getAvailableIDs();
     }
 
     public void setSelectTimeZoneListener(SelectTimeZoneListener selectTimeZoneListener) {
         this.selectTimeZoneListener = selectTimeZoneListener;
+    }
+
+    public void setSelectedID(String selectedID) {
+        if (selectedID != null) {
+            this.selectedID = selectedID;
+        } else {
+            this.selectedID = "";
+            this.selected = -1;
+            notifyDataSetChanged();
+        }
     }
 
     public void setTimeZones(String[] timeZones) {
@@ -82,6 +101,14 @@ public class TimeZonePickerAdapter extends RecyclerView.Adapter<TimeZonePickerAd
 
         holder.getTimeZoneName().setText(timeZone.getID());
         holder.getTimeZoneOffset().setText(Format.UTCOffset(offset));
+        holder.setPos(position);
+        if (position == selected || timeZone.getID().equals(selectedID)) {
+            holder.itemView.setBackgroundColor(Color.argb(128,0,0,0));
+        } else {
+            TypedValue outValue = new TypedValue();
+            context.getTheme().resolveAttribute(android.R.attr.selectableItemBackground, outValue, true);
+            holder.itemView.setBackgroundResource(outValue.resourceId);
+        }
 
     }
 
@@ -94,6 +121,7 @@ public class TimeZonePickerAdapter extends RecyclerView.Adapter<TimeZonePickerAd
 
         private final TextView timeZoneName;
         private final TextView timeZoneOffset;
+        private int pos = -1;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -101,13 +129,13 @@ public class TimeZonePickerAdapter extends RecyclerView.Adapter<TimeZonePickerAd
             timeZoneName = itemView.findViewById(R.id.time_zone_name);
             timeZoneOffset = itemView.findViewById(R.id.time_zone_offset);
 
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (selectTimeZoneListener != null) {
-                        selectTimeZoneListener.onSelectTimeZone(timeZoneName.getText().toString());
-                    }
+            itemView.setOnClickListener(v -> {
+                if (selectTimeZoneListener != null) {
+                    selectTimeZoneListener.onSelectTimeZone(timeZoneName.getText().toString());
                 }
+                v.setBackgroundColor(Color.argb(128,0,0,0));
+                selected = pos;
+                selectedID = timeZones[selected];
             });
 
         }
@@ -118,6 +146,14 @@ public class TimeZonePickerAdapter extends RecyclerView.Adapter<TimeZonePickerAd
 
         public TextView getTimeZoneOffset() {
             return timeZoneOffset;
+        }
+
+        public void setPos(int pos) {
+            this.pos = pos;
+        }
+
+        public int getPos() {
+            return pos;
         }
 
     }
