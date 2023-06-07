@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TimePicker;
 
+import com.icarus1.database.Database;
 import com.icarus1.databinding.FragmentClockBinding;
 import com.icarus1.util.Debug;
 import com.icarus1.util.Time;
@@ -26,6 +27,7 @@ import com.icarus1.views.TimeZonePicker;
 public class ClockFragment extends Fragment {
 
     private FragmentClockBinding binding;
+    private Database db;
 
     private ClockViewModel viewModel;
     private Handler handler;
@@ -53,6 +55,20 @@ public class ClockFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         binding.timePicker.setIs24HourView(true);
         binding.useSystemTime.setOnClickListener(v -> setTimeAndTimeZoneFromSystemValues());
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        db = new Database(requireContext());
+        db.open();
+        binding.timeZonePicker.setDatabase(db);
+    }
+
+    @Override
+    public void onStop() {
+        db.close();
+        super.onStop();
     }
 
     @Override

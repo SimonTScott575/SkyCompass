@@ -9,23 +9,29 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.icarus1.R;
+import com.icarus1.database.Database;
 import com.icarus1.util.Format;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.List;
 import java.util.TimeZone;
 
 public class TimeZonePickerAdapter extends RecyclerView.Adapter<TimeZonePickerAdapter.ViewHolder> {
 
-    private final ArrayList<String> timeZones;
+    private String[] timeZones;
     private int year = 1970, month = 0, day = 0;
     private int hour = 12, minute = 0, second = 0;
     private TimeZonePicker.UseDST useDST = TimeZonePicker.UseDST.NEVER;
 
     public TimeZonePickerAdapter() {
-        timeZones = new ArrayList<>(0);
-        timeZones.addAll(Arrays.asList(TimeZone.getAvailableIDs()));
+        timeZones = TimeZone.getAvailableIDs();
+    }
+
+    public void setTimeZones(String[] timeZones) {
+        this.timeZones = timeZones;
+        notifyDataSetChanged();
     }
 
     public void setDate(int year, int month, int day) {
@@ -58,7 +64,7 @@ public class TimeZonePickerAdapter extends RecyclerView.Adapter<TimeZonePickerAd
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 
-        TimeZone timeZone = TimeZone.getTimeZone(timeZones.get(position));
+        TimeZone timeZone = TimeZone.getTimeZone(timeZones[position]);
         int offset = timeZone.getRawOffset();
         switch (useDST) {
             case ALWAYS:
@@ -80,7 +86,7 @@ public class TimeZonePickerAdapter extends RecyclerView.Adapter<TimeZonePickerAd
 
     @Override
     public int getItemCount() {
-        return timeZones.size();
+        return timeZones.length;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

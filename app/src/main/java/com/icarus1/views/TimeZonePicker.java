@@ -14,7 +14,9 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.icarus1.database.Database;
 import com.icarus1.databinding.ViewTimeZonePickerBinding;
+import com.icarus1.util.Debug;
 import com.icarus1.util.Format;
 import com.icarus1.util.TimeZone;
 
@@ -22,11 +24,13 @@ public class TimeZonePicker extends ConstraintLayout {
 
     private ViewTimeZonePickerBinding binding;
     private TimeZone timeZone;
+    private Database db;
     private UseDST useDST = UseDST.NEVER;
     private OnCheckedListener onCheckedListener;
     private TimeZonePickerAdapter adapter;
     private OnTimeZoneChanged onTimeZoneChanged;
     private RangeWatcher watcher;
+    private TextWatcher searchWatcher;
     private int year = 1970, month = 0, day = 0;
     private int hour = 12, minute = 0, second = 0;
 
@@ -63,10 +67,16 @@ public class TimeZonePicker extends ConstraintLayout {
         binding.textSuggestions.setLayoutManager(new LinearLayoutManager(context));
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(context, DividerItemDecoration.VERTICAL);
         binding.textSuggestions.addItemDecoration(dividerItemDecoration);
+        binding.textSearch.addTextChangedListener(searchWatcher = new SearchWatcher());
 
         binding.useDst.setOnCheckedChangeListener(onCheckedListener);
         binding.useDst.check(binding.useDstDate.getId());
 
+    }
+
+    public void setDatabase(Database database) {
+        db = database;
+        adapter.setTimeZones(db.getTimeZones(""));
     }
 
     public UseDST getUseDST() {
@@ -270,6 +280,25 @@ public class TimeZonePicker extends ConstraintLayout {
             }
 
         }
+    }
+
+    private class SearchWatcher implements TextWatcher {
+
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            if (db != null) {
+                adapter.setTimeZones(db.getTimeZones(s.toString()));
+            }
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+        }
+
     }
 
     public enum UseDST {
