@@ -1,4 +1,4 @@
-# Icarus
+# Sky Compass
 
 Android app for tracking the sun and moon - past, present and future.
 
