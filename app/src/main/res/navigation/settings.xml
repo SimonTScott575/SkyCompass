@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/navigation_settings_fragment_start"
-        android:name="com.icarus1.settings.PreferenceFragment" >
+        android:name="com.skycompass.settings.PreferenceFragment" >
 
         <action
             android:id="@+id/navigation_settings_action_start"
@@ -17,7 +17,7 @@
 
     <fragment
         android:id="@+id/navigation_settings_fragment_settings"
-        android:name="com.icarus1.settings.PreferenceFragment"
+        android:name="com.skycompass.settings.PreferenceFragment"
         android:label="@string/page_settings" />
 
 </navigation>

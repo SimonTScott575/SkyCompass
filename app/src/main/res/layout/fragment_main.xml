@@ -6,7 +6,7 @@
 
     <data>
 
-        <import type="com.icarus1.views.Panel" />
+        <import type="com.skycompass.views.Panel" />
 
     </data>
 
@@ -18,7 +18,7 @@
 
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/fragment_compass"
-            android:name="com.icarus1.CompassFragment"
+            android:name="com.skycompass.CompassFragment"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginStart="16dp"
@@ -162,7 +162,7 @@
             app:layout_constraintTop_toBottomOf="@+id/fragment_compass"
             custom:srcCompat="@drawable/view" />
 
-        <com.icarus1.views.Panel
+        <com.skycompass.views.Panel
             android:id="@+id/map_card_view"
             style="@style/panel"
             android:layout_width="0dp"
@@ -175,14 +175,14 @@
 
             <androidx.fragment.app.FragmentContainerView
                 android:id="@+id/map_fragment_container"
-                android:name="com.icarus1.MapFragment"
+                android:name="com.skycompass.MapFragment"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 tools:layout="@layout/fragment_map" />
 
-        </com.icarus1.views.Panel>
+        </com.skycompass.views.Panel>
 
-        <com.icarus1.views.Panel
+        <com.skycompass.views.Panel
             android:id="@+id/calendar_card_view"
             style="@style/panel"
             android:layout_width="0dp"
@@ -194,14 +194,14 @@
 
             <androidx.fragment.app.FragmentContainerView
                 android:id="@+id/calendar_fragment_container"
-                android:name="com.icarus1.CalendarFragment"
+                android:name="com.skycompass.CalendarFragment"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 tools:layout="@layout/fragment_calendar" />
 
-        </com.icarus1.views.Panel>
+        </com.skycompass.views.Panel>
 
-        <com.icarus1.views.Panel
+        <com.skycompass.views.Panel
             android:id="@+id/clock_card_view"
             style="@style/panel"
             android:layout_width="0dp"
@@ -213,12 +213,12 @@
 
             <androidx.fragment.app.FragmentContainerView
                 android:id="@+id/clock_fragment_container"
-                android:name="com.icarus1.ClockFragment"
+                android:name="com.skycompass.ClockFragment"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 tools:layout="@layout/fragment_clock" />
 
-        </com.icarus1.views.Panel>
+        </com.skycompass.views.Panel>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/navigation_main_fragment_main"
-        android:name="com.icarus1.MainFragment"
+        android:name="com.skycompass.MainFragment"
         android:label="@string/app_name"
         tools:layout="@layout/fragment_main" >
         <action
@@ -20,7 +20,7 @@
 
     <fragment
         android:id="@+id/navigation_main_fragment_help"
-        android:name="com.icarus1.HelpFragment"
+        android:name="com.skycompass.HelpFragment"
         android:label="@string/help" >
         <action
             android:id="@+id/navigation_action_help_to_settings"
@@ -29,7 +29,7 @@
 
     <fragment
         android:id="@+id/navigation_main_fragment_settings"
-        android:name="com.icarus1.settings.PreferenceFragment"
+        android:name="com.skycompass.settings.PreferenceFragment"
         android:label="@string/page_settings" />
 
 </navigation>
