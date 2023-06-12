@@ -5,7 +5,6 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.widget.RadioGroup;
 
 import androidx.annotation.NonNull;
@@ -16,7 +15,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.skycompass.database.Database;
 import com.skycompass.databinding.ViewTimeZonePickerBinding;
-import com.skycompass.util.Format;
 import com.skycompass.util.TimeZone;
 
 public class TimeZonePicker extends ConstraintLayout {
@@ -30,13 +28,12 @@ public class TimeZonePicker extends ConstraintLayout {
     private ViewTimeZonePickerBinding binding;
     private TimeZone timeZone;
     private UseDST useDST = UseDST.NEVER;
+    private Database db;
 
     private TimeZonePickerAdapter adapter;
-    private OffsetWatcher offsetWatcher;
-    private OnTimeZoneChanged onTimeZoneChanged;
     private OnCheckedListener onCheckedListener;
 
-    private Database db;
+    private OnTimeZoneChanged onTimeZoneChanged;
 
     private int year = 1970, month = 0, day = 0;
     private int hour = 12, minute = 0, second = 0;
@@ -71,10 +68,9 @@ public class TimeZonePicker extends ConstraintLayout {
         binding.textSuggestions.addItemDecoration(dividerItemDecoration);
         binding.textSearch.addTextChangedListener(new SearchWatcher());
 
-        binding.plus.setOnClickListener(new ShiftNumber(1));
-        binding.minus.setOnClickListener(new ShiftNumber(-1));
-        binding.numberEditText.addTextChangedListener(offsetWatcher = new OffsetWatcher());
-        binding.numberEditText.setText("00:00");
+        binding.numberEditText.setOnTimeZOneChanged((hour, minute) -> setTimeZoneAsEditText(new TimeZone(
+            hour * TimeZone.MILLISECONDS_IN_HOUR + minute * TimeZone.MILLISECONDS_IN_MINUTE
+        )));
 
         binding.useDst.setOnCheckedChangeListener(onCheckedListener);
         binding.useDst.check(binding.useDstDate.getId());
@@ -135,11 +131,7 @@ public class TimeZonePicker extends ConstraintLayout {
 
         adapter.setSelectedID(timeZone.getID());
 
-        if (!Format.UTCOffsetTime(offset).equals(binding.numberEditText.getText().toString())) {
-            binding.numberEditText.removeTextChangedListener(offsetWatcher);
-            binding.numberEditText.setText(Format.UTCOffsetTime(offset));
-            binding.numberEditText.addTextChangedListener(offsetWatcher);
-        }
+        binding.numberEditText.setOffset(offset);
 
         if (onTimeZoneChanged != null) {
             onTimeZoneChanged.onTimeZoneChanged(this, this.timeZone);
@@ -237,88 +229,6 @@ public class TimeZonePicker extends ConstraintLayout {
             }
             adapter.setUseDST(useDST);
             setTimeZoneAsDSTButton(timeZone, useDST);
-        }
-    }
-
-    private static int[] parseTimes(String offset) {
-
-        String[] times = offset.split(":",2);
-
-        int hours = 0;
-        int minutes = 0;
-        try {
-            hours = Integer.parseInt(times[0]);
-            minutes = Integer.parseInt(times[1]);
-        } catch (NumberFormatException e) {
-        } catch (IndexOutOfBoundsException e) {
-        }
-
-        return new int[]{hours, minutes};
-
-    }
-
-    private class ShiftNumber implements View.OnClickListener {
-
-        private final int shift;
-
-        public ShiftNumber(int shift) {
-            this.shift = shift;
-        }
-
-        @Override
-        public void onClick(View v) {
-
-            String text = binding.numberEditText.getText().toString();
-
-            int[] times = parseTimes(text);
-
-            times[0] += shift;
-
-            setTimeZone(new TimeZone(
-                    times[0] * TimeZone.MILLISECONDS_IN_HOUR + times[1] * TimeZone.MILLISECONDS_IN_MINUTE
-            ));
-
-        }
-
-    }
-
-    private class OffsetWatcher implements TextWatcher {
-
-        private String textToSelection = "";
-        private String textAfterSelection = "";
-
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            textToSelection = s.toString().substring(0,start);
-        }
-
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-            textAfterSelection = s.toString().substring(start+count);
-        }
-
-        @Override
-        public void afterTextChanged(Editable s) {
-
-            String text = s.toString();
-
-            if (!text.contains(":")) {
-
-                int start = textToSelection.length();
-                String newText = textToSelection+":"+textAfterSelection;
-                binding.numberEditText.setText(newText);
-                binding.numberEditText.setSelection(start);
-
-            } else {
-
-                int[] times = parseTimes(text);
-
-                setTimeZoneAsEditText(new TimeZone(
-                        times[0] * TimeZone.MILLISECONDS_IN_HOUR + times[1] * TimeZone.MILLISECONDS_IN_MINUTE
-                ));
-
-            }
-
         }
     }
 
