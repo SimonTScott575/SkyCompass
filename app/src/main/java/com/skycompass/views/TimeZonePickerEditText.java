@@ -8,13 +8,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 
 import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.appcompat.widget.LinearLayoutCompat;
 
 import com.skycompass.databinding.ViewTimeZonePickerEditTextBinding;
 import com.skycompass.util.Format;
 import com.skycompass.util.TimeZone;
 
-public class TimeZonePickerEditText extends ConstraintLayout {
+public class TimeZonePickerEditText extends LinearLayoutCompat {
 
     private ViewTimeZonePickerEditTextBinding binding;
     private OnTimeZoneChanged onTimeZoneChanged;
