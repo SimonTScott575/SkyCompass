@@ -119,7 +119,7 @@ public class CompassFragment extends Fragment {
         @Override
         public void onPrepareMenu(@NonNull Menu menu) {
 
-            MenuItem item = menu.findItem(R.id.menu_item_rotate_to_north);
+            MenuItem item = menu.findItem(R.id.menu_item_compass);
 
             item.setVisible(true);
             item.setIcon(viewModel.isRotateToNorth() ? R.drawable.compass_off : R.drawable.compass);
@@ -129,7 +129,7 @@ public class CompassFragment extends Fragment {
         @Override
         public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
 
-            if (menuItem.getItemId() == R.id.menu_item_rotate_to_north) {
+            if (menuItem.getItemId() == R.id.menu_item_compass) {
 
                 boolean rotateToNorth = !viewModel.isRotateToNorth();
 

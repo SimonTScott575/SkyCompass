@@ -26,8 +26,6 @@ import com.skycompass.util.Debug;
 
 public class HelpFragment extends Fragment {
 
-    private static final HelpFragment.MenuListener MENU_LISTENER = new HelpFragment.MenuListener();
-
     private FragmentHelpBinding binding;
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -48,22 +46,6 @@ public class HelpFragment extends Fragment {
 
         binding.webView.loadUrl("https://appassets.androidplatform.net/assets/help/index.html");
 
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        requireActivity().addMenuProvider(MENU_LISTENER);
-
-    }
-
-    @Override
-    public void onPause() {
-
-        requireActivity().removeMenuProvider(MENU_LISTENER);
-
-        super.onPause();
     }
 
     private static class LocalContentWebViewClient extends WebViewClientCompat {
@@ -92,24 +74,6 @@ public class HelpFragment extends Fragment {
             return mAssetLoader.shouldInterceptRequest(Uri.parse(url));
         }
 
-    }
-
-    private static class MenuListener implements MenuProvider {
-        @Override
-        public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
-        }
-        @Override
-        public void onPrepareMenu(@NonNull Menu menu) {
-            try {
-                menu.findItem(R.id.menu_item_help).setVisible(false);
-            } catch (NullPointerException e) {
-                Debug.error(e.getMessage());
-            }
-        }
-        @Override
-        public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
-            return false;
-        }
     }
 
 }

@@ -2,37 +2,35 @@
 <menu xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <group
-        android:id="@+id/menu_group_compass"
-        android:visible="false">
-        <item
-            android:id="@+id/menu_item_rotate_to_north"
-            android:icon="@drawable/compass"
-            app:iconTint="?attr/colorOnPrimary"
-            android:title=""
-            app:showAsAction="ifRoom" />
-    </group>
+
+    <item
+        android:id="@+id/menu_item_compass"
+        android:icon="@drawable/compass"
+        android:title=""
+        app:iconTint="?attr/colorOnPrimary"
+        app:showAsAction="ifRoom"/>
 
     <group
         android:id="@+id/menu_group_core">
         <item
             android:id="@+id/menu_item_dark_mode"
             android:icon="@drawable/dark_mode"
-            app:iconTint="?attr/colorOnPrimary"
             android:title="@string/dark_mode"
+            app:iconTint="?attr/colorOnPrimary"
             app:showAsAction="ifRoom" />
         <item
             android:id="@+id/menu_item_help"
             android:icon="@drawable/help"
-            app:iconTint="?attr/colorOnPrimary"
             android:title="@string/help"
-            app:showAsAction="ifRoom" />
-        <item
-            android:id="@+id/menu_item_settings"
-            android:icon="@drawable/settings"
             app:iconTint="?attr/colorOnPrimary"
-            android:title="@string/page_settings"
             app:showAsAction="ifRoom" />
     </group>
+
+    <item
+        android:id="@+id/menu_item_settings"
+        android:icon="@drawable/settings"
+        android:title="@string/page_settings"
+        app:iconTint="?attr/colorOnPrimary"
+        app:showAsAction="ifRoom" />
 
 </menu>

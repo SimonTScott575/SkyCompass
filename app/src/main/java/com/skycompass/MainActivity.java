@@ -95,6 +95,8 @@ public class MainActivity extends AppCompatActivity {
 
     private class MenuListener implements MenuProvider {
 
+        private int currentDestination;
+
         @Override
         public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
             getMenuInflater().inflate(R.menu.main, menu);
@@ -103,7 +105,17 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onPrepareMenu(@NonNull Menu menu) {
 
+            try {
+                currentDestination = navigationController.getCurrentDestination().getId();
+            } catch (NullPointerException e){
+                Debug.error(e.getMessage());
+            }
+
             menu.setGroupVisible(R.id.menu_group_core, true);
+            menu.findItem(R.id.menu_item_compass).setVisible(currentDestination == R.id.navigation_main_fragment_main);
+            menu.findItem(R.id.menu_item_dark_mode).setVisible(currentDestination == R.id.navigation_main_fragment_main);
+            menu.findItem(R.id.menu_item_help).setVisible(currentDestination == R.id.navigation_main_fragment_main);
+            menu.findItem(R.id.menu_item_settings).setVisible(currentDestination == R.id.navigation_main_fragment_main);
 
             MenuItem darkModeItem = menu.findItem(R.id.menu_item_dark_mode);
             int nightModeFlags = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
@@ -129,20 +141,18 @@ public class MainActivity extends AppCompatActivity {
             int id = menuItem.getItemId();
 
             if (id == R.id.menu_item_settings) {
-                try {
-                    if(navigationController.getCurrentDestination().getId() == R.id.navigation_main_fragment_main) {
-                        navigationController.navigate(R.id.navigation_action_main_to_settings);
-                    } else if(navigationController.getCurrentDestination().getId() == R.id.navigation_main_fragment_help) {
-                        navigationController.navigate(R.id.navigation_action_help_to_settings);
-                    }
-                } catch (NullPointerException e){
-                    Debug.log(e.getMessage());
+                if(currentDestination == R.id.navigation_main_fragment_main) {
+                    navigationController.navigate(R.id.navigation_action_main_to_settings);
+                    invalidateMenu();
                 }
                 return true;
             }
 
             if (id == R.id.menu_item_help) {
-                navigationController.navigate(R.id.navigation_action_main_to_help);
+                if (currentDestination == R.id.navigation_main_fragment_main) {
+                    navigationController.navigate(R.id.navigation_action_main_to_help);
+                    invalidateMenu();
+                }
                 return true;
             }
 
@@ -153,6 +163,7 @@ public class MainActivity extends AppCompatActivity {
 
             if (id == android.R.id.home) {
                 navigationController.navigateUp();
+                invalidateMenu();
                 return true;
             }
 
