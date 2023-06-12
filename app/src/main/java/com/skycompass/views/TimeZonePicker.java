@@ -21,15 +21,23 @@ import com.skycompass.util.TimeZone;
 
 public class TimeZonePicker extends ConstraintLayout {
 
+    public enum UseDST {
+        DATE,
+        ALWAYS,
+        NEVER
+    }
+
     private ViewTimeZonePickerBinding binding;
     private TimeZone timeZone;
-    private Database db;
     private UseDST useDST = UseDST.NEVER;
-    private OnCheckedListener onCheckedListener;
+
     private TimeZonePickerAdapter adapter;
+    private OffsetWatcher offsetWatcher;
     private OnTimeZoneChanged onTimeZoneChanged;
-    private RangeWatcher watcher;
-    private TextWatcher searchWatcher;
+    private OnCheckedListener onCheckedListener;
+
+    private Database db;
+
     private int year = 1970, month = 0, day = 0;
     private int hour = 12, minute = 0, second = 0;
 
@@ -51,27 +59,21 @@ public class TimeZonePicker extends ConstraintLayout {
     private void init(Context context, @Nullable AttributeSet attrs) {
 
         onCheckedListener = new OnCheckedListener();
-
         timeZone = new TimeZone(0);
 
         binding = ViewTimeZonePickerBinding.inflate(LayoutInflater.from(context), this, true);
 
         adapter = new TimeZonePickerAdapter(context);
-        adapter.setSelectTimeZoneListener(new TimeZonePickerAdapter.SelectTimeZoneListener() {
-            @Override
-            public void onSelectTimeZone(String id) {
-                setTimeZone(new TimeZone(id, false));
-            }
-        });
+        adapter.setSelectTimeZoneListener(id -> setTimeZone(new TimeZone(id, false)));
         binding.textSuggestions.setAdapter(adapter);
         binding.textSuggestions.setLayoutManager(new LinearLayoutManager(context));
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(context, DividerItemDecoration.VERTICAL);
         binding.textSuggestions.addItemDecoration(dividerItemDecoration);
-        binding.textSearch.addTextChangedListener(searchWatcher = new SearchWatcher());
+        binding.textSearch.addTextChangedListener(new SearchWatcher());
 
         binding.plus.setOnClickListener(new ShiftNumber(1));
         binding.minus.setOnClickListener(new ShiftNumber(-1));
-        binding.numberEditText.addTextChangedListener(watcher = new RangeWatcher());
+        binding.numberEditText.addTextChangedListener(offsetWatcher = new OffsetWatcher());
         binding.numberEditText.setText("00:00");
 
         binding.useDst.setOnCheckedChangeListener(onCheckedListener);
@@ -82,6 +84,120 @@ public class TimeZonePicker extends ConstraintLayout {
     public void setDatabase(Database database) {
         db = database;
         adapter.setTimeZones(db.getTimeZones(""));
+    }
+
+    public void setDate(int year, int month, int day) {
+        this.year = year;
+        this.month = month;
+        this.day = day;
+        TimeZonePickerAdapter adapter = (TimeZonePickerAdapter) binding.textSuggestions.getAdapter();
+        adapter.setDate(year, month, day);
+        setTimeZone(timeZone);
+    }
+
+    public void setTime(int hour, int second, int minute) {
+        this.hour = hour;
+        this.second = second;
+        this.minute = minute;
+        TimeZonePickerAdapter adapter = (TimeZonePickerAdapter) binding.textSuggestions.getAdapter();
+        adapter.setTime(hour, second, minute);
+        setTimeZone(timeZone);
+    }
+
+    public TimeZone getTimeZone() {
+        return timeZone;
+    }
+
+    public void setTimeZone(TimeZone timeZone) {
+
+        int offset = timeZone.getRawOffset();
+        switch (useDST) {
+            case DATE:
+                if (timeZone.getID() == null) {
+                    this.timeZone = timeZone;
+                    break;
+                }
+                int dstOffset = TimeZone.getDSTOffset(
+                    java.util.TimeZone.getTimeZone(timeZone.getID()),
+                    year, month, day,
+                    hour, minute, second
+                );
+                offset += dstOffset;
+                this.timeZone = new TimeZone(timeZone, dstOffset != 0);
+                break;
+            case ALWAYS:
+                offset += timeZone.getDST();
+                this.timeZone = new TimeZone(timeZone, true);
+                break;
+            default:
+                this.timeZone = new TimeZone(timeZone, false);
+        }
+
+        adapter.setSelectedID(timeZone.getID());
+
+        if (!Format.UTCOffsetTime(offset).equals(binding.numberEditText.getText().toString())) {
+            binding.numberEditText.removeTextChangedListener(offsetWatcher);
+            binding.numberEditText.setText(Format.UTCOffsetTime(offset));
+            binding.numberEditText.addTextChangedListener(offsetWatcher);
+        }
+
+        if (onTimeZoneChanged != null) {
+            onTimeZoneChanged.onTimeZoneChanged(this, this.timeZone);
+        }
+
+    }
+
+    private void setTimeZoneAsEditText(TimeZone timeZone) {
+
+        this.timeZone = timeZone;
+
+        adapter.setSelectedID(timeZone.getID());
+
+        if (onTimeZoneChanged != null) {
+            onTimeZoneChanged.onTimeZoneChanged(this, timeZone);
+        }
+
+    }
+
+    private void setTimeZoneAsDSTButton(TimeZone timeZone, UseDST useDST) {
+
+        setUseDSTAsDSTButton(useDST);
+        setTimeZone(timeZone);
+
+    }
+
+    public void setTimeZoneAndUseDST(TimeZone timeZone, UseDST useDST) {
+
+        setUseDST(useDST);
+        setTimeZone(timeZone);
+
+    }
+
+    public void setOnTimeZoneChangedListener(OnTimeZoneChanged onTimeZoneChanged) {
+        this.onTimeZoneChanged = onTimeZoneChanged;
+    }
+
+    public interface OnTimeZoneChanged {
+        void onTimeZoneChanged(TimeZonePicker timeZonePicker, TimeZone timeZone);
+    }
+
+    private class SearchWatcher implements TextWatcher {
+
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            if (db != null) {
+                adapter.setTimeZones(db.getTimeZones(s.toString()));
+            }
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+        }
+
     }
 
     public UseDST getUseDST() {
@@ -124,92 +240,6 @@ public class TimeZonePicker extends ConstraintLayout {
         }
     }
 
-    public void setTimeZone(TimeZone timeZone) {
-
-        int offset = timeZone.getRawOffset();
-        switch (useDST) {
-            case DATE:
-                if (timeZone.getID() == null) {
-                    this.timeZone = timeZone;
-                    break;
-                }
-                int dstOffset = TimeZone.getDSTOffset(
-                        java.util.TimeZone.getTimeZone(timeZone.getID()),
-                        year, month, day,
-                        hour, minute, second
-                );
-                offset += dstOffset;
-                this.timeZone = new TimeZone(timeZone, dstOffset != 0);
-                break;
-            case ALWAYS:
-                offset += timeZone.getDST();
-                this.timeZone = new TimeZone(timeZone, true);
-                break;
-            default:
-                this.timeZone = new TimeZone(timeZone, false);
-        }
-
-        adapter.setSelectedID(timeZone.getID());
-
-        if (!Format.UTCOffsetTime(offset).equals(binding.numberEditText.getText().toString())) {
-            binding.numberEditText.removeTextChangedListener(watcher);
-            binding.numberEditText.setText(Format.UTCOffsetTime(offset));
-            binding.numberEditText.addTextChangedListener(watcher);
-        }
-
-        if (onTimeZoneChanged != null) {
-            onTimeZoneChanged.onTimeZoneChanged(this, this.timeZone);
-        }
-
-    }
-    private void setTimeZoneAsDSTButton(TimeZone timeZone, UseDST useDST) {
-
-        setUseDSTAsDSTButton(useDST);
-        setTimeZone(timeZone);
-
-    }
-    private void setTimeZoneAsEditText(TimeZone timeZone) {
-
-        this.timeZone = timeZone;
-
-        adapter.setSelectedID(timeZone.getID());
-
-        if (onTimeZoneChanged != null) {
-            onTimeZoneChanged.onTimeZoneChanged(this, timeZone);
-        }
-
-    }
-
-    public void setTimeZoneAndUseDST(TimeZone timeZone, UseDST useDST) {
-
-        setUseDST(useDST);
-        setTimeZone(timeZone);
-
-    }
-
-    public void setOnTimeZoneChangedListener(OnTimeZoneChanged onTimeZoneChanged) {
-        this.onTimeZoneChanged = onTimeZoneChanged;
-    }
-    public interface OnTimeZoneChanged {
-        void onTimeZoneChanged(TimeZonePicker timeZonePicker, TimeZone timeZone);
-    }
-
-    public void setDate(int year, int month, int day) {
-        this.year = year;
-        this.month = month;
-        this.day = day;
-        TimeZonePickerAdapter adapter = (TimeZonePickerAdapter) binding.textSuggestions.getAdapter();
-        adapter.setDate(year, month, day);
-    }
-
-    public void setTime(int hour, int second, int minute) {
-        this.hour = hour;
-        this.second = second;
-        this.minute = minute;
-        TimeZonePickerAdapter adapter = (TimeZonePickerAdapter) binding.textSuggestions.getAdapter();
-        adapter.setTime(hour, second, minute);
-    }
-
     private static int[] parseTimes(String offset) {
 
         String[] times = offset.split(":",2);
@@ -245,14 +275,14 @@ public class TimeZonePicker extends ConstraintLayout {
             times[0] += shift;
 
             setTimeZone(new TimeZone(
-                times[0] * TimeZone.MILLISECONDS_IN_HOUR + times[1] * TimeZone.MILLISECONDS_IN_MINUTE
+                    times[0] * TimeZone.MILLISECONDS_IN_HOUR + times[1] * TimeZone.MILLISECONDS_IN_MINUTE
             ));
 
         }
 
     }
 
-    private class RangeWatcher implements TextWatcher {
+    private class OffsetWatcher implements TextWatcher {
 
         private String textToSelection = "";
         private String textAfterSelection = "";
@@ -284,37 +314,12 @@ public class TimeZonePicker extends ConstraintLayout {
                 int[] times = parseTimes(text);
 
                 setTimeZoneAsEditText(new TimeZone(
-                    times[0] * TimeZone.MILLISECONDS_IN_HOUR + times[1] * TimeZone.MILLISECONDS_IN_MINUTE
+                        times[0] * TimeZone.MILLISECONDS_IN_HOUR + times[1] * TimeZone.MILLISECONDS_IN_MINUTE
                 ));
 
             }
 
         }
-    }
-
-    private class SearchWatcher implements TextWatcher {
-
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-        }
-
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-            if (db != null) {
-                adapter.setTimeZones(db.getTimeZones(s.toString()));
-            }
-        }
-
-        @Override
-        public void afterTextChanged(Editable s) {
-        }
-
-    }
-
-    public enum UseDST {
-        DATE,
-        ALWAYS,
-        NEVER
     }
 
 }

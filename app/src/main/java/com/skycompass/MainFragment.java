@@ -27,8 +27,11 @@ public class MainFragment extends Fragment {
     private final OnChangeTimeListener onChangeTimeListener = new OnChangeTimeListener();
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(
+        @NonNull LayoutInflater inflater,
+        ViewGroup container,
+        Bundle savedInstanceState
+    ) {
 
         binding = FragmentMainBinding.inflate(inflater, container, false);
 
@@ -38,7 +41,9 @@ public class MainFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
 
-        initUI();
+        binding.changeLocation.setOnClickListener(view1 -> binding.mapCardView.show());
+        binding.changeDate.setOnClickListener(view1 -> binding.calendarCardView.show());
+        binding.changeTime.setOnClickListener(view1 -> binding.clockCardView.show());
 
     }
 
@@ -55,33 +60,25 @@ public class MainFragment extends Fragment {
 
     }
 
-    private void initUI() {
-
-        binding.changeLocation.setOnClickListener(view -> binding.mapCardView.show());
-        binding.changeDate.setOnClickListener(view -> binding.calendarCardView.show());
-        binding.changeTime.setOnClickListener(view -> binding.clockCardView.show());
-
-    }
-
     private FragmentManager getChildFragmentManagerOrThrowException()
-            throws NoChildFragmentManagerAttachedException {
+    throws NoChildFragmentManagerAttached {
 
         try {
             return getChildFragmentManager();
         } catch (IllegalStateException e) {
-            throw new NoChildFragmentManagerAttachedException();
+            throw new NoChildFragmentManagerAttached();
         }
 
     }
 
     private CompassFragment getCompassFragment()
-    throws FragmentNotFoundException, NoChildFragmentManagerAttachedException {
+    throws FragmentNotFound, NoChildFragmentManagerAttached {
 
         CompassFragment fragment = (CompassFragment) getChildFragmentManagerOrThrowException()
             .findFragmentById(R.id.fragment_compass);
 
         if (fragment == null) {
-            throw new FragmentNotFoundException();
+            throw new FragmentNotFound();
         }
 
         return fragment;
@@ -89,13 +86,13 @@ public class MainFragment extends Fragment {
     }
 
     private ClockFragment getClockFragment()
-    throws FragmentNotFoundException, NoChildFragmentManagerAttachedException {
+    throws FragmentNotFound, NoChildFragmentManagerAttached {
 
         ClockFragment fragment = (ClockFragment) getChildFragmentManagerOrThrowException()
             .findFragmentById(R.id.clock_fragment_container);
 
         if (fragment == null) {
-            throw new FragmentNotFoundException();
+            throw new FragmentNotFound();
         }
 
         return fragment;
@@ -157,7 +154,7 @@ public class MainFragment extends Fragment {
         }
 
         compassFragment.setDate(year, month, day);
-        clockFragment.setDate(year, month, day);
+        clockFragment.setDate(year, month, day, currentDate);
 
     }
 
@@ -178,10 +175,8 @@ public class MainFragment extends Fragment {
     private void setTime(Time time, int offset, String location) {
 
         CompassFragment compassFragment;
-        ClockFragment clockFragment;
         try {
             compassFragment = getCompassFragment();
-            clockFragment = getClockFragment();
         } catch (Debug.Exception e) {
             Debug.error(e);
             return;
@@ -204,8 +199,6 @@ public class MainFragment extends Fragment {
             time.getSecond() - timeZone.getRawSecondOffset() - timeZone.getRawMillisecondOffset()/1000f
         );
 
-        clockFragment.setTime(time.getHour(), time.getMinute(), time.getSecond());
-
     }
 
     private class OnChangeTimeListener implements FragmentResultListener {
@@ -223,13 +216,13 @@ public class MainFragment extends Fragment {
         }
     }
 
-    private static class FragmentNotFoundException extends Debug.Exception {
-        private FragmentNotFoundException() {
+    private static class FragmentNotFound extends Debug.Exception {
+        private FragmentNotFound() {
             super("Fragment Not Found.");
         }
     }
-    private static class NoChildFragmentManagerAttachedException extends Debug.Exception {
-        private NoChildFragmentManagerAttachedException() {
+    private static class NoChildFragmentManagerAttached extends Debug.Exception {
+        private NoChildFragmentManagerAttached() {
             super("No child fragment manager.");
         }
     }

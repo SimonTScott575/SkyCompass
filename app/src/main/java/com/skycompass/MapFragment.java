@@ -19,6 +19,7 @@ import android.widget.Toast;
 import com.skycompass.databinding.FragmentMapBinding;
 import com.skycompass.util.Debug;
 import com.skycompass.util.Format;
+import com.skycompass.util.LocationRequester;
 
 import org.osmdroid.config.Configuration;
 import org.osmdroid.util.GeoPoint;
@@ -31,45 +32,8 @@ public class MapFragment extends Fragment {
     private final LocationRequester locationRequester;
 
     public MapFragment() {
-
-        locationRequester = new LocationRequester((latitude, longitude) -> {
-
-            boolean differentLatitude = true;
-            boolean differentLongitude = true;
-            if (viewModel.getMyLocation() != null) {
-                differentLatitude = viewModel.getMyLocation().getLatitude() != latitude;
-                differentLongitude = viewModel.getMyLocation().getLongitude() != longitude;
-            }
-
-            if (differentLatitude || differentLongitude) {
-                setMyLocation(longitude, latitude);
-                setLocationAsMyLocation(latitude, longitude);
-            }
-
-        });
-
-        locationRequester.setOnPermissionResult(granted -> {
-
-            if (granted) {
-                setLocationFromMyLocation();
-            } else {
-
-                binding.myLocation.setImageDrawable(
-                    ResourcesCompat.getDrawable(
-                        getResources(), R.drawable.no_location, requireActivity().getTheme()
-                    )
-                );
-
-                notifyUserLocationPermissionDenied();
-
-            }
-
-            if (locationRequester.enabled() == LocationRequester.EnabledState.DISABLED) {
-                notifyUserLocationDisabled();
-            }
-
-        });
-
+        locationRequester = new LocationRequester(new OnReceivedMyLocationRequester());
+        locationRequester.setOnPermissionResult(new OnPermissionResult());
     }
 
     @Override
@@ -98,34 +62,7 @@ public class MapFragment extends Fragment {
         Context ctx = requireActivity();
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
 
-        setUpMap();
-
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        binding.mapView.onResume();
-        locationRequester.resume();
-    }
-
-    @Override
-    public void onPause() {
-        locationRequester.pause();
-        binding.mapView.onPause();
-        super.onPause();
-    }
-
-    @Override
-    public void onDetach() {
-        locationRequester.unregister();
-        super.onDetach();
-    }
-
-    private void setUpMap() {
-
         binding.mapView.setUp();
-
         binding.mapView.setOnMarkerDragListener(new Marker.OnMarkerDragListener() {
             @Override
             public void onMarkerDrag(Marker marker) {
@@ -155,6 +92,35 @@ public class MapFragment extends Fragment {
             );
         }
 
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        binding.mapView.onResume();
+        locationRequester.resume();
+    }
+
+    @Override
+    public void onPause() {
+        locationRequester.pause();
+        binding.mapView.onPause();
+        super.onPause();
+    }
+
+    @Override
+    public void onDetach() {
+        locationRequester.unregister();
+        super.onDetach();
+    }
+
+    public void setMyLocation(double longitude, double latitude) {
+        viewModel.setMyLocation(new GeoPoint(latitude, longitude));
+        binding.myLocation.setImageDrawable(
+            ResourcesCompat.getDrawable(
+                getResources(), R.drawable.set_as_my_location, requireActivity().getTheme()
+            )
+        );
     }
 
     public void setLocation(double longitude, double latitude, String location) {
@@ -222,15 +188,31 @@ public class MapFragment extends Fragment {
         } catch (NoParentFragmentManagerAttachedException e) {
             Debug.log(e);
         }
+
     }
 
-    public void setMyLocation(double longitude, double latitude) {
-        viewModel.setMyLocation(new GeoPoint(latitude, longitude));
-        binding.myLocation.setImageDrawable(
-            ResourcesCompat.getDrawable(
-                getResources(), R.drawable.set_as_my_location, requireActivity().getTheme()
-            )
-        );
+    private class OnClickSetToMyLocation implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+
+            LocationRequester.PermissionState state = locationRequester.permissionState();
+
+            switch (state) {
+                case REQUESTED:
+                    break;
+                case GRANTED:
+                    setLocationFromMyLocation();
+                    break;
+                default:
+                    locationRequester.request(MapFragment.this);
+                    break;
+            }
+
+            if (locationRequester.enabled() == LocationRequester.EnabledState.DISABLED) {
+                notifyUserLocationDisabled();
+            }
+
+        }
     }
 
     private void notifyUserLocationPermissionDenied() {
@@ -255,21 +237,41 @@ public class MapFragment extends Fragment {
 
     }
 
-    private class OnClickSetToMyLocation implements View.OnClickListener {
+    private class OnReceivedMyLocationRequester implements LocationRequester.OnLocationChanged {
         @Override
-        public void onClick(View v) {
+        public void onLocationChanged(double latitude, double longitude) {
 
-            LocationRequester.PermissionState state = locationRequester.permissionState();
+            boolean differentLatitude = true;
+            boolean differentLongitude = true;
+            if (viewModel.getMyLocation() != null) {
+                differentLatitude = viewModel.getMyLocation().getLatitude() != latitude;
+                differentLongitude = viewModel.getMyLocation().getLongitude() != longitude;
+            }
 
-            switch (state) {
-                case REQUESTED:
-                    break;
-                case GRANTED:
-                    setLocationFromMyLocation();
-                    break;
-                default:
-                    locationRequester.request(MapFragment.this);
-                    break;
+            if (differentLatitude || differentLongitude) {
+                setMyLocation(longitude, latitude);
+                setLocationAsMyLocation(latitude, longitude);
+            }
+
+        }
+    }
+
+    private class OnPermissionResult implements LocationRequester.OnPermissionResult {
+        @Override
+        public void onResult(boolean granted) {
+
+            if (granted) {
+                setLocationFromMyLocation();
+            } else {
+
+                binding.myLocation.setImageDrawable(
+                        ResourcesCompat.getDrawable(
+                                getResources(), R.drawable.no_location, requireActivity().getTheme()
+                        )
+                );
+
+                notifyUserLocationPermissionDenied();
+
             }
 
             if (locationRequester.enabled() == LocationRequester.EnabledState.DISABLED) {

@@ -81,6 +81,15 @@ public class CalendarFragment extends Fragment {
 
     }
 
+    private class OnDateChangedListener implements DatePicker.OnDateChangedListener {
+        @Override
+        public void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+
+            setDateAsDatePickerDate(year, monthOfYear, dayOfMonth);
+
+        }
+    }
+
     private void setDate(int year, int month, int dayOfMonth) {
 
         viewModel.setDate(year, month, dayOfMonth);
@@ -103,16 +112,7 @@ public class CalendarFragment extends Fragment {
         int month = calendar.get(Calendar.MONTH);
         int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
 
-        viewModel.setDate(year, month, dayOfMonth);
-        viewModel.setSystemDate(true);
-
-        binding.datePicker.setOnDateChangedListener(null);
-        binding.datePicker.updateDate(year, month, dayOfMonth);
-        binding.datePicker.setOnDateChangedListener(onDateChangedListener);
-
-        binding.useSystemDate.setVisibility(View.INVISIBLE);
-
-        onDateChanged(year, month, dayOfMonth, true);
+        setDateAsSystemDate(year, month, dayOfMonth);
 
     }
 
@@ -155,15 +155,6 @@ public class CalendarFragment extends Fragment {
             Debug.log(e);
         }
 
-    }
-
-    private class OnDateChangedListener implements DatePicker.OnDateChangedListener {
-        @Override
-        public void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-
-            setDateAsDatePickerDate(year, monthOfYear, dayOfMonth);
-
-        }
     }
 
     private void startRetrieveSystemDate()
