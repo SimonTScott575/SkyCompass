@@ -45,7 +45,7 @@
 
     <style name="image_button_opaque" parent="@android:style/Widget.Material.Light.ImageButton">
         <item name="android:background">@drawable/circle_ripple</item>
-        <item name="backgroundTint">@color/cream_dark</item>
+        <item name="backgroundTint">?attr/colorSecondary</item>
     </style>
 
     <style name="button_toggle" parent="Widget.MaterialComponents.Button.OutlinedButton"/>

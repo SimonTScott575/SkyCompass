@@ -33,6 +33,7 @@
             android:padding="13dp"
             android:scaleType="fitCenter"
             android:src="@drawable/set_as_my_location"
+            app:tint="?attr/colorOnSecondary"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 

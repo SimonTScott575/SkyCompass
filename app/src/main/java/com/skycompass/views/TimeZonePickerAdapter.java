@@ -1,6 +1,8 @@
 package com.skycompass.views;
 
 import android.content.Context;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -8,10 +10,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.skycompass.R;
+import com.skycompass.settings.SavedSettings;
 import com.skycompass.util.Format;
 
 import java.util.TimeZone;
@@ -30,9 +34,16 @@ public class TimeZonePickerAdapter extends RecyclerView.Adapter<TimeZonePickerAd
     private int selected = -1;
     private String selectedID = "";
 
+    private Color highlight = Color.valueOf(Color.parseColor("#f0c02e"));
+
     public TimeZonePickerAdapter(Context context) {
         this.context = context;
         timeZones = TimeZone.getAvailableIDs();
+
+        if ((context.getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES) {
+            highlight = Color.valueOf(Color.parseColor("#414141"));
+        }
+
     }
 
     public void setSelectTimeZoneListener(SelectTimeZoneListener selectTimeZoneListener) {
@@ -41,7 +52,11 @@ public class TimeZonePickerAdapter extends RecyclerView.Adapter<TimeZonePickerAd
 
     public void setSelectedID(String selectedID) {
         if (selectedID != null) {
+            int prevSelected = selected;
             this.selectedID = selectedID;
+            this.selected = -1;
+            notifyItemChanged(prevSelected);
+            notifyItemChanged(selected);
         } else {
             this.selectedID = "";
             this.selected = -1;
@@ -51,6 +66,7 @@ public class TimeZonePickerAdapter extends RecyclerView.Adapter<TimeZonePickerAd
 
     public void setTimeZones(String[] timeZones) {
         this.timeZones = timeZones;
+        selected = -1;
         notifyDataSetChanged();
     }
 
@@ -103,7 +119,7 @@ public class TimeZonePickerAdapter extends RecyclerView.Adapter<TimeZonePickerAd
         holder.getTimeZoneOffset().setText(Format.UTCOffset(offset));
         holder.setPos(position);
         if (position == selected || timeZone.getID().equals(selectedID)) {
-            holder.itemView.setBackgroundColor(Color.argb(128,0,0,0));
+            holder.itemView.setBackgroundColor(highlight.toArgb());
         } else {
             TypedValue outValue = new TypedValue();
             context.getTheme().resolveAttribute(android.R.attr.selectableItemBackground, outValue, true);
@@ -133,7 +149,6 @@ public class TimeZonePickerAdapter extends RecyclerView.Adapter<TimeZonePickerAd
                 if (selectTimeZoneListener != null) {
                     selectTimeZoneListener.onSelectTimeZone(timeZoneName.getText().toString());
                 }
-                v.setBackgroundColor(Color.argb(128,0,0,0));
                 selected = pos;
                 selectedID = timeZones[selected];
             });

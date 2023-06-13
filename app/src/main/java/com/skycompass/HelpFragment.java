@@ -1,5 +1,7 @@
 package com.skycompass;
 
+import android.content.res.Configuration;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -26,8 +28,6 @@ import com.skycompass.util.Debug;
 
 public class HelpFragment extends Fragment {
 
-    private static final HelpFragment.MenuListener MENU_LISTENER = new HelpFragment.MenuListener();
-
     private FragmentHelpBinding binding;
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -40,30 +40,21 @@ public class HelpFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        boolean nightMode = ((getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES);
+        if (nightMode) {
+            binding.webView.setBackgroundColor(requireContext().getColor(R.color.grey_dark));
+        } else {
+            binding.webView.setBackgroundColor(requireContext().getColor(R.color.cream_light));
+        }
+
         final WebViewAssetLoader assetLoader = new WebViewAssetLoader.Builder()
                 .addPathHandler("/assets/", new WebViewAssetLoader.AssetsPathHandler(requireContext()))
                 .addPathHandler("/res/", new WebViewAssetLoader.ResourcesPathHandler(requireContext()))
                 .build();
         binding.webView.setWebViewClient(new LocalContentWebViewClient(assetLoader));
 
-        binding.webView.loadUrl("https://appassets.androidplatform.net/assets/help/index.html");
+        binding.webView.loadUrl("https://appassets.androidplatform.net/assets/help/" + "index" + (nightMode ? "-night" : "") + ".html");
 
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        requireActivity().addMenuProvider(MENU_LISTENER);
-
-    }
-
-    @Override
-    public void onPause() {
-
-        requireActivity().removeMenuProvider(MENU_LISTENER);
-
-        super.onPause();
     }
 
     private static class LocalContentWebViewClient extends WebViewClientCompat {
@@ -92,24 +83,6 @@ public class HelpFragment extends Fragment {
             return mAssetLoader.shouldInterceptRequest(Uri.parse(url));
         }
 
-    }
-
-    private static class MenuListener implements MenuProvider {
-        @Override
-        public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
-        }
-        @Override
-        public void onPrepareMenu(@NonNull Menu menu) {
-            try {
-                menu.findItem(R.id.menu_item_help).setVisible(false);
-            } catch (NullPointerException e) {
-                Debug.error(e.getMessage());
-            }
-        }
-        @Override
-        public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
-            return false;
-        }
     }
 
 }

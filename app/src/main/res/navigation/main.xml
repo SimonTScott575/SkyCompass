@@ -12,20 +12,24 @@
         tools:layout="@layout/fragment_main" >
         <action
             android:id="@+id/navigation_action_main_to_settings"
-            app:destination="@id/navigation_main_fragment_settings" />
+            app:destination="@id/navigation_main_fragment_settings"
+            app:enterAnim="@anim/slide_in_left"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_right"
+            app:popExitAnim="@anim/slide_out_right"/>
         <action
             android:id="@+id/navigation_action_main_to_help"
-            app:destination="@id/navigation_main_fragment_help" />
+            app:destination="@id/navigation_main_fragment_help"
+            app:enterAnim="@anim/slide_in_left"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_right"
+            app:popExitAnim="@anim/slide_out_right"/>
     </fragment>
 
     <fragment
         android:id="@+id/navigation_main_fragment_help"
         android:name="com.skycompass.HelpFragment"
-        android:label="@string/help" >
-        <action
-            android:id="@+id/navigation_action_help_to_settings"
-            app:destination="@id/navigation_main_fragment_settings" />
-    </fragment>
+        android:label="@string/help" />
 
     <fragment
         android:id="@+id/navigation_main_fragment_settings"

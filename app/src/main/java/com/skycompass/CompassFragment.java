@@ -1,5 +1,7 @@
 package com.skycompass;
 
+import android.content.res.Configuration;
+import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -17,6 +19,7 @@ import android.view.ViewGroup;
 
 import com.skycompass.compass.CompassModel;
 import com.skycompass.compass.CompassSensor;
+import com.skycompass.compass.Values;
 import com.skycompass.databinding.FragmentCompassBinding;
 
 public class CompassFragment extends Fragment {
@@ -56,6 +59,11 @@ public class CompassFragment extends Fragment {
         binding.compassView.setRotateToNorth(viewModel.isRotateToNorth());
         binding.compassView.setNorthRotation(viewModel.getNorthRotation());
         binding.compassView.setCurrentRotation(viewModel.getNorthRotation());
+
+        int nightMode = (getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK);
+        if (nightMode == Configuration.UI_MODE_NIGHT_YES) {
+            binding.compassView.setColor(Color.valueOf(Color.parseColor("#FF0000")));
+        }
 
     }
 
@@ -119,7 +127,7 @@ public class CompassFragment extends Fragment {
         @Override
         public void onPrepareMenu(@NonNull Menu menu) {
 
-            MenuItem item = menu.findItem(R.id.menu_item_rotate_to_north);
+            MenuItem item = menu.findItem(R.id.menu_item_compass);
 
             item.setVisible(true);
             item.setIcon(viewModel.isRotateToNorth() ? R.drawable.compass_off : R.drawable.compass);
@@ -129,7 +137,7 @@ public class CompassFragment extends Fragment {
         @Override
         public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
 
-            if (menuItem.getItemId() == R.id.menu_item_rotate_to_north) {
+            if (menuItem.getItemId() == R.id.menu_item_compass) {
 
                 boolean rotateToNorth = !viewModel.isRotateToNorth();
 

@@ -4,6 +4,7 @@ import static com.skycompass.compass.Values.BORDER_THICKNESS_FRACTION;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -40,6 +41,12 @@ public class CompassView extends View {
 
     public CompassView(Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
+    }
+
+    public void setColor(Color color) {
+        foreground.setColor(color);
+        background.setColor(color);
+        invalidate();
     }
 
     public void setCompassModel(CompassModel compassModel) {
