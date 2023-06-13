@@ -1,6 +1,7 @@
 package com.skycompass.compass;
 
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 
 import com.skycompass.R;
@@ -29,6 +30,11 @@ class Background {
         altitudeTextPaint.setStyle(Paint.Style.FILL);
         setRadius(radius);
 
+    }
+
+    public void setColor(Color color) {
+        altitudeTrackPaint.setColor(color.toArgb());
+        altitudeTextPaint.setColor(color.toArgb());
     }
 
     public final float getRadius() {

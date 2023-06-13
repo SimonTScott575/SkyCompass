@@ -1,6 +1,7 @@
 package com.skycompass.compass;
 
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 
 public class Foreground {
@@ -33,6 +34,11 @@ public class Foreground {
 
         setRing(innerRadius, outerRadius);
 
+    }
+
+    public void setColor(Color color) {
+        NSEWPaint.setColor(color.toArgb());
+        ringPaint.setColor(color.toArgb());
     }
 
     public void setRing(float innerRadius, float outerRadius) {

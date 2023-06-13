@@ -1,5 +1,7 @@
 package com.skycompass;
 
+import android.content.res.Configuration;
+import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -17,6 +19,7 @@ import android.view.ViewGroup;
 
 import com.skycompass.compass.CompassModel;
 import com.skycompass.compass.CompassSensor;
+import com.skycompass.compass.Values;
 import com.skycompass.databinding.FragmentCompassBinding;
 
 public class CompassFragment extends Fragment {
@@ -56,6 +59,11 @@ public class CompassFragment extends Fragment {
         binding.compassView.setRotateToNorth(viewModel.isRotateToNorth());
         binding.compassView.setNorthRotation(viewModel.getNorthRotation());
         binding.compassView.setCurrentRotation(viewModel.getNorthRotation());
+
+        int nightMode = (getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK);
+        if (nightMode == Configuration.UI_MODE_NIGHT_YES) {
+            binding.compassView.setColor(Color.valueOf(Color.parseColor("#FF0000")));
+        }
 
     }
 
