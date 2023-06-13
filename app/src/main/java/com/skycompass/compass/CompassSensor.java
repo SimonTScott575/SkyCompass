@@ -18,18 +18,18 @@ public class CompassSensor {
     }
 
     public CompassSensor(OnOrientationChanged onOrientationChanged) {
+        setOnOrientationChanged(onOrientationChanged);
+    }
+
+    public final void setOnOrientationChanged(OnOrientationChanged onOrientationChanged) {
         this.onOrientationChanged = onOrientationChanged;
     }
 
-    public void setOnOrientationChanged(OnOrientationChanged onOrientationChanged) {
-        this.onOrientationChanged = onOrientationChanged;
-    }
-
-    public boolean requested() {
+    public final boolean requested() {
         return sensorManager != null;
     }
 
-    public void request(Context context) {
+    public final void request(Context context) {
 
         if (requested()) {
             throw new RuntimeException("Sensor already requested without being destroyed.");
@@ -58,7 +58,7 @@ public class CompassSensor {
 
     }
 
-    public void destroy() {
+    public final void destroy() {
 
         if (sensorManager != null) {
             sensorManager.unregisterListener(sensorListener);

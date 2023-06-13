@@ -112,7 +112,6 @@ public class MainActivity extends AppCompatActivity {
             }
 
             menu.setGroupVisible(R.id.menu_group_core, true);
-            menu.findItem(R.id.menu_item_compass).setVisible(currentDestination == R.id.navigation_main_fragment_main);
             menu.findItem(R.id.menu_item_dark_mode).setVisible(currentDestination == R.id.navigation_main_fragment_main);
             menu.findItem(R.id.menu_item_help).setVisible(currentDestination == R.id.navigation_main_fragment_main);
             menu.findItem(R.id.menu_item_settings).setVisible(currentDestination == R.id.navigation_main_fragment_main);

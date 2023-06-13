@@ -14,9 +14,7 @@ public class CompassView extends View {
 
     private float innerRadius;
     private float ringThickness;
-    private boolean rotate;
     private float northRotation;
-    private float currentRotation;
 
     private final Background background = new Background(innerRadius);
     private final Foreground foreground = new Foreground(innerRadius, innerRadius + ringThickness);
@@ -54,14 +52,8 @@ public class CompassView extends View {
         invalidate();
     }
 
-    public void setCurrentRotation(float rotation) {
-        this.currentRotation = rotation;
-        invalidate();
-    }
-
-    public void setRotateToNorth(boolean rotate) {
-        this.rotate = rotate;
-        invalidate();
+    public float getNorthRotation() {
+        return northRotation;
     }
 
     public void setNorthRotation(float rotation) {
@@ -100,20 +92,11 @@ public class CompassView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        if (rotate) {
-            float diff = northRotation - currentRotation;
-            currentRotation += (northRotation - currentRotation)*0.1f * (Math.abs(diff) > Math.PI ? -1f : 1f);
-            currentRotation = (float) (currentRotation > Math.PI ? currentRotation - 2f*Math.PI: currentRotation);
-            currentRotation = (float) (currentRotation < -Math.PI ? currentRotation + 2f*Math.PI: currentRotation);
-        } else {
-            currentRotation = 0f;
-        }
-
         drawBackground(canvas);
 
         canvas.save();
         canvas.rotate(
-            (float)Math.toDegrees(-currentRotation),
+            (float)Math.toDegrees(-northRotation),
             innerRadius + ringThickness, innerRadius + ringThickness
         );
 

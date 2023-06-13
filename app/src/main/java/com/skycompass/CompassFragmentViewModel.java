@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel;
 public class CompassFragmentViewModel extends ViewModel {
 
     private boolean rotateToNorth;
-    private float northRotation;
+    private float targetRotation;
 
     public boolean isRotateToNorth() {
         return rotateToNorth;
@@ -19,12 +19,12 @@ public class CompassFragmentViewModel extends ViewModel {
         this.rotateToNorth = rotateToNorth;
     }
 
-    public float getNorthRotation() {
-        return northRotation;
+    public float getTargetRotation() {
+        return targetRotation;
     }
 
-    public void setNorthRotation(float northRotation) {
-        this.northRotation = northRotation;
+    public void setTargetRotation(float targetRotation) {
+        this.targetRotation = targetRotation;
     }
 
 }

@@ -10,6 +10,7 @@ import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -19,24 +20,25 @@ import android.view.ViewGroup;
 
 import com.skycompass.compass.CompassModel;
 import com.skycompass.compass.CompassSensor;
-import com.skycompass.compass.Values;
 import com.skycompass.databinding.FragmentCompassBinding;
+import com.skycompass.util.Debug;
 
 public class CompassFragment extends Fragment {
-
-    private final CompassModel compassModel;
 
     private FragmentCompassBinding binding;
     private CompassFragmentViewModel viewModel;
 
+    private final CompassModel compassModel;
     private final MenuProvider menuProvider;
-
     private final CompassSensor sensor;
+    private Handler handler;
+    private UpdateCompassRotation updateCompassRotation;
 
     public CompassFragment() {
         compassModel = new CompassModel(0, 0);
-        sensor = new CompassSensor(orientation -> setNorthRotation(orientation[0]));
+        sensor = new CompassSensor(orientation -> setTargetRotation(orientation[0]));
         menuProvider = new MenuListener();
+        updateCompassRotation = new UpdateCompassRotation();
     }
 
     @Override
@@ -56,9 +58,7 @@ public class CompassFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
 
         binding.compassView.setCompassModel(compassModel);
-        binding.compassView.setRotateToNorth(viewModel.isRotateToNorth());
-        binding.compassView.setNorthRotation(viewModel.getNorthRotation());
-        binding.compassView.setCurrentRotation(viewModel.getNorthRotation());
+        binding.compassView.setNorthRotation(viewModel.getTargetRotation());
 
         int nightMode = (getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK);
         if (nightMode == Configuration.UI_MODE_NIGHT_YES) {
@@ -77,6 +77,12 @@ public class CompassFragment extends Fragment {
 
         requireActivity().addMenuProvider(menuProvider);
 
+        try {
+            startUpdateCompassRotation();
+        } catch (HandlerNoPostException e) {
+            Debug.error(e);
+        }
+
     }
 
     @Override
@@ -86,22 +92,26 @@ public class CompassFragment extends Fragment {
 
         sensor.destroy();
 
+        endUpdateCompassRotation();
+
         super.onPause();
     }
 
     public void setRotateToNorth(boolean rotate) {
-        binding.compassView.setRotateToNorth(rotate);
         viewModel.setRotateToNorth(rotate);
         if (rotate && !sensor.requested()) {
             sensor.request(requireContext());
+            viewModel.setTargetRotation(0);
+            binding.compassView.setNorthRotation(0);
         } else if (!rotate) {
             sensor.destroy();
+            viewModel.setTargetRotation(0);
+            binding.compassView.setNorthRotation(0);
         }
     }
 
-    public void setNorthRotation(float rotation) {
-        binding.compassView.setNorthRotation(rotation);
-        viewModel.setNorthRotation(rotation);
+    public void setTargetRotation(float rotation) {
+        viewModel.setTargetRotation(rotation);
     }
 
     public void setLocation(double longitude, double latitude) {
@@ -128,7 +138,6 @@ public class CompassFragment extends Fragment {
         public void onPrepareMenu(@NonNull Menu menu) {
 
             MenuItem item = menu.findItem(R.id.menu_item_compass);
-
             item.setVisible(true);
             item.setIcon(viewModel.isRotateToNorth() ? R.drawable.compass_off : R.drawable.compass);
 
@@ -155,6 +164,64 @@ public class CompassFragment extends Fragment {
             return false;
         }
 
+    }
+
+    private void startUpdateCompassRotation()
+    throws HandlerNoPostException {
+
+        updateCompassRotation = new UpdateCompassRotation();
+        handler = new Handler(requireActivity().getMainLooper());
+        boolean success = handler.post(updateCompassRotation);
+        if (!success) {
+            throw new HandlerNoPostException();
+        }
+
+    }
+
+    private void endUpdateCompassRotation() {
+        updateCompassRotation.end();
+    }
+
+    private class UpdateCompassRotation implements Runnable {
+
+        private boolean end = false;
+
+        @Override
+        public void run() {
+
+            if (viewModel.getRotateToNorth()) {
+
+                float targetRotation = viewModel.getTargetRotation();
+                float northRotation = binding.compassView.getNorthRotation();
+
+                float diff = targetRotation - northRotation;
+                northRotation += (targetRotation - northRotation)*0.05f * (Math.abs(diff) > Math.PI ? -1f : 1f);
+                northRotation = (float) (northRotation > Math.PI ? northRotation - 2f*Math.PI: northRotation);
+                northRotation = (float) (northRotation < -Math.PI ? northRotation + 2f*Math.PI: northRotation);
+
+                binding.compassView.setNorthRotation(northRotation);
+
+            }
+
+            if (!end) {
+                boolean success = handler.postDelayed(this, 20);
+                if (!success) {
+                    Debug.error(new HandlerNoPostException());
+                }
+            }
+
+        }
+
+        public void end() {
+            end = true;
+        }
+
+    }
+
+    private static class HandlerNoPostException extends Debug.Exception {
+        public HandlerNoPostException() {
+            super("Handler failed to post.");
+        }
     }
 
 }
