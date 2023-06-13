@@ -1,5 +1,7 @@
 package com.skycompass;
 
+import android.content.res.Configuration;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -38,13 +40,20 @@ public class HelpFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        boolean nightMode = ((getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES);
+        if (nightMode) {
+            binding.webView.setBackgroundColor(requireContext().getColor(R.color.grey_dark));
+        } else {
+            binding.webView.setBackgroundColor(requireContext().getColor(R.color.cream_light));
+        }
+
         final WebViewAssetLoader assetLoader = new WebViewAssetLoader.Builder()
                 .addPathHandler("/assets/", new WebViewAssetLoader.AssetsPathHandler(requireContext()))
                 .addPathHandler("/res/", new WebViewAssetLoader.ResourcesPathHandler(requireContext()))
                 .build();
         binding.webView.setWebViewClient(new LocalContentWebViewClient(assetLoader));
 
-        binding.webView.loadUrl("https://appassets.androidplatform.net/assets/help/index.html");
+        binding.webView.loadUrl("https://appassets.androidplatform.net/assets/help/" + "index" + (nightMode ? "-night" : "") + ".html");
 
     }
 
