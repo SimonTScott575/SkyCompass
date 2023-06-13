@@ -51,17 +51,9 @@ public class TimeZonePickerAdapter extends RecyclerView.Adapter<TimeZonePickerAd
     }
 
     public void setSelectedID(String selectedID) {
-        if (selectedID != null) {
-            int prevSelected = selected;
-            this.selectedID = selectedID;
-            this.selected = -1;
-            notifyItemChanged(prevSelected);
-            notifyItemChanged(selected);
-        } else {
-            this.selectedID = "";
-            this.selected = -1;
-            notifyDataSetChanged();
-        }
+        this.selectedID = (selectedID != null ? selectedID : "");
+        this.selected = -1;
+        notifyDataSetChanged();
     }
 
     public void setTimeZones(String[] timeZones) {

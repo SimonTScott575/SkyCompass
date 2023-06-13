@@ -55,10 +55,14 @@ public class TimeZonePicker extends ConstraintLayout {
 
     private void init(Context context, @Nullable AttributeSet attrs) {
 
+        binding = ViewTimeZonePickerBinding.inflate(LayoutInflater.from(context), this, true);
+
         onCheckedListener = new OnCheckedListener();
         timeZone = new TimeZone(0);
 
-        binding = ViewTimeZonePickerBinding.inflate(LayoutInflater.from(context), this, true);
+        binding.numberEditText.setOnTimeZOneChanged((hour, minute) -> setTimeZoneAsEditText(new TimeZone(
+            hour * TimeZone.MILLISECONDS_IN_HOUR + minute * TimeZone.MILLISECONDS_IN_MINUTE
+        )));
 
         adapter = new TimeZonePickerAdapter(context);
         adapter.setSelectTimeZoneListener(id -> setTimeZone(new TimeZone(id, false)));
@@ -66,11 +70,8 @@ public class TimeZonePicker extends ConstraintLayout {
         binding.textSuggestions.setLayoutManager(new LinearLayoutManager(context));
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(context, DividerItemDecoration.VERTICAL);
         binding.textSuggestions.addItemDecoration(dividerItemDecoration);
-        binding.textSearch.addTextChangedListener(new SearchWatcher());
 
-        binding.numberEditText.setOnTimeZOneChanged((hour, minute) -> setTimeZoneAsEditText(new TimeZone(
-            hour * TimeZone.MILLISECONDS_IN_HOUR + minute * TimeZone.MILLISECONDS_IN_MINUTE
-        )));
+        binding.textSearch.addTextChangedListener(new SearchWatcher());
 
         binding.useDst.setOnCheckedChangeListener(onCheckedListener);
         binding.useDst.check(binding.useDstDate.getId());
