@@ -80,10 +80,14 @@ public class MainFragment extends Fragment {
         }
 
         try {
-            CompassFragment compassFragment = getCompassFragment();
-            compassFragment.setLocation(longitude, latitude);
+            CompassFragment fragment = getCompassFragment();
+            fragment.setLocation(longitude, latitude);
         } catch (Debug.Exception e) {
-            return;
+        }
+        try {
+            InfoFragment fragment = getInfoFragment();
+            fragment.setLocation(longitude, latitude);
+        } catch (Debug.Exception e) {
         }
 
     }
@@ -116,7 +120,11 @@ public class MainFragment extends Fragment {
             CompassFragment compassFragment = getCompassFragment();
             compassFragment.setDate(year, month, day);
         } catch (Debug.Exception e) {
-            return;
+        }
+        try {
+            InfoFragment fragment = getInfoFragment();
+            fragment.setDate(year, month, day);
+        } catch (Debug.Exception e) {
         }
         try {
             ClockFragment clockFragment = getClockFragment();
@@ -157,16 +165,24 @@ public class MainFragment extends Fragment {
 
         TimeZone timeZone = new TimeZone(offset);
 
-        CompassFragment compassFragment;
         try {
-            compassFragment = getCompassFragment();
+            CompassFragment compassFragment = getCompassFragment();
             compassFragment.setTime(
                 time.getHour() - timeZone.getRawHourOffset(),
                 time.getMinute() - timeZone.getRawMinuteOffset(),
                 time.getSecond() - timeZone.getRawSecondOffset() - timeZone.getRawMillisecondOffset()/1000f
             );
         } catch (Debug.Exception e) {
-            return;
+        }
+        try {
+            InfoFragment fragment = getInfoFragment();
+            fragment.setTime(
+                time.getHour() - timeZone.getRawHourOffset(),
+                time.getMinute() - timeZone.getRawMinuteOffset(),
+                time.getSecond() - timeZone.getRawSecondOffset() - timeZone.getRawMillisecondOffset()/1000f,
+                offset
+            );
+        } catch (Debug.Exception e) {
         }
 
     }
@@ -210,12 +226,20 @@ public class MainFragment extends Fragment {
     private class OnClickRight implements View.OnClickListener {
         @Override
         public void onClick(View v) {
+
+            Bundle bundle = new Bundle();
+            bundle.putAll(location);
+            bundle.putAll(date);
+            bundle.putAll(time);
+
             getChildFragmentManager().beginTransaction()
                 .setReorderingAllowed(true)
                 .setCustomAnimations(R.anim.fade_in, R.anim.fade_out)
-                .replace(R.id.fragment_compass, InfoFragment.class, null)
+                .replace(R.id.fragment_compass, InfoFragment.class, bundle)
                 .commit();
+
             binding.textView.setText(R.string.info);
+
         }
 
     }
