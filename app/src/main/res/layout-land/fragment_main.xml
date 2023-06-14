@@ -18,14 +18,12 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
-            android:layout_marginBottom="16dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/constraintLayout"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/textView"
             tools:layout="@layout/fragment_compass" />
 
         <androidx.appcompat.widget.LinearLayoutCompat
@@ -206,6 +204,43 @@
                 tools:layout="@layout/fragment_clock" />
 
         </com.skycompass.views.Panel>
+
+        <TextView
+            android:id="@+id/textView"
+            style="@style/text"
+            android:layout_width="200sp"
+            android:layout_height="wrap_content"
+            android:text="@string/compass"
+            android:textSize="32sp"
+            android:gravity="center"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/constraintLayout"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageButton
+            android:id="@+id/left"
+            style="@style/image_button"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:scaleType="fitCenter"
+            app:layout_constraintBottom_toBottomOf="@+id/textView"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintEnd_toStartOf="@+id/textView"
+            app:layout_constraintTop_toTopOf="@+id/textView"
+            custom:srcCompat="@drawable/left" />
+
+        <ImageButton
+            android:id="@+id/right"
+            style="@style/image_button"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:scaleType="fitCenter"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintBottom_toBottomOf="@+id/textView"
+            app:layout_constraintStart_toEndOf="@+id/textView"
+            app:layout_constraintTop_toTopOf="@+id/textView"
+            custom:srcCompat="@drawable/right" />
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

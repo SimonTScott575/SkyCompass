@@ -22,6 +22,7 @@ import com.skycompass.compass.CompassModel;
 import com.skycompass.compass.CompassSensor;
 import com.skycompass.databinding.FragmentCompassBinding;
 import com.skycompass.util.Debug;
+import com.skycompass.util.TimeZone;
 
 public class CompassFragment extends Fragment {
 
@@ -65,6 +66,28 @@ public class CompassFragment extends Fragment {
             binding.compassView.setColor(Color.valueOf(Color.parseColor("#FF0000")));
         }
 
+        Bundle args = getArguments();
+        if (args != null) {
+
+            double longitude = args.getDouble("Longitude");
+            double latitude = args.getDouble("Latitude");
+            setLocation(longitude, latitude);
+
+            int year = args.getInt("Y");
+            int month = args.getInt("M");
+            int day = args.getInt("D");
+            setDate(year, month, day);
+
+            int UTCOffset = args.getInt("OFFSET");
+            TimeZone timeZone = new TimeZone(UTCOffset);
+            int hour = args.getInt("HOUR") - timeZone.getRawHourOffset();
+            int minute = args.getInt("MINUTE") - timeZone.getRawMinuteOffset();
+            float seconds = args.getInt("SECOND") - timeZone.getRawSecondOffset() - timeZone.getRawMillisecondOffset()/1000f;
+
+            setTime(hour, minute, seconds);
+
+        }
+
     }
 
     @Override
@@ -97,6 +120,20 @@ public class CompassFragment extends Fragment {
         super.onPause();
     }
 
+    public void setLocation(double longitude, double latitude) {
+        compassModel.setLocation(latitude, longitude);
+        binding.compassView.invalidate();
+    }
+
+    public void setDate(int year, int month, int dayOfMonth) {
+        compassModel.setDate(year, month, dayOfMonth);
+        binding.compassView.invalidate();
+    }
+
+    public void setTime(int hour, int minute, float seconds) {
+        binding.compassView.setTime(hour, minute, seconds);
+    }
+
     public void setRotateToNorth(boolean rotate) {
         viewModel.setRotateToNorth(rotate);
         if (rotate && !sensor.requested()) {
@@ -114,58 +151,6 @@ public class CompassFragment extends Fragment {
         viewModel.setTargetRotation(rotation);
     }
 
-    public void setLocation(double longitude, double latitude) {
-        compassModel.setLocation(latitude, longitude);
-        binding.compassView.invalidate();
-    }
-
-    public void setDate(int year, int month, int dayOfMonth) {
-        compassModel.setDate(year, month, dayOfMonth);
-        binding.compassView.invalidate();
-    }
-
-    public void setTime(int hour, int minute, float seconds) {
-        binding.compassView.setTime(hour, minute, seconds);
-    }
-
-    private class MenuListener implements MenuProvider {
-
-        @Override
-        public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
-        }
-
-        @Override
-        public void onPrepareMenu(@NonNull Menu menu) {
-
-            MenuItem item = menu.findItem(R.id.menu_item_compass);
-            item.setVisible(true);
-            item.setIcon(viewModel.isRotateToNorth() ? R.drawable.compass_off : R.drawable.compass);
-
-        }
-
-        @Override
-        public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
-
-            if (menuItem.getItemId() == R.id.menu_item_compass) {
-
-                boolean rotateToNorth = !viewModel.isRotateToNorth();
-
-                setRotateToNorth(rotateToNorth);
-
-                if (rotateToNorth) {
-                    menuItem.setIcon(R.drawable.compass_off);
-                } else {
-                    menuItem.setIcon(R.drawable.compass);
-                }
-
-                return true;
-            }
-
-            return false;
-        }
-
-    }
-
     private void startUpdateCompassRotation()
     throws HandlerNoPostException {
 
@@ -180,6 +165,12 @@ public class CompassFragment extends Fragment {
 
     private void endUpdateCompassRotation() {
         updateCompassRotation.end();
+    }
+
+    private static class HandlerNoPostException extends Debug.Exception {
+        public HandlerNoPostException() {
+            super("Handler failed to post.");
+        }
     }
 
     private class UpdateCompassRotation implements Runnable {
@@ -218,10 +209,42 @@ public class CompassFragment extends Fragment {
 
     }
 
-    private static class HandlerNoPostException extends Debug.Exception {
-        public HandlerNoPostException() {
-            super("Handler failed to post.");
+    private class MenuListener implements MenuProvider {
+
+        @Override
+        public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
         }
+
+        @Override
+        public void onPrepareMenu(@NonNull Menu menu) {
+
+            MenuItem item = menu.findItem(R.id.menu_item_compass);
+            item.setVisible(true);
+            item.setIcon(viewModel.isRotateToNorth() ? R.drawable.compass_off : R.drawable.compass);
+
+        }
+
+        @Override
+        public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
+
+            if (menuItem.getItemId() == R.id.menu_item_compass) {
+
+                boolean rotateToNorth = !viewModel.isRotateToNorth();
+
+                setRotateToNorth(rotateToNorth);
+
+                if (rotateToNorth) {
+                    menuItem.setIcon(R.drawable.compass_off);
+                } else {
+                    menuItem.setIcon(R.drawable.compass);
+                }
+
+                return true;
+            }
+
+            return false;
+        }
+
     }
 
 }

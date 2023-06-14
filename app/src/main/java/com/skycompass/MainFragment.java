@@ -25,6 +25,12 @@ public class MainFragment extends Fragment {
     private final OnChangeLocationListener onChangeLocationListener = new OnChangeLocationListener();
     private final OnChangeDateListener onChangeDateListener = new OnChangeDateListener();
     private final OnChangeTimeListener onChangeTimeListener = new OnChangeTimeListener();
+    private final OnClickLeft onClickLeft = new OnClickLeft();
+    private final OnClickRight onClickRight = new OnClickRight();
+
+    private Bundle location;
+    private Bundle date;
+    private Bundle time;
 
     @Override
     public View onCreateView(
@@ -45,6 +51,9 @@ public class MainFragment extends Fragment {
         binding.changeDate.setOnClickListener(view1 -> binding.calendarCardView.show());
         binding.changeTime.setOnClickListener(view1 -> binding.clockCardView.show());
 
+        binding.right.setOnClickListener(onClickRight);
+        binding.left.setOnClickListener(onClickLeft);
+
     }
 
     @Override
@@ -60,54 +69,7 @@ public class MainFragment extends Fragment {
 
     }
 
-    private FragmentManager getChildFragmentManagerOrThrowException()
-    throws NoChildFragmentManagerAttached {
-
-        try {
-            return getChildFragmentManager();
-        } catch (IllegalStateException e) {
-            throw new NoChildFragmentManagerAttached();
-        }
-
-    }
-
-    private CompassFragment getCompassFragment()
-    throws FragmentNotFound, NoChildFragmentManagerAttached {
-
-        CompassFragment fragment = (CompassFragment) getChildFragmentManagerOrThrowException()
-            .findFragmentById(R.id.fragment_compass);
-
-        if (fragment == null) {
-            throw new FragmentNotFound();
-        }
-
-        return fragment;
-
-    }
-
-    private ClockFragment getClockFragment()
-    throws FragmentNotFound, NoChildFragmentManagerAttached {
-
-        ClockFragment fragment = (ClockFragment) getChildFragmentManagerOrThrowException()
-            .findFragmentById(R.id.clock_fragment_container);
-
-        if (fragment == null) {
-            throw new FragmentNotFound();
-        }
-
-        return fragment;
-
-    }
-
     private void setLocation(double longitude, double latitude, @Nullable String location) {
-
-        CompassFragment compassFragment;
-        try {
-            compassFragment = getCompassFragment();
-        } catch (Debug.Exception e) {
-            Debug.error(e);
-            return;
-        }
 
         binding.locationText.setText(Format.LatitudeLongitude(latitude, longitude));
 
@@ -117,7 +79,12 @@ public class MainFragment extends Fragment {
             binding.locationAddress.setText(R.string.tap_to_change_location);
         }
 
-        compassFragment.setLocation(longitude, latitude);
+        try {
+            CompassFragment compassFragment = getCompassFragment();
+            compassFragment.setLocation(longitude, latitude);
+        } catch (Debug.Exception e) {
+            return;
+        }
 
     }
 
@@ -125,6 +92,7 @@ public class MainFragment extends Fragment {
         @Override
         public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
 
+            location = result;
             double longitude = result.getDouble("Longitude");
             double latitude = result.getDouble("Latitude");
             String location = result.getString("Location");
@@ -136,16 +104,6 @@ public class MainFragment extends Fragment {
 
     private void setDate(int year, int month, int day, boolean currentDate) {
 
-        CompassFragment compassFragment;
-        ClockFragment clockFragment;
-        try {
-            compassFragment = getCompassFragment();
-            clockFragment = getClockFragment();
-        } catch (Debug.Exception e) {
-            Debug.error(e);
-            return;
-        }
-
         binding.dateText.setText(Format.Date(year, month, day));
         if (currentDate) {
             binding.dateSubscript.setText(R.string.using_system_date);
@@ -153,8 +111,20 @@ public class MainFragment extends Fragment {
             binding.dateSubscript.setText(R.string.tap_to_change_date);
         }
 
-        compassFragment.setDate(year, month, day);
-        clockFragment.setDate(year, month, day, currentDate);
+
+        try {
+            CompassFragment compassFragment = getCompassFragment();
+            compassFragment.setDate(year, month, day);
+        } catch (Debug.Exception e) {
+            return;
+        }
+        try {
+            ClockFragment clockFragment = getClockFragment();
+            clockFragment.setDate(year, month, day, currentDate);
+        } catch (Debug.Exception e) {
+            Debug.error(e);
+            return;
+        }
 
     }
 
@@ -162,6 +132,7 @@ public class MainFragment extends Fragment {
         @Override
         public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
 
+            date = result;
             int year = result.getInt("Y");
             int month = result.getInt("M");
             int day = result.getInt("D");
@@ -174,14 +145,6 @@ public class MainFragment extends Fragment {
 
     private void setTime(Time time, int offset, String location) {
 
-        CompassFragment compassFragment;
-        try {
-            compassFragment = getCompassFragment();
-        } catch (Debug.Exception e) {
-            Debug.error(e);
-            return;
-        }
-
         String text = Format.Time(time.getHour(), time.getMinute(), time.getSecond());
         text += " (" + Format.UTCOffset(offset) + ")";
 
@@ -193,11 +156,18 @@ public class MainFragment extends Fragment {
         }
 
         TimeZone timeZone = new TimeZone(offset);
-        compassFragment.setTime(
-            time.getHour() - timeZone.getRawHourOffset(),
-            time.getMinute() - timeZone.getRawMinuteOffset(),
-            time.getSecond() - timeZone.getRawSecondOffset() - timeZone.getRawMillisecondOffset()/1000f
-        );
+
+        CompassFragment compassFragment;
+        try {
+            compassFragment = getCompassFragment();
+            compassFragment.setTime(
+                time.getHour() - timeZone.getRawHourOffset(),
+                time.getMinute() - timeZone.getRawMinuteOffset(),
+                time.getSecond() - timeZone.getRawSecondOffset() - timeZone.getRawMillisecondOffset()/1000f
+            );
+        } catch (Debug.Exception e) {
+            return;
+        }
 
     }
 
@@ -205,6 +175,7 @@ public class MainFragment extends Fragment {
         @Override
         public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
 
+            time = result;
             int hour = result.getInt("HOUR");
             int minute = result.getInt("MINUTE");
             int seconds = result.getInt("SECOND");
@@ -216,16 +187,109 @@ public class MainFragment extends Fragment {
         }
     }
 
+    private class OnClickLeft implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+
+            Bundle bundle = new Bundle();
+            bundle.putAll(location);
+            bundle.putAll(date);
+            bundle.putAll(time);
+
+            getChildFragmentManager().beginTransaction()
+                .setReorderingAllowed(true)
+                .setCustomAnimations(R.anim.fade_in, R.anim.fade_out)
+                .replace(R.id.fragment_compass, CompassFragment.class, bundle)
+                .commit();
+
+            binding.textView.setText(R.string.compass);
+
+        }
+
+    }
+    private class OnClickRight implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            getChildFragmentManager().beginTransaction()
+                .setReorderingAllowed(true)
+                .setCustomAnimations(R.anim.fade_in, R.anim.fade_out)
+                .replace(R.id.fragment_compass, InfoFragment.class, null)
+                .commit();
+            binding.textView.setText(R.string.info);
+        }
+
+    }
+
+    private CompassFragment getCompassFragment()
+            throws FragmentNotFound, NoChildFragmentManagerAttached {
+
+        Fragment fragment2 = getChildFragmentManagerOrThrowException()
+                .findFragmentById(R.id.fragment_compass);
+
+        CompassFragment fragment;
+        if (fragment2 instanceof CompassFragment) {
+            fragment = (CompassFragment) fragment2;
+        } else {
+            throw new FragmentNotFound();
+        }
+
+        return fragment;
+
+    }
+
+    private InfoFragment getInfoFragment()
+            throws FragmentNotFound, NoChildFragmentManagerAttached {
+
+        Fragment fragment2 = getChildFragmentManagerOrThrowException()
+                .findFragmentById(R.id.fragment_compass);
+
+        InfoFragment fragment;
+        if (fragment2 instanceof InfoFragment) {
+            fragment = (InfoFragment) fragment2;
+        } else {
+            throw new FragmentNotFound();
+        }
+
+        return fragment;
+
+    }
+
+    private ClockFragment getClockFragment()
+            throws FragmentNotFound, NoChildFragmentManagerAttached {
+
+        ClockFragment fragment = (ClockFragment) getChildFragmentManagerOrThrowException()
+                .findFragmentById(R.id.clock_fragment_container);
+
+        if (fragment == null) {
+            throw new FragmentNotFound();
+        }
+
+        return fragment;
+
+    }
+
+    private FragmentManager getChildFragmentManagerOrThrowException()
+            throws NoChildFragmentManagerAttached {
+
+        try {
+            return getChildFragmentManager();
+        } catch (IllegalStateException e) {
+            throw new NoChildFragmentManagerAttached();
+        }
+
+    }
+
+
     private static class FragmentNotFound extends Debug.Exception {
         private FragmentNotFound() {
             super("Fragment Not Found.");
         }
     }
+
     private static class NoChildFragmentManagerAttached extends Debug.Exception {
         private NoChildFragmentManagerAttached() {
             super("No child fragment manager.");
         }
     }
-
 
 }
