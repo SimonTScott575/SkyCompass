@@ -88,8 +88,12 @@ public class InfoFragment extends Fragment {
 
     private void update() {
 
+        int hour = -timeZone.getRawHourOffset();
+        int minute = -timeZone.getRawMinuteOffset();
+        int second = -timeZone.getRawSecondOffset();
+
         Observer observer = new Observer(latitude,longitude,0);
-        Time time = new Time(year+1, month+1, dayOfMonth, hour, minute, second);
+        Time time = new Time(year, month+1, dayOfMonth+1, hour, minute, second);
         int limitDays = 1;
 
         Time sunrise = Astronomy.searchRiseSet(Body.Sun, observer, Direction.Rise, time, limitDays);
@@ -106,13 +110,41 @@ public class InfoFragment extends Fragment {
             binding.sunsetTime.setText("N/A");
         }
 
+        Time moonrise = Astronomy.searchRiseSet(Body.Moon, observer, Direction.Rise, time, limitDays);
+        Time moonset = Astronomy.searchRiseSet(Body.Moon, observer, Direction.Set, time, limitDays);
+
+        if (moonrise != null) {
+            binding.moonrise.setText(timeToString(moonrise));
+        } else {
+            binding.moonrise.setText("N/A");
+        }
+        if (moonset != null) {
+            binding.moonset.setText(timeToString(moonset));
+        } else {
+            binding.moonset.setText("N/A");
+        }
+
+        MoonQuarterInfo moonQuarterInfo = Astronomy.searchMoonQuarter(time);
+        int quarter = moonQuarterInfo.getQuarter() == 0 ? 3 : moonQuarterInfo.getQuarter()-1;
+        binding.moonPhase.setText(quarterName(quarter));
+
     }
 
     private String timeToString(Time time) {
         com.skycompass.util.Time local = timeZone.timeFromUTC(new com.skycompass.util.Time(
             time.toDateTime().getHour(), time.toDateTime().getMinute(), (int)time.toDateTime().getSecond()
         ));
-        return Format.Time(local.getHour(), local.getMinute(), (int) local.getSecond());
+        return Format.Time(local.getHour(), local.getMinute(), local.getSecond());
+    }
+
+    private static String quarterName(int quarter) {
+        switch (quarter) {
+            case 0: return "New Moon";
+            case 1: return "First Quarter";
+            case 2: return "Full Moon";
+            case 3: return "Third Quarter";
+            default: return "INVALID QUARTER";
+        }
     }
 
 }

@@ -49,5 +49,8 @@
 
     <string name="sunrise">Sunrise</string>
     <string name="sunset">Sunset</string>
+    <string name="moon_rise">Moonrise</string>
+    <string name="moon_set">Moonset</string>
+    <string name="moon_phase">Moon Phase</string>
 
 </resources>
