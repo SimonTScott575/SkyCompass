@@ -11,6 +11,8 @@ import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.preference.PreferenceManager;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -91,6 +93,10 @@ public class MapFragment extends Fragment {
                 viewModel.getMarkerLocationDescription()
             );
         }
+
+        binding.copyright.setMovementMethod(LinkMovementMethod.getInstance());
+        binding.copyright.setClickable(true);
+        binding.copyright.setText(Html.fromHtml("© <a href='https://www.openstreetmap.org/copyright/en'>OpenStreetMap</a> contributors", Html.FROM_HTML_MODE_COMPACT));
 
     }
 
