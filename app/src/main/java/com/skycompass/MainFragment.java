@@ -1,5 +1,7 @@
 package com.skycompass;
 
+import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -53,6 +55,17 @@ public class MainFragment extends Fragment {
 
         binding.right.setOnClickListener(onClickRight);
         binding.left.setOnClickListener(onClickLeft);
+
+        try {
+            getCompassFragment();
+            setFragmentCompass();
+        } catch (Debug.Exception e) {
+        }
+        try {
+            getInfoFragment();
+            setFragmentInfo();
+        } catch (Debug.Exception e) {
+        }
 
     }
 
@@ -203,6 +216,40 @@ public class MainFragment extends Fragment {
         }
     }
 
+    private void setFragmentInfo() {
+
+        binding.textView.setText(R.string.info);
+
+        binding.left.setClickable(true);
+        binding.right.setClickable(false);
+        try (
+                TypedArray a = requireContext().obtainStyledAttributes(new int[] { R.attr.colorSecondaryVariant });
+                TypedArray b = requireContext().obtainStyledAttributes(new int[] { R.attr.colorSecondary })
+        ) {
+            binding.left.setColorFilter(b.getColor(0, 0));
+            binding.right.setColorFilter(a.getColor(0, 0));
+        } catch (Exception e){
+        }
+
+    }
+
+    private void setFragmentCompass() {
+
+        binding.textView.setText(R.string.compass);
+
+        binding.left.setClickable(false);
+        binding.right.setClickable(true);
+        try (
+                TypedArray a = requireContext().obtainStyledAttributes(new int[] { R.attr.colorSecondaryVariant });
+                TypedArray b = requireContext().obtainStyledAttributes(new int[] { R.attr.colorSecondary })
+        ) {
+            binding.left.setColorFilter(a.getColor(0, 0));
+            binding.right.setColorFilter(b.getColor(0, 0));
+        } catch (Exception e){
+        }
+
+    }
+
     private class OnClickLeft implements View.OnClickListener {
         @Override
         public void onClick(View v) {
@@ -218,7 +265,7 @@ public class MainFragment extends Fragment {
                 .replace(R.id.fragment_compass, CompassFragment.class, bundle)
                 .commit();
 
-            binding.textView.setText(R.string.compass);
+            setFragmentCompass();
 
         }
 
@@ -238,7 +285,7 @@ public class MainFragment extends Fragment {
                 .replace(R.id.fragment_compass, InfoFragment.class, bundle)
                 .commit();
 
-            binding.textView.setText(R.string.info);
+            setFragmentInfo();
 
         }
 

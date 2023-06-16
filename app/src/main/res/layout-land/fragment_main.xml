@@ -226,6 +226,7 @@
             app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintEnd_toStartOf="@+id/textView"
             app:layout_constraintTop_toTopOf="@+id/textView"
+            app:tint="?attr/colorSecondary"
             custom:srcCompat="@drawable/left" />
 
         <ImageButton
@@ -238,6 +239,7 @@
             app:layout_constraintBottom_toBottomOf="@+id/textView"
             app:layout_constraintStart_toEndOf="@+id/textView"
             app:layout_constraintTop_toTopOf="@+id/textView"
+            app:tint="?attr/colorSecondary"
             custom:srcCompat="@drawable/right" />
 
 
