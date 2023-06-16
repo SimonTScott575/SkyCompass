@@ -22,6 +22,7 @@ import com.skycompass.databinding.FragmentClockBinding;
 import com.skycompass.util.Debug;
 import com.skycompass.util.Time;
 import com.skycompass.util.TimeZone;
+import com.skycompass.views.ShowHideAnimation;
 import com.skycompass.views.TimeZonePicker;
 
 public class ClockFragment extends Fragment {
@@ -34,6 +35,8 @@ public class ClockFragment extends Fragment {
 
     private final TimePicker.OnTimeChangedListener onTimeChangedListener;
     private final TimeZonePicker.OnTimeZoneChanged onTimeZoneChangedListener;
+
+    private ShowHideAnimation showHideUseSystemDateAnimation;
 
     public ClockFragment() {
         onTimeChangedListener = new OnTimeChanged();
@@ -62,6 +65,8 @@ public class ClockFragment extends Fragment {
 
         binding.timePicker.setIs24HourView(true);
         binding.useSystemTime.setOnClickListener(v -> setTimeAndTimeZoneFromSystemValues());
+
+        showHideUseSystemDateAnimation = new ShowHideAnimation(binding.useSystemTime);
 
     }
 
@@ -151,7 +156,7 @@ public class ClockFragment extends Fragment {
         viewModel.setTimeZone(timeZone);
         viewModel.setUseSystemTime(false);
 
-        binding.useSystemTime.setVisibility(View.VISIBLE);
+        showHideUseSystemDateAnimation.show();
 
         binding.timePicker.setOnTimeChangedListener(null);
         binding.timePicker.setHour(time.getHour());
@@ -173,7 +178,7 @@ public class ClockFragment extends Fragment {
         viewModel.setTimeZone(timeZone);
         viewModel.setUseSystemTime(false);
 
-        binding.useSystemTime.setVisibility(View.VISIBLE);
+        showHideUseSystemDateAnimation.show();
 
         onTimeAndTimeZoneChanged(time, timeZone);
 
@@ -195,7 +200,7 @@ public class ClockFragment extends Fragment {
         viewModel.setUseDST(DATE);
         viewModel.setUseSystemTime(true);
 
-        binding.useSystemTime.setVisibility(View.INVISIBLE);
+        showHideUseSystemDateAnimation.hide();
 
         binding.timePicker.setOnTimeChangedListener(null);
         binding.timePicker.setHour(time.getHour());

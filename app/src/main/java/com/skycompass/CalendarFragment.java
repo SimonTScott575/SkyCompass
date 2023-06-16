@@ -17,6 +17,7 @@ import android.widget.DatePicker;
 
 import com.skycompass.databinding.FragmentCalendarBinding;
 import com.skycompass.util.Debug;
+import com.skycompass.views.ShowHideAnimation;
 
 public class CalendarFragment extends Fragment {
 
@@ -25,6 +26,7 @@ public class CalendarFragment extends Fragment {
     private Handler handler;
     private RetrieveSystemDate retrieveSystemDate;
     private final OnDateChangedListener onDateChangedListener;
+    private ShowHideAnimation showHideUseSystemDateAnimation;
 
     public CalendarFragment() {
         onDateChangedListener = new OnDateChangedListener();
@@ -47,6 +49,8 @@ public class CalendarFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
 
         binding.useSystemDate.setOnClickListener(v -> setDateFromSystemDate());
+
+        showHideUseSystemDateAnimation = new ShowHideAnimation(binding.useSystemDate);
 
     }
 
@@ -99,7 +103,7 @@ public class CalendarFragment extends Fragment {
         binding.datePicker.updateDate(year, month, dayOfMonth);
         binding.datePicker.setOnDateChangedListener(onDateChangedListener);
 
-        binding.useSystemDate.setVisibility(View.VISIBLE);
+        showUseSystemDate();
 
         onDateChanged(year, month, dayOfMonth, false);
 
@@ -125,7 +129,7 @@ public class CalendarFragment extends Fragment {
         binding.datePicker.updateDate(year, month, dayOfMonth);
         binding.datePicker.setOnDateChangedListener(onDateChangedListener);
 
-        binding.useSystemDate.setVisibility(View.INVISIBLE);
+        hideUseSystemDate();
 
         onDateChanged(year, month, dayOfMonth, true);
 
@@ -136,7 +140,7 @@ public class CalendarFragment extends Fragment {
         viewModel.setDate(year, month, dayOfMonth);
         viewModel.setSystemDate(false);
 
-        binding.useSystemDate.setVisibility(View.VISIBLE);
+        showUseSystemDate();
 
         onDateChanged(year, month, dayOfMonth, false);
 
@@ -241,6 +245,14 @@ public class CalendarFragment extends Fragment {
         public NoParentFragmentManagerAttachedException() {
             super("No parent fragment manager attached.");
         }
+    }
+
+    private void showUseSystemDate() {
+        showHideUseSystemDateAnimation.show();
+    }
+
+    private void hideUseSystemDate() {
+        showHideUseSystemDateAnimation.hide();
     }
 
 }
