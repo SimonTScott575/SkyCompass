@@ -5,6 +5,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 
 import androidx.annotation.NonNull;
@@ -17,7 +18,7 @@ import com.skycompass.database.Database;
 import com.skycompass.databinding.ViewTimeZonePickerBinding;
 import com.skycompass.util.TimeZone;
 
-public class TimeZonePicker extends ConstraintLayout {
+public class TimeZonePicker extends LinearLayout {
 
     public enum UseDST {
         DATE,
@@ -54,6 +55,8 @@ public class TimeZonePicker extends ConstraintLayout {
     }
 
     private void init(Context context, @Nullable AttributeSet attrs) {
+
+        setOrientation(VERTICAL);
 
         binding = ViewTimeZonePickerBinding.inflate(LayoutInflater.from(context), this, true);
 
