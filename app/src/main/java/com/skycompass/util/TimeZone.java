@@ -86,6 +86,22 @@ public class TimeZone {
         return result;
     }
 
+    public final Time timeFromUTC(Time utc) {
+        return new Time(
+            utc.getHour() + getRawHourOffset(),
+            utc.getMinute() + getRawMinuteOffset(),
+            utc.getSecond() + getRawSecondOffset()
+        );
+    }
+
+    public final Time timeToUTC(Time time) {
+        return new Time(
+            time.getHour() - getRawHourOffset(),
+            time.getMinute() - getRawMinuteOffset(),
+            time.getSecond() - getRawSecondOffset()
+        );
+    }
+
     //TODO make not nullable - eg with exception
     public final String getID() {
         if (timeZone != null) {

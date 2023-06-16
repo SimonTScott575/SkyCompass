@@ -12,6 +12,8 @@ import androidx.annotation.Nullable;
 
 public class CompassView extends View {
 
+    private float offsetHorizontal;
+    private float offsetVertical;
     private float innerRadius;
     private float ringThickness;
     private float northRotation;
@@ -78,6 +80,8 @@ public class CompassView extends View {
         float hh = h - ypad;
 
         int maxLength = (int)Math.min(ww,hh);
+        offsetHorizontal = (w - maxLength)/2f;
+        offsetVertical = (h - maxLength)/2f;
 
         innerRadius = maxLength * BORDER_THICKNESS_FRACTION / 2f;
         ringThickness = maxLength/2f - innerRadius;
@@ -92,6 +96,10 @@ public class CompassView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
+        canvas.save();
+        canvas.translate(offsetHorizontal, 0);
+        canvas.translate(offsetVertical, 0);
+
         drawBackground(canvas);
 
         canvas.save();
@@ -102,6 +110,8 @@ public class CompassView extends View {
 
         drawBodies(canvas);
         drawForeground(canvas);
+
+        canvas.restore();
 
         canvas.restore();
 
