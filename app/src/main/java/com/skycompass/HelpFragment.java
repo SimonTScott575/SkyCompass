@@ -1,5 +1,6 @@
 package com.skycompass;
 
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.net.Uri;
@@ -51,7 +52,17 @@ public class HelpFragment extends Fragment {
                 .addPathHandler("/assets/", new WebViewAssetLoader.AssetsPathHandler(requireContext()))
                 .addPathHandler("/res/", new WebViewAssetLoader.ResourcesPathHandler(requireContext()))
                 .build();
-        binding.webView.setWebViewClient(new LocalContentWebViewClient(assetLoader));
+        binding.webView.setWebViewClient(new LocalContentWebViewClient(assetLoader) {
+            @Override
+            public boolean shouldOverrideUrlLoading(@NonNull WebView view, @NonNull WebResourceRequest request) {
+                if ("appassets.androidplatform.net".equals(request.getUrl().getHost())) {
+                    return false;
+                }
+                Intent intent = new Intent(Intent.ACTION_VIEW, request.getUrl());
+                startActivity(intent);
+                return true;
+            }
+        });
 
         binding.webView.loadUrl("https://appassets.androidplatform.net/assets/help/" + "index" + (nightMode ? "-night" : "") + ".html");
 
