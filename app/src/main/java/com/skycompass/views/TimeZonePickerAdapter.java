@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.skycompass.R;
@@ -50,7 +51,7 @@ public class TimeZonePickerAdapter extends RecyclerView.Adapter<TimeZonePickerAd
         this.selectTimeZoneListener = selectTimeZoneListener;
     }
 
-    public void setSelectedID(String selectedID) {
+    public void setSelectedID(@Nullable String selectedID) {
         this.selectedID = (selectedID != null ? selectedID : "");
         this.selected = -1;
         notifyDataSetChanged();

@@ -20,6 +20,8 @@
             android:calendarViewShown="false"
             android:datePickerMode="spinner"
             android:theme="@style/picker"
+            android:minDate="01/01/1950"
+            android:maxDate="12/31/2050"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

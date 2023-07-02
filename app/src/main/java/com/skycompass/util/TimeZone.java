@@ -1,5 +1,7 @@
 package com.skycompass.util;
 
+import androidx.annotation.Nullable;
+
 import java.util.Calendar;
 
 public class TimeZone {
@@ -102,7 +104,7 @@ public class TimeZone {
         );
     }
 
-    //TODO make not nullable - eg with exception
+    @Nullable
     public final String getID() {
         if (timeZone != null) {
             return timeZone.getID();
