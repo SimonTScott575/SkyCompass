@@ -8,7 +8,7 @@ import android.graphics.Paint;
 import android.graphics.RadialGradient;
 import android.graphics.Shader;
 
-public class Track {
+class Track {
 
     private static final Paint GLOW_PAINT = new Paint(CelestialObject.SUN.getPaint().getColor());
     static {

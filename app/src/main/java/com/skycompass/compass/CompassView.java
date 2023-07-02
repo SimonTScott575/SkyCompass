@@ -22,7 +22,7 @@ public class CompassView extends View {
     private final Foreground foreground = new Foreground(innerRadius, innerRadius + ringThickness);
     private final Track track = new Track(innerRadius);
 
-    private CompassModel compass = new CompassModel(0,0);
+    private final CompassModel compass = new CompassModel(0,0);
     private int hour;
     private int minutes;
     private float seconds;
@@ -39,18 +39,37 @@ public class CompassView extends View {
         super(context, attrs, defStyleAttr);
     }
 
-    public CompassView(Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        super(context, attrs, defStyleAttr, defStyleRes);
+    public double getLongitude() {
+        return compass.getLongitude();
+    }
+
+    public double getLatitude() {
+        return compass.getLatitude();
+    }
+
+    public void setLocation(double latitude, double longitude) {
+        compass.setLocation(latitude, longitude);
+    }
+
+    public int getYear() {
+        return compass.getYear();
+    }
+
+    public int getMonth() {
+        return compass.getMonth();
+    }
+
+    public int getDayOfMonth() {
+        return compass.getDayOfMonth();
+    }
+
+    public void setDate(int year, int month, int dayOfMonth) {
+        compass.setDate(year, month, dayOfMonth);
     }
 
     public void setColor(Color color) {
         foreground.setColor(color);
         background.setColor(color);
-        invalidate();
-    }
-
-    public void setCompassModel(CompassModel compassModel) {
-        this.compass = compassModel;
         invalidate();
     }
 

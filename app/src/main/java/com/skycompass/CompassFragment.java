@@ -19,7 +19,6 @@ import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.skycompass.compass.CompassModel;
 import com.skycompass.compass.CompassSensor;
 import com.skycompass.databinding.FragmentCompassBinding;
 import com.skycompass.util.Debug;
@@ -31,14 +30,12 @@ public class CompassFragment extends Fragment {
     private FragmentCompassBinding binding;
     private CompassFragmentViewModel viewModel;
 
-    private final CompassModel compassModel;
     private final MenuProvider menuProvider;
     private final CompassSensor sensor;
     private Handler handler;
     private UpdateCompassRotation updateCompassRotation;
 
     public CompassFragment() {
-        compassModel = new CompassModel(0, 0);
         sensor = new CompassSensor(orientation -> {
             switch (requireContext().getDisplay().getRotation()) {
                 case Surface.ROTATION_90:
@@ -74,7 +71,6 @@ public class CompassFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
 
-        binding.compassView.setCompassModel(compassModel);
         binding.compassView.setNorthRotation(viewModel.getTargetRotation());
 
         int nightMode = (getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK);
@@ -137,12 +133,12 @@ public class CompassFragment extends Fragment {
     }
 
     public void setLocation(double longitude, double latitude) {
-        compassModel.setLocation(latitude, longitude);
+        binding.compassView.setLocation(latitude, longitude);
         binding.compassView.invalidate();
     }
 
     public void setDate(int year, int month, int dayOfMonth) {
-        compassModel.setDate(year, month, dayOfMonth);
+        binding.compassView.setDate(year, month, dayOfMonth);
         binding.compassView.invalidate();
     }
 

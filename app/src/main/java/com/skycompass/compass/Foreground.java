@@ -6,7 +6,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 
-public class Foreground {
+class Foreground {
 
     private float innerRadius;
     private float outerRadius;
