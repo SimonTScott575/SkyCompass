@@ -6,10 +6,12 @@ import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.EditText;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.LinearLayoutCompat;
 
+import com.skycompass.compass.CompassView;
 import com.skycompass.databinding.ViewTimeZonePickerEditTextBinding;
 import com.skycompass.util.Format;
 import com.skycompass.util.TimeZone;
@@ -107,6 +109,9 @@ public class TimeZonePickerEditText extends LinearLayoutCompat {
 
             String text = s.toString();
 
+            int hour;
+            int minute;
+
             if (!text.contains(":")) {
 
                 int start = textToSelection.length();
@@ -114,14 +119,52 @@ public class TimeZonePickerEditText extends LinearLayoutCompat {
                 binding.numberEditText.setText(newText);
                 binding.numberEditText.setSelection(start);
 
+                return;
+
             } else {
 
                 int[] times = parseTimes(text);
 
-                if (onTimeZoneChanged != null) {
-                    onTimeZoneChanged.onTimeZoneChanged(times[0], times[1]);
+                hour = times[0];
+                minute = times[1];
+
+            }
+
+            if (Math.abs(hour) > 23) {
+
+                String newText = ((Math.signum(hour)>0?1:-1)*23) + ":" + minute;
+                int start;
+                if (textToSelection.length() > text.indexOf(':')) {
+                    start = newText.length();
+                } else {
+                    start = newText.indexOf(':');
                 }
 
+                binding.numberEditText.setText(newText);
+                binding.numberEditText.setSelection(start);
+
+                return;
+
+            }
+            if (minute > 59 || minute < 0) {
+
+                String newText = hour + ":" + (minute > 59 ? 59 : 0);
+                int start;
+                if (textToSelection.length() > text.indexOf(':')) {
+                    start = newText.length();
+                } else {
+                    start = newText.indexOf(':');
+                }
+
+                binding.numberEditText.setText(newText);
+                binding.numberEditText.setSelection(start);
+
+                return;
+
+            }
+
+            if (onTimeZoneChanged != null) {
+                onTimeZoneChanged.onTimeZoneChanged(hour, minute);
             }
 
         }
