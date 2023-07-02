@@ -64,9 +64,9 @@ public class Foreground {
         String[] text = new String[]{TEXT_N, TEXT_E, TEXT_S, TEXT_W};
         float[] textWidth = new float[]{
             NSEWPaint.measureText(TEXT_N),
-            NSEWPaint.measureText(TEXT_N),
-            NSEWPaint.measureText(TEXT_N),
-            NSEWPaint.measureText(TEXT_N)
+            NSEWPaint.measureText(TEXT_E),
+            NSEWPaint.measureText(TEXT_S),
+            NSEWPaint.measureText(TEXT_W)
         };
 
         int SEWColor = NSEWPaint.getColor();
