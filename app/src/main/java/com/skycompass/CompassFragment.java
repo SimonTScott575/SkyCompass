@@ -15,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -22,6 +23,7 @@ import com.skycompass.compass.CompassModel;
 import com.skycompass.compass.CompassSensor;
 import com.skycompass.databinding.FragmentCompassBinding;
 import com.skycompass.util.Debug;
+import com.skycompass.util.Fn;
 import com.skycompass.util.TimeZone;
 
 public class CompassFragment extends Fragment {
@@ -37,7 +39,21 @@ public class CompassFragment extends Fragment {
 
     public CompassFragment() {
         compassModel = new CompassModel(0, 0);
-        sensor = new CompassSensor(orientation -> setTargetRotation(orientation[0]));
+        sensor = new CompassSensor(orientation -> {
+            switch (requireContext().getDisplay().getRotation()) {
+                case Surface.ROTATION_90:
+                    orientation[0] += Math.PI / 2d;
+                    break;
+                case Surface.ROTATION_180:
+                    orientation[0] += 2 * Math.PI / 2d;
+                    break;
+                case Surface.ROTATION_270:
+                    orientation[0] += 3 * Math.PI / 2d;
+                    break;
+            }
+            orientation[0] = Fn.clampAngle(orientation[0]);
+            setTargetRotation(orientation[0]);
+        });
         menuProvider = new MenuListener();
         updateCompassRotation = new UpdateCompassRotation();
     }
@@ -185,10 +201,7 @@ public class CompassFragment extends Fragment {
                 float targetRotation = viewModel.getTargetRotation();
                 float northRotation = binding.compassView.getNorthRotation();
 
-                float diff = targetRotation - northRotation;
-                northRotation += (targetRotation - northRotation)*0.05f * (Math.abs(diff) > Math.PI ? -1f : 1f);
-                northRotation = (float) (northRotation > Math.PI ? northRotation - 2f*Math.PI: northRotation);
-                northRotation = (float) (northRotation < -Math.PI ? northRotation + 2f*Math.PI: northRotation);
+                northRotation = Fn.lerpAngle(northRotation, targetRotation, 0.05f);
 
                 binding.compassView.setNorthRotation(northRotation);
 
