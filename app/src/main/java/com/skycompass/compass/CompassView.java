@@ -1,6 +1,6 @@
 package com.skycompass.compass;
 
-import static com.skycompass.compass.Values.BORDER_THICKNESS_FRACTION;
+import static com.skycompass.compass.Values.*;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -83,7 +83,7 @@ public class CompassView extends View {
         offsetHorizontal = (w - maxLength)/2f;
         offsetVertical = (h - maxLength)/2f;
 
-        innerRadius = maxLength * BORDER_THICKNESS_FRACTION / 2f;
+        innerRadius = maxLength * FACE_FRACTION / 2f;
         ringThickness = maxLength/2f - innerRadius;
 
         background.setRadius(innerRadius);

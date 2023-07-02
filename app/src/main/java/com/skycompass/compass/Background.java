@@ -1,10 +1,10 @@
 package com.skycompass.compass;
 
+import static com.skycompass.compass.Values.*;
+
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-
-import com.skycompass.R;
 
 class Background {
 
@@ -18,15 +18,15 @@ class Background {
     public Background(float radius) {
 
         backgroundPaint = new Paint();
-        backgroundPaint.setColor(Values.BACKGROUND.toArgb());
+        backgroundPaint.setColor(BACKGROUND_COLOR.toArgb());
         backgroundPaint.setStyle(Paint.Style.FILL);
 
         altitudeTrackPaint = new Paint();
-        altitudeTrackPaint.setColor(Values.TRACK.toArgb());
+        altitudeTrackPaint.setColor(TRACK_COLOR.toArgb());
         altitudeTrackPaint.setStyle(Paint.Style.STROKE);
 
         altitudeTextPaint = new Paint();
-        altitudeTextPaint.setColor(Values.TRACK.toArgb());
+        altitudeTextPaint.setColor(TRACK_COLOR.toArgb());
         altitudeTextPaint.setStyle(Paint.Style.FILL);
         setRadius(radius);
 

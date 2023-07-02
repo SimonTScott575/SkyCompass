@@ -1,15 +1,12 @@
 package com.skycompass.compass;
 
+import static com.skycompass.compass.Values.*;
+
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 
 public class Foreground {
-
-    private static final String TEXT_N = "N";
-    private static final String TEXT_S = "S";
-    private static final String TEXT_E = "E";
-    private static final String TEXT_W = "W";
 
     private float innerRadius;
     private float outerRadius;
@@ -22,15 +19,15 @@ public class Foreground {
     public Foreground(float innerRadius, float outerRadius) {
 
         ringPaint = new Paint();
-        ringPaint.setColor(Values.RING.toArgb());
+        ringPaint.setColor(RING_COLOR.toArgb());
         ringPaint.setStyle(Paint.Style.STROKE);
 
         NSEWPaint = new Paint();
-        NSEWPaint.setColor(Values.DIRECTION_SEW.toArgb());
+        NSEWPaint.setColor(TEXT_SEW_COLOR.toArgb());
         NSEWPaint.setStyle(Paint.Style.FILL);
         NSEWPaint.setFakeBoldText(true);
 
-        NColor = Values.DIRECTION_N.toArgb();
+        NColor = TEXT_N_COLOR.toArgb();
 
         setRing(innerRadius, outerRadius);
 
@@ -45,7 +42,7 @@ public class Foreground {
 
         this.innerRadius = innerRadius;
         this.outerRadius = outerRadius;
-        outlineThickness = (outerRadius - innerRadius) * Values.OUTLINE_THICKNESS_FRACTION;
+        outlineThickness = (outerRadius - innerRadius) * RIM_FRACTION_OF_BORDER;
         NSEWPadding = outlineThickness;
         ringPaint.setStrokeWidth(outlineThickness);
         NSEWPaint.setTextSize((outerRadius - innerRadius) - NSEWPadding);

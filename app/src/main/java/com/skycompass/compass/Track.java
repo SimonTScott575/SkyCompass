@@ -1,5 +1,7 @@
 package com.skycompass.compass;
 
+import static com.skycompass.compass.Values.*;
+
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -7,10 +9,6 @@ import android.graphics.RadialGradient;
 import android.graphics.Shader;
 
 public class Track {
-
-    private static final float FRACTION_BLANK = 0.2f;
-    private static final float FRACTION_WIDTH = 0.03f;
-    private static final float FRACTION_RADIUS = 0.075f;
 
     private static final Paint GLOW_PAINT = new Paint(CelestialObject.SUN.getPaint().getColor());
     static {
@@ -35,8 +33,8 @@ public class Track {
         this.radius = radius;
         diameter = 2*radius;
 
-        width = radius * FRACTION_WIDTH;
-        objectRadius = FRACTION_RADIUS * radius;
+        width = radius * TRACK_WIDTH_FRACTION;
+        objectRadius = TRACK_MARKER_FRACTION * radius;
 
     }
 
@@ -98,7 +96,7 @@ public class Track {
             }
 
             float length = (float) (Math.sqrt( Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2) ));
-            float padding = length * FRACTION_BLANK / 2f;
+            float padding = length * TRACK_SPACE_FRACTION / 2f;
             float angle = (float) Math.atan2(endY - startY, endX - startX);
 
             length *= radius;
