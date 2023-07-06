@@ -9,7 +9,7 @@ import io.github.cosinekitty.astronomy.Refraction;
 import io.github.cosinekitty.astronomy.Time;
 import io.github.cosinekitty.astronomy.Topocentric;
 
-public class CompassModel {
+class CompassModel {
 
     private double longitude;
     private double latitude;

@@ -5,7 +5,7 @@ import android.graphics.Paint;
 
 import io.github.cosinekitty.astronomy.Body;
 
-public enum CelestialObject {
+enum CelestialObject {
 
     SUN,
     MOON,

@@ -1,10 +1,10 @@
 package com.skycompass.compass;
 
+import static com.skycompass.compass.Values.*;
+
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-
-import com.skycompass.R;
 
 class Background {
 
@@ -18,16 +18,17 @@ class Background {
     public Background(float radius) {
 
         backgroundPaint = new Paint();
-        backgroundPaint.setColor(Values.BACKGROUND.toArgb());
+        backgroundPaint.setColor(BACKGROUND_COLOR.toArgb());
         backgroundPaint.setStyle(Paint.Style.FILL);
 
         altitudeTrackPaint = new Paint();
-        altitudeTrackPaint.setColor(Values.TRACK.toArgb());
+        altitudeTrackPaint.setColor(TRACK_COLOR.toArgb());
         altitudeTrackPaint.setStyle(Paint.Style.STROKE);
 
         altitudeTextPaint = new Paint();
-        altitudeTextPaint.setColor(Values.TRACK.toArgb());
+        altitudeTextPaint.setColor(TRACK_COLOR.toArgb());
         altitudeTextPaint.setStyle(Paint.Style.FILL);
+
         setRadius(radius);
 
     }
@@ -58,12 +59,6 @@ class Background {
 
         canvas.drawOval(0, 0, diameter, diameter, backgroundPaint);
 
-        drawAltitudeTracks(canvas);
-
-    }
-
-    private void drawAltitudeTracks(Canvas canvas) {
-
         for (int i = 0; i < 8; i++) {
 
             float trackRadius = (8-i)* radius /9f;
@@ -71,6 +66,7 @@ class Background {
             canvas.drawCircle(radius, radius, trackRadius, altitudeTrackPaint);
 
             String text = 10*(i+1) + "\u00B0";
+
             canvas.drawText(
                 text,
                 radius - altitudeTextPaint.measureText(text)/2,
@@ -79,7 +75,8 @@ class Background {
             );
 
         }
-        canvas.drawCircle(radius, radius, 1, altitudeTrackPaint);
+
+        canvas.drawCircle(radius, radius, altitudeTrackPaint.getStrokeWidth()/2f, altitudeTrackPaint);
 
     }
 

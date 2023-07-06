@@ -1,6 +1,6 @@
 package com.skycompass.compass;
 
-public class Coordinate {
+class Coordinate {
 
     private final double altitude;
     private final double azimuth;
