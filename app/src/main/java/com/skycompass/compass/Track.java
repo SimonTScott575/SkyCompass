@@ -45,53 +45,57 @@ class Track {
         double[] altitude = new double[25];
 
         {
-            Coordinate coordinate = compass.getCoordinate(body, 0, 0, 0);
+            Coordinate coordinate = compass.getCoordinate(body, currentHour - 12, 0, 0);
             x[0] = coordinate.getX();
             y[0] = coordinate.getY();
             altitude[0] = coordinate.getAltitude();
-            for (int hour = 1; hour < 25; hour++) {
+            for (int i = 1; i < 25; i++) {
+
+                int hour = currentHour - 12 + i;
 
                 coordinate = compass.getCoordinate(body, hour, 0, 0);
 
-                x[hour] = coordinate.getX();
-                y[hour] = coordinate.getY();
-                altitude[hour] = coordinate.getAltitude();
+                x[i] = coordinate.getX();
+                y[i] = coordinate.getY();
+                altitude[i] = coordinate.getAltitude();
 
-                if (altitude[hour] > 0 && altitude[hour-1] < 0) {
+                if (altitude[i] > 0 && altitude[i-1] < 0) {
 
-                    Coordinate c = getHorizonCoordinate(false, hour-1, compass, body);
+                    Coordinate c = getHorizonCoordinate(false, hour - 1, compass, body);
 
-                    x[hour-1] = c.getX();
-                    y[hour-1] = c.getY();
+                    x[i-1] = c.getX();
+                    y[i-1] = c.getY();
 
-                } else if (altitude[hour] < 0 && altitude[hour-1] > 0) {
+                } else if (altitude[i] < 0 && altitude[i-1] > 0) {
 
-                    Coordinate c = getHorizonCoordinate(true, hour-1, compass, body);
+                    Coordinate c = getHorizonCoordinate(true, hour - 1, compass, body);
 
-                    x[hour] = c.getX();
-                    y[hour] = c.getY();
+                    x[i] = c.getX();
+                    y[i] = c.getY();
 
                 }
 
             }
         }
 
-        for (int hour = 0; hour < 24; hour++) {
+        for (int i = 0; i < 24; i++) {
 
-            double startX = x[hour];
-            double startY = y[hour];
-            double endX = x[hour+1];
-            double endY = y[hour+1];
+            int hour = currentHour - 12 + i;
 
-            if (altitude[hour] < 0 && altitude[hour+1] > 0) {
+            double startX = x[i];
+            double startY = y[i];
+            double endX = x[i+1];
+            double endY = y[i+1];
+
+            if (altitude[i] < 0 && altitude[i+1] > 0) {
                 double length = Math.sqrt( Math.pow(startX, 2) + Math.pow(startY, 2) );
                 startX /= length;
                 startY /= length;
-            } else if (altitude[hour] > 0 && altitude[hour+1] < 0) {
+            } else if (altitude[i] > 0 && altitude[i+1] < 0) {
                 double length = Math.sqrt( Math.pow(endX, 2) + Math.pow(endY, 2) );
                 endX /= length;
                 endY /= length;
-            } else if (altitude[hour] < 0 && altitude[hour+1] < 0) {
+            } else if (altitude[i] < 0 && altitude[i+1] < 0) {
                 continue;
             }
 
@@ -115,8 +119,13 @@ class Track {
             canvas.rotate(-angle*360f/(2*(float)Math.PI), (float) startX, (float) startY); // (float)(startX + (endX - startX)/2f), (float)(startY + (endY - startY)/2f));
 
             int prevAlpha = body.getPaint().getAlpha();
-            body.getPaint().setAlpha(alphaOfTrack(hour, currentHour));
-            canvas.drawRect((float) startX + padding, (float) startY, (float) startX + length - padding, (float) startY + width, body.getPaint());
+            body.getPaint().setAlpha( alphaOfTrack(hour, currentHour) );
+            canvas.drawRect(
+                (float) startX + padding,
+                (float) startY,
+                (float) startX + length - padding,
+                (float) startY + width, body.getPaint()
+            );
             body.getPaint().setAlpha(prevAlpha);
 
             canvas.restore();
