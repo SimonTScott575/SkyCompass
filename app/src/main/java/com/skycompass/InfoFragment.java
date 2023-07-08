@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
@@ -127,6 +128,7 @@ public class InfoFragment extends Fragment {
         MoonQuarterInfo moonQuarterInfo = Astronomy.searchMoonQuarter(time);
         int quarter = moonQuarterInfo.getQuarter() == 0 ? 3 : moonQuarterInfo.getQuarter()-1;
         binding.moonPhase.setText(quarterName(quarter));
+        binding.moonPhaseImg.setImageDrawable(ContextCompat.getDrawable(requireContext(), quarterImage(quarter)));
 
     }
 
@@ -139,11 +141,21 @@ public class InfoFragment extends Fragment {
 
     private static String quarterName(int quarter) {
         switch (quarter) {
-            case 0: return "New Moon";
-            case 1: return "First Quarter";
-            case 2: return "Full Moon";
-            case 3: return "Third Quarter";
+            case 0: return "New Moon - First Quarter";
+            case 1: return "First Quarter - Full Moon";
+            case 2: return "Full Moon - Third Quarter";
+            case 3: return "Third Quarter - New Moon";
             default: return "INVALID QUARTER";
+        }
+    }
+
+    private static int quarterImage(int quarter) {
+        switch (quarter) {
+            case 0: return R.drawable.moon_new_first;
+            case 1: return R.drawable.moon_first_full;
+            case 2: return R.drawable.moon_full_third;
+            case 3: return R.drawable.moon_third_new;
+            default: return -1;
         }
     }
 
