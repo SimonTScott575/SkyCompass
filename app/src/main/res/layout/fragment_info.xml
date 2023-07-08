@@ -123,6 +123,7 @@
 
         <ImageView
             android:id="@+id/moonPhaseImg"
+            style="@style/image"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginStart="8dp"

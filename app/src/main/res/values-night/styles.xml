@@ -48,4 +48,8 @@
         <item name="android:textColor">@color/red_checked_selector</item>
     </style>
 
+    <style name="image">
+        <item name="android:tint">@color/red_light</item>
+    </style>
+
 </resources>

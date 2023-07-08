@@ -50,4 +50,8 @@
 
     <style name="button_toggle" parent="Widget.MaterialComponents.Button.OutlinedButton"/>
 
+    <style name="image">
+        <item name="android:tint">@color/cream_dark</item>
+    </style>
+
 </resources>
