@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
+import androidx.navigation.NavDestination;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
@@ -21,7 +22,6 @@ import com.skycompass.settings.SavedSettings;
 import com.skycompass.util.Debug;
 
 public class MainActivity extends AppCompatActivity {
-    //TODO hide setting configuration behind splash screen
 
     private static final SavedSettings.NightModeListener NIGHT_MODE_LISTENER = new NightModeListener();
 
@@ -35,8 +35,15 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        initBindingAndContentView();
-        initToolbarAndActionBar();
+        SavedSettings.NightMode currentNightMode;
+        int currentNightModeCode = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+        if (currentNightModeCode == Configuration.UI_MODE_NIGHT_YES) {
+            currentNightMode = SavedSettings.NightMode.NIGHT;
+        } else if (currentNightModeCode == Configuration.UI_MODE_NIGHT_NO) {
+            currentNightMode = SavedSettings.NightMode.DAY;
+        } else {
+            currentNightMode = null;
+        }
 
         savedState = SavedSettings.from(this);
         savedState.setNightModeListener(NIGHT_MODE_LISTENER);
@@ -53,6 +60,17 @@ public class MainActivity extends AppCompatActivity {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
                 break;
         }
+
+        if (
+            savedNightMode != SavedSettings.NightMode.SYSTEM &&
+            currentNightMode != null &&
+            currentNightMode != savedNightMode
+        ) {
+            return;
+        }
+
+        initBindingAndContentView();
+        initToolbarAndActionBar();
 
         addMenuProvider(menuListener);
 
@@ -106,7 +124,10 @@ public class MainActivity extends AppCompatActivity {
         public void onPrepareMenu(@NonNull Menu menu) {
 
             try {
-                currentDestination = navigationController.getCurrentDestination().getId();
+                NavDestination dest = navigationController.getCurrentDestination();
+                if (dest != null) {
+                    currentDestination = dest.getId();
+                }
             } catch (NullPointerException e){
                 Debug.error(e.getMessage());
             }
