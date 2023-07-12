@@ -75,7 +75,7 @@ public class CompassFragment extends Fragment {
 
         int nightMode = (getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK);
         if (nightMode == Configuration.UI_MODE_NIGHT_YES) {
-            binding.compassView.setColor(Color.valueOf(Color.parseColor("#FF0000")));
+            binding.compassView.setColor(Color.valueOf(Color.parseColor("#F55353")));
         }
 
         Bundle args = getArguments();

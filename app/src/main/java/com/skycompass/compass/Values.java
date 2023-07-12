@@ -9,7 +9,7 @@ class Values {
     public static final String TEXT_E = "E";
     public static final String TEXT_W = "W";
 
-    public static final Color TEXT_N_COLOR = Color.valueOf(Color.parseColor("#FF0000"));
+    public static final Color TEXT_N_COLOR = Color.valueOf(Color.parseColor("#F55353"));
     public static final Color TEXT_SEW_COLOR = Color.valueOf(Color.parseColor("#000000"));
     public static final Color BACKGROUND_COLOR = Color.valueOf(Color.parseColor("#00000000"));
     public static final Color TRACK_COLOR = Color.valueOf(Color.parseColor("#000000"));

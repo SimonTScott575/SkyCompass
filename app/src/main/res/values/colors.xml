@@ -7,20 +7,16 @@
     <color name="cream_light">#F6F6F6</color>
     <color name="cream_dark">#CCCCCC</color>
 
-    <color name="blue_light">#2155CD</color>
-    <color name="blue_dark">#1746A2</color>
+    <color name="blue_light">#267acf</color>
+    <color name="blue_dark">#2a6bac</color>
 
-    <color name="red_light">#ff0000</color>
-    <color name="red_dark">#8c0000</color>
-
-    <color name="orange_light">#FA7D09</color>
-    <color name="orange_dark">#FF4301</color>
-
+    <color name="red_light">#F55353</color>
+    <color name="red_dark">#cd3737</color>
 
     <color name="grey_light">#414141</color>
     <color name="grey_dark">#313131</color>
 
-    <color name="gold_light">#f0c02e</color>
-    <color name="gold_dark">#C58940</color>
+    <color name="gold_light">#FEB139</color>
+    <color name="gold_dark">#bd801f</color>
 
 </resources>

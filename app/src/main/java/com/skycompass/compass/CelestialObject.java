@@ -33,7 +33,7 @@ enum CelestialObject {
 
     private static final Paint[] paint = new Paint[values().length];
     static {
-        paint[SUN.ordinal()] = createPaint(255,235, 235, 71);
+        paint[SUN.ordinal()] = createPaint(255,246, 245, 77);
         paint[MOON.ordinal()] = createPaint(255,150,150,150);
         paint[MERCURY.ordinal()] = createPaint(255,193,189,188);
         paint[VENUS.ordinal()] = createPaint(255,244,220,196);
