@@ -112,25 +112,33 @@ public class TimeZonePicker extends LinearLayout {
 
         int offset = timeZone.getRawOffset();
         switch (useDST) {
+
             case DATE:
+
                 if (timeZone.getID() == null) {
                     this.timeZone = timeZone;
                     break;
+                } else {
+                    int dstOffset = TimeZone.getDSTOffset(
+                        java.util.TimeZone.getTimeZone(timeZone.getID()),
+                        year, month, day,
+                        hour, minute, second
+                    );
+                    offset += dstOffset;
+                    this.timeZone = new TimeZone(timeZone, dstOffset != 0);
+                    break;
                 }
-                int dstOffset = TimeZone.getDSTOffset(
-                    java.util.TimeZone.getTimeZone(timeZone.getID()),
-                    year, month, day,
-                    hour, minute, second
-                );
-                offset += dstOffset;
-                this.timeZone = new TimeZone(timeZone, dstOffset != 0);
-                break;
+
             case ALWAYS:
+
                 offset += timeZone.getDST();
                 this.timeZone = new TimeZone(timeZone, true);
                 break;
+
             default:
+
                 this.timeZone = new TimeZone(timeZone, false);
+
         }
 
         adapter.setSelectedID(timeZone.getID());

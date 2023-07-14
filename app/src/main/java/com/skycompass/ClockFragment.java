@@ -1,5 +1,6 @@
 package com.skycompass;
 
+import static com.skycompass.views.TimeZonePicker.UseDST.ALWAYS;
 import static com.skycompass.views.TimeZonePicker.UseDST.DATE;
 
 import androidx.fragment.app.FragmentManager;
@@ -59,9 +60,15 @@ public class ClockFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
 
-        viewModel.setTime(new Time(binding.timePicker.getHour(), binding.timePicker.getMinute(), 0));
-        viewModel.setTimeZone(binding.timeZonePicker.getTimeZone());
-        viewModel.setUseDST(binding.timeZonePicker.getUseDST());
+        if (viewModel.getTime() == null) {
+            viewModel.setTime(new Time(0, 0, 0));
+        }
+        if (viewModel.getTimeZone() == null) {
+            viewModel.setTimeZone(new TimeZone(0));
+        }
+        if (viewModel.getUseDST() == null) {
+            viewModel.setUseDST(ALWAYS);
+        }
 
         binding.timePicker.setIs24HourView(true);
         binding.useSystemTime.setOnClickListener(v -> setTimeAndTimeZoneFromSystemValues());
@@ -125,9 +132,9 @@ public class ClockFragment extends Fragment {
             binding.timeZonePicker.setDate(year, month, dayOfMonth);
             binding.timeZonePicker.setOnTimeZoneChangedListener(onTimeZoneChangedListener);
 
-            viewModel.setTimeZone(binding.timeZonePicker.getTimeZone());
+//            viewModel.setTimeZone(binding.timeZonePicker.getTimeZone());
 
-            onTimeAndTimeZoneChanged(viewModel.getTime(), binding.timeZonePicker.getTimeZone());
+            onTimeAndTimeZoneChanged(viewModel.getTime(), viewModel.getTimeZone());
 
         } else {
             binding.timeZonePicker.setDate(year, month, dayOfMonth);
