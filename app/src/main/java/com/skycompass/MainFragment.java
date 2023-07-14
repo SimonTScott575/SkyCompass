@@ -1,7 +1,6 @@
 package com.skycompass;
 
 import android.content.res.TypedArray;
-import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -128,7 +127,6 @@ public class MainFragment extends Fragment {
             binding.dateSubscript.setText(R.string.tap_to_change_date);
         }
 
-
         try {
             CompassFragment compassFragment = getCompassFragment();
             compassFragment.setDate(year, month, day);
@@ -167,7 +165,7 @@ public class MainFragment extends Fragment {
     private void setTime(Time time, int offset, String location) {
 
         String text = Format.Time(time.getHour(), time.getMinute(), time.getSecond());
-        text += " (" + Format.UTCOffset(offset) + ")";
+        text += " (UTC" + Format.TimeZoneOffset(offset) + ")";
 
         binding.timeText.setText(text);
         if (location != null) {
@@ -223,8 +221,8 @@ public class MainFragment extends Fragment {
         binding.left.setClickable(true);
         binding.right.setClickable(false);
         try (
-                TypedArray a = requireContext().obtainStyledAttributes(new int[] { R.attr.colorSecondaryVariant });
-                TypedArray b = requireContext().obtainStyledAttributes(new int[] { R.attr.colorSecondary })
+            TypedArray a = requireContext().obtainStyledAttributes(new int[] { R.attr.colorSecondaryVariant });
+            TypedArray b = requireContext().obtainStyledAttributes(new int[] { R.attr.colorSecondary })
         ) {
             binding.left.setColorFilter(b.getColor(0, 0));
             binding.right.setColorFilter(a.getColor(0, 0));
@@ -240,8 +238,8 @@ public class MainFragment extends Fragment {
         binding.left.setClickable(false);
         binding.right.setClickable(true);
         try (
-                TypedArray a = requireContext().obtainStyledAttributes(new int[] { R.attr.colorSecondaryVariant });
-                TypedArray b = requireContext().obtainStyledAttributes(new int[] { R.attr.colorSecondary })
+            TypedArray a = requireContext().obtainStyledAttributes(new int[] { R.attr.colorSecondaryVariant });
+            TypedArray b = requireContext().obtainStyledAttributes(new int[] { R.attr.colorSecondary })
         ) {
             binding.left.setColorFilter(a.getColor(0, 0));
             binding.right.setColorFilter(b.getColor(0, 0));
@@ -268,8 +266,8 @@ public class MainFragment extends Fragment {
             setFragmentCompass();
 
         }
-
     }
+
     private class OnClickRight implements View.OnClickListener {
         @Override
         public void onClick(View v) {
@@ -288,14 +286,13 @@ public class MainFragment extends Fragment {
             setFragmentInfo();
 
         }
-
     }
 
     private CompassFragment getCompassFragment()
-            throws FragmentNotFound, NoChildFragmentManagerAttached {
+    throws FragmentNotFound, NoChildFragmentManagerAttached {
 
         Fragment fragment2 = getChildFragmentManagerOrThrowException()
-                .findFragmentById(R.id.fragment_compass);
+            .findFragmentById(R.id.fragment_compass);
 
         CompassFragment fragment;
         if (fragment2 instanceof CompassFragment) {
@@ -309,10 +306,10 @@ public class MainFragment extends Fragment {
     }
 
     private InfoFragment getInfoFragment()
-            throws FragmentNotFound, NoChildFragmentManagerAttached {
+    throws FragmentNotFound, NoChildFragmentManagerAttached {
 
         Fragment fragment2 = getChildFragmentManagerOrThrowException()
-                .findFragmentById(R.id.fragment_compass);
+            .findFragmentById(R.id.fragment_compass);
 
         InfoFragment fragment;
         if (fragment2 instanceof InfoFragment) {
@@ -326,10 +323,10 @@ public class MainFragment extends Fragment {
     }
 
     private ClockFragment getClockFragment()
-            throws FragmentNotFound, NoChildFragmentManagerAttached {
+    throws FragmentNotFound, NoChildFragmentManagerAttached {
 
         ClockFragment fragment = (ClockFragment) getChildFragmentManagerOrThrowException()
-                .findFragmentById(R.id.clock_fragment_container);
+            .findFragmentById(R.id.clock_fragment_container);
 
         if (fragment == null) {
             throw new FragmentNotFound();
@@ -340,7 +337,7 @@ public class MainFragment extends Fragment {
     }
 
     private FragmentManager getChildFragmentManagerOrThrowException()
-            throws NoChildFragmentManagerAttached {
+    throws NoChildFragmentManagerAttached {
 
         try {
             return getChildFragmentManager();

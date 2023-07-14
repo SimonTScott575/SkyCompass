@@ -1,5 +1,9 @@
 package com.skycompass.util;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+
 public class Format {
 
     private Format() {
@@ -7,88 +11,40 @@ public class Format {
 
     public static String Time(int hour, int minute, int seconds) {
 
-        String result = "";
+        LocalTime time = LocalTime.of(hour, minute, seconds);
 
-        result += hour < 10 ? "0" : "";
-        result += hour;
+        return time.format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+
+    }
+
+    public static String TimeZoneOffset(int offset) {
+
+        TimeZone timeZone = new TimeZone(offset);
+
+        int hoursOffset = timeZone.getRawHourOffset();
+        int absHourOffset = Math.abs(hoursOffset);
+        String hours = absHourOffset < 10 ? "0" : "";
+        hours += String.valueOf(absHourOffset);
+
+        int minutesOffset = timeZone.getRawMinuteOffset();
+        int absMinutesOffset = Math.abs(minutesOffset);
+        String minutes = absMinutesOffset < 10 ? "0" : "";
+        minutes += String.valueOf(absMinutesOffset);
+
+        String result = "";
+        result += (hoursOffset < 0 || minutesOffset < 0) ? "-" : "+";
+        result += hours;
         result += ":";
-        result += minute < 10 ? "0" : "";
-        result += minute;
-        result += ":";
-        result += seconds < 10 ? "0" : "";
-        result += seconds;
+        result += minutes;
 
         return result;
-
-    }
-
-    public static String UTCOffsetTime(int offset) {
-
-        TimeZone timeZone = new TimeZone(offset);
-
-        int hoursOffset = timeZone.getRawHourOffset();
-        int minutesOffset = timeZone.getRawMinuteOffset();
-
-        StringBuilder result = new StringBuilder();
-
-        result.append(hoursOffset < 0 ? "-" : "");
-
-        int absHourOffset = Math.abs(hoursOffset);
-        int absMinutesOffset = Math.abs(minutesOffset);
-
-        String hours = absHourOffset < 10 ? "0" : "";
-        hours += String.valueOf(absHourOffset);
-
-        String minutes = absMinutesOffset < 10 ? "0" : "";
-        minutes += String.valueOf(absMinutesOffset);
-
-        result.append(hours);
-        result.append(":");
-        result.append(minutes);
-
-        return result.toString();
-    }
-    public static String UTCOffset(int offset) {
-
-        TimeZone timeZone = new TimeZone(offset);
-
-        int hoursOffset = timeZone.getRawHourOffset();
-        int minutesOffset = timeZone.getRawMinuteOffset();
-
-        StringBuilder result = new StringBuilder("UTC");
-
-        result.append(hoursOffset < 0 ? "-" : "+");
-
-        int absHourOffset = Math.abs(hoursOffset);
-        int absMinutesOffset = Math.abs(minutesOffset);
-
-        String hours = absHourOffset < 10 ? "0" : "";
-        hours += String.valueOf(absHourOffset);
-
-        String minutes = absMinutesOffset < 10 ? "0" : "";
-        minutes += String.valueOf(absMinutesOffset);
-
-        result.append(hours);
-        result.append(":");
-        result.append(minutes);
-
-        return result.toString();
     }
 
     public static String Date(int year, int month, int dayOfMonth) {
 
-        month += 1;
-        dayOfMonth += 1;
+        LocalDate date = LocalDate.of(year, month+1, dayOfMonth+1);
 
-        String result = "";
-
-        result += year;
-        result += "-";
-        result += month;
-        result += "-";
-        result += dayOfMonth;
-
-        return result;
+        return date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
     }
 

@@ -2,7 +2,6 @@ package com.skycompass.views;
 
 import android.content.Context;
 import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.graphics.Color;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -10,13 +9,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.skycompass.R;
-import com.skycompass.settings.SavedSettings;
 import com.skycompass.util.Format;
 
 import java.util.TimeZone;
@@ -108,8 +105,9 @@ public class TimeZonePickerAdapter extends RecyclerView.Adapter<TimeZonePickerAd
                 break;
         }
 
+        String offsetText = "UTC" + Format.TimeZoneOffset(offset);
+        holder.getTimeZoneOffset().setText(offsetText);
         holder.getTimeZoneName().setText(timeZone.getID());
-        holder.getTimeZoneOffset().setText(Format.UTCOffset(offset));
         holder.setPos(position);
         if (position == selected || timeZone.getID().equals(selectedID)) {
             holder.itemView.setBackgroundColor(highlight.toArgb());

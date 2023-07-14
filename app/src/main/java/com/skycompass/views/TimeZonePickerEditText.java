@@ -6,12 +6,10 @@ import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.EditText;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.LinearLayoutCompat;
 
-import com.skycompass.compass.CompassView;
 import com.skycompass.databinding.ViewTimeZonePickerEditTextBinding;
 import com.skycompass.util.Format;
 import com.skycompass.util.TimeZone;
@@ -50,9 +48,9 @@ public class TimeZonePickerEditText extends LinearLayoutCompat {
 
     public void setOffset(int offset) {
 
-        if (!Format.UTCOffsetTime(offset).equals(binding.numberEditText.getText().toString())) {
+        if (!Format.TimeZoneOffset(offset).equals(binding.numberEditText.getText().toString())) {
             binding.numberEditText.removeTextChangedListener(offsetWatcher);
-            binding.numberEditText.setText(Format.UTCOffsetTime(offset));
+            binding.numberEditText.setText(Format.TimeZoneOffset(offset));
             binding.numberEditText.addTextChangedListener(offsetWatcher);
         }
 
@@ -83,7 +81,7 @@ public class TimeZonePickerEditText extends LinearLayoutCompat {
             times[0] += shift;
             int offset = times[0] * TimeZone.MILLISECONDS_IN_HOUR + times[1] * TimeZone.MILLISECONDS_IN_MINUTE;
 
-            binding.numberEditText.setText(Format.UTCOffsetTime(offset));
+            binding.numberEditText.setText(Format.TimeZoneOffset(offset));
 
         }
 
