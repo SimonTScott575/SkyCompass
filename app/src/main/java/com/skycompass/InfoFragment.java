@@ -15,6 +15,9 @@ import com.skycompass.databinding.FragmentInfoBinding;
 import com.skycompass.util.Format;
 import com.skycompass.util.TimeZone;
 
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+
 import io.github.cosinekitty.astronomy.Astronomy;
 import io.github.cosinekitty.astronomy.Body;
 import io.github.cosinekitty.astronomy.Direction;
@@ -133,10 +136,15 @@ public class InfoFragment extends Fragment {
     }
 
     private String timeToString(Time time) {
-        com.skycompass.util.Time local = timeZone.timeFromUTC(new com.skycompass.util.Time(
-            time.toDateTime().getHour(), time.toDateTime().getMinute(), (int)time.toDateTime().getSecond()
+
+        LocalTime local = timeZone.timeFromUTC(LocalTime.of(
+            time.toDateTime().getHour(),
+            time.toDateTime().getMinute(),
+            (int)time.toDateTime().getSecond()
         ));
+
         return Format.Time(local.getHour(), local.getMinute(), local.getSecond());
+
     }
 
     private static String quarterName(int quarter) {

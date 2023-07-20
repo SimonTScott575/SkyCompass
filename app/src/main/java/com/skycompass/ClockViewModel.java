@@ -2,14 +2,15 @@ package com.skycompass;
 
 import androidx.lifecycle.ViewModel;
 
-import com.skycompass.util.Time;
 import com.skycompass.util.TimeZone;
 import com.skycompass.views.TimeZonePicker;
+
+import java.time.LocalTime;
 
 public class ClockViewModel extends ViewModel {
 
     private boolean useSystemTime;
-    private Time time;
+    private LocalTime time;
     private TimeZone timeZone;
     private TimeZonePicker.UseDST useDST;
 
@@ -25,11 +26,11 @@ public class ClockViewModel extends ViewModel {
         this.useSystemTime = useSystemTime;
     }
 
-    public void setTime(Time time) {
+    public void setTime(LocalTime time) {
         this.time = time;
     }
 
-    public Time getTime() {
+    public LocalTime getTime() {
         return time;
     }
 

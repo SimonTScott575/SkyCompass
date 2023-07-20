@@ -1,6 +1,5 @@
 package com.skycompass;
 
-import android.icu.util.Calendar;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -18,6 +17,8 @@ import android.widget.DatePicker;
 import com.skycompass.databinding.FragmentCalendarBinding;
 import com.skycompass.util.Debug;
 import com.skycompass.views.ShowHideAnimation;
+
+import java.time.LocalDate;
 
 public class CalendarFragment extends Fragment {
 
@@ -100,7 +101,7 @@ public class CalendarFragment extends Fragment {
         viewModel.setSystemDate(false);
 
         binding.datePicker.setOnDateChangedListener(null);
-        binding.datePicker.updateDate(year, month, dayOfMonth);
+        binding.datePicker.updateDate(year, month, dayOfMonth+1);
         binding.datePicker.setOnDateChangedListener(onDateChangedListener);
 
         showUseSystemDate();
@@ -111,10 +112,10 @@ public class CalendarFragment extends Fragment {
 
     public void setDateFromSystemDate() {
 
-        Calendar calendar = Calendar.getInstance();
-        int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH);
-        int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
+        LocalDate date = LocalDate.now();
+        int year = date.getYear();
+        int month = date.getMonthValue()-1;
+        int dayOfMonth = date.getDayOfMonth()-1;
 
         setDateAsSystemDate(year, month, dayOfMonth);
 
@@ -126,7 +127,7 @@ public class CalendarFragment extends Fragment {
         viewModel.setSystemDate(true);
 
         binding.datePicker.setOnDateChangedListener(null);
-        binding.datePicker.updateDate(year, month, dayOfMonth);
+        binding.datePicker.updateDate(year, month, dayOfMonth+1);
         binding.datePicker.setOnDateChangedListener(onDateChangedListener);
 
         hideUseSystemDate();
@@ -151,7 +152,7 @@ public class CalendarFragment extends Fragment {
         Bundle bundle = new Bundle();
         bundle.putInt("Y", year);
         bundle.putInt("M", monthOfYear);
-        bundle.putInt("D", dayOfMonth-1);
+        bundle.putInt("D", dayOfMonth);
         bundle.putBoolean("CURRENT DATE", currentDate);
         try {
             getParentFragmentManagerOrThrowException().setFragmentResult("A", bundle);
@@ -190,10 +191,10 @@ public class CalendarFragment extends Fragment {
 
             if (viewModel.isSystemDate()) {
 
-                Calendar calendar = Calendar.getInstance();
-                int year = calendar.get(Calendar.YEAR);
-                int month = calendar.get(Calendar.MONTH);
-                int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
+                LocalDate date = LocalDate.now();
+                int year = date.getYear();
+                int month = date.getMonthValue()-1;
+                int dayOfMonth = date.getDayOfMonth()-1;
 
                 boolean dateChanged = firstRun
                     || prevYear != year

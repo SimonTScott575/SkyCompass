@@ -16,8 +16,9 @@ import android.view.ViewGroup;
 import com.skycompass.databinding.FragmentMainBinding;
 import com.skycompass.util.Debug;
 import com.skycompass.util.Format;
-import com.skycompass.util.Time;
 import com.skycompass.util.TimeZone;
+
+import java.time.LocalTime;
 
 public class MainFragment extends Fragment {
 
@@ -162,7 +163,7 @@ public class MainFragment extends Fragment {
         }
     }
 
-    private void setTime(Time time, int offset, String location) {
+    private void setTime(LocalTime time, int offset, String location) {
 
         String text = Format.Time(time.getHour(), time.getMinute(), time.getSecond());
         text += " (UTC" + Format.TimeZoneOffset(offset) + ")";
@@ -209,7 +210,7 @@ public class MainFragment extends Fragment {
             int UTCOffset = result.getInt("OFFSET");
             String location = result.getString("LOCATION");
 
-            setTime(new Time(hour, minute, seconds), UTCOffset, location);
+            setTime(LocalTime.of(hour, minute, seconds), UTCOffset, location);
 
         }
     }

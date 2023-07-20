@@ -21,10 +21,11 @@ import android.widget.TimePicker;
 import com.skycompass.database.Database;
 import com.skycompass.databinding.FragmentClockBinding;
 import com.skycompass.util.Debug;
-import com.skycompass.util.Time;
 import com.skycompass.util.TimeZone;
 import com.skycompass.views.ShowHideAnimation;
 import com.skycompass.views.TimeZonePicker;
+
+import java.time.LocalTime;
 
 public class ClockFragment extends Fragment {
 
@@ -61,7 +62,7 @@ public class ClockFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
 
         if (viewModel.getTime() == null) {
-            viewModel.setTime(new Time(0, 0, 0));
+            viewModel.setTime(LocalTime.of(0, 0, 0));
         }
         if (viewModel.getTimeZone() == null) {
             viewModel.setTimeZone(new TimeZone(0));
@@ -145,7 +146,7 @@ public class ClockFragment extends Fragment {
     public class OnTimeChanged implements TimePicker.OnTimeChangedListener {
         @Override
         public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
-            setTimeAndTimeZoneAsPickerValues(new Time(hourOfDay, minute, 0), viewModel.getTimeZone());
+            setTimeAndTimeZoneAsPickerValues(LocalTime.of(hourOfDay, minute, 0), viewModel.getTimeZone());
         }
     }
 
@@ -157,7 +158,7 @@ public class ClockFragment extends Fragment {
         }
     }
 
-    public void setTimeAndTimeZone(Time time, TimeZone timeZone) {
+    public void setTimeAndTimeZone(LocalTime time, TimeZone timeZone) {
 
         viewModel.setTime(time);
         viewModel.setTimeZone(timeZone);
@@ -179,7 +180,7 @@ public class ClockFragment extends Fragment {
 
     }
 
-    private void setTimeAndTimeZoneAsPickerValues(Time time, TimeZone timeZone) {
+    private void setTimeAndTimeZoneAsPickerValues(LocalTime time, TimeZone timeZone) {
 
         viewModel.setTime(time);
         viewModel.setTimeZone(timeZone);
@@ -193,14 +194,14 @@ public class ClockFragment extends Fragment {
 
     public void setTimeAndTimeZoneFromSystemValues() {
 
-        Time systemTime = Time.fromSystem();
+        LocalTime systemTime = LocalTime.now();
         TimeZone timeZone = TimeZone.fromSystem();
 
         setTimeAndTimeZoneAsSystemValues(systemTime, timeZone);
 
     }
 
-    private void setTimeAndTimeZoneAsSystemValues(Time time, TimeZone timeZone) {
+    private void setTimeAndTimeZoneAsSystemValues(LocalTime time, TimeZone timeZone) {
 
         viewModel.setTime(time);
         viewModel.setTimeZone(timeZone);
@@ -223,7 +224,7 @@ public class ClockFragment extends Fragment {
 
     }
 
-    public void onTimeAndTimeZoneChanged(Time time, TimeZone timeZone) {
+    public void onTimeAndTimeZoneChanged(LocalTime time, TimeZone timeZone) {
 
         Bundle bundle = new Bundle();
         bundle.putInt("HOUR", time.getHour());
@@ -268,7 +269,7 @@ public class ClockFragment extends Fragment {
 
             if (viewModel.isUseSystemTime()) {
 
-                Time time = Time.fromSystem();
+                LocalTime time = LocalTime.now();
                 TimeZone timeZone = TimeZone.fromSystem();
 
                 boolean timeChanged = firstRun

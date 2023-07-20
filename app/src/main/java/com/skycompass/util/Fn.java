@@ -5,6 +5,14 @@ public class Fn {
     private Fn() {
     }
 
+    public static int modular(int value, int mod) {
+        return ((value % mod) + mod) % mod;
+    }
+
+    public static long modular(long value, long mod) {
+        return ((value % mod) + mod) % mod;
+    }
+
     public static float modular(float value, float mod) {
         return ((value % mod) + mod) % mod;
     }

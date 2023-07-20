@@ -2,6 +2,7 @@ package com.skycompass.util;
 
 import androidx.annotation.Nullable;
 
+import java.time.LocalTime;
 import java.util.Calendar;
 
 public class TimeZone {
@@ -88,19 +89,19 @@ public class TimeZone {
         return result;
     }
 
-    public final Time timeFromUTC(Time utc) {
-        return new Time(
-            utc.getHour() + getRawHourOffset(),
-            utc.getMinute() + getRawMinuteOffset(),
-            utc.getSecond() + getRawSecondOffset()
+    public final LocalTime timeFromUTC(LocalTime utc) {
+        return LocalTime.of(
+            Fn.modular(utc.getHour() + getRawHourOffset(), 24),
+            Fn.modular(utc.getMinute() + getRawMinuteOffset(), 60),
+            Fn.modular(utc.getSecond() + getRawSecondOffset(), 60)
         );
     }
 
-    public final Time timeToUTC(Time time) {
-        return new Time(
-            time.getHour() - getRawHourOffset(),
-            time.getMinute() - getRawMinuteOffset(),
-            time.getSecond() - getRawSecondOffset()
+    public final LocalTime timeToUTC(LocalTime time) {
+        return LocalTime.of(
+            Fn.modular(time.getHour() - getRawHourOffset(), 24),
+            Fn.modular(time.getMinute() - getRawMinuteOffset(), 60),
+            Fn.modular(time.getSecond() - getRawSecondOffset(), 60)
         );
     }
 
