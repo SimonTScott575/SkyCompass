@@ -65,6 +65,7 @@ public class CompassView extends View {
 
     public void setDate(int year, int month, int dayOfMonth) {
         compass.setDate(year, month, dayOfMonth);
+        invalidate();
     }
 
     public void setColor(Color color) {

@@ -139,7 +139,6 @@ public class CompassFragment extends Fragment {
 
     public void setDate(int year, int month, int dayOfMonth) {
         binding.compassView.setDate(year, month, dayOfMonth);
-        binding.compassView.invalidate();
     }
 
     public void setTime(int hour, int minute, float seconds) {

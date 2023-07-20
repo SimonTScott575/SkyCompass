@@ -2,18 +2,16 @@ package com.skycompass;
 
 import androidx.lifecycle.ViewModel;
 
+import java.time.LocalDate;
+
 public class CalendarViewModel extends ViewModel {
 
     private boolean systemDate;
-    private int year;
-    private int month;
-    private int dayOfMonth;
+    private LocalDate date;
 
     public CalendarViewModel() {
         systemDate = true;
-        year = 2000;
-        month = 0;
-        dayOfMonth = 0;
+        date = LocalDate.of(2000, 1, 1);
     }
 
     public boolean isSystemDate() {
@@ -24,22 +22,12 @@ public class CalendarViewModel extends ViewModel {
         this.systemDate = systemDate;
     }
 
-    public int getYear() {
-        return year;
+    public LocalDate getDate() {
+        return date;
     }
 
-    public int getMonth() {
-        return month;
-    }
-
-    public int getDayOfMonth() {
-        return dayOfMonth;
-    }
-
-    public void setDate(int year, int month, int dayOfMonth) {
-        this.year = year;
-        this.month = month;
-        this.dayOfMonth = dayOfMonth;
+    public void setDate(LocalDate date) {
+        this.date = date;
     }
 
 }

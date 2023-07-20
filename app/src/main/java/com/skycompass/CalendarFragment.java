@@ -64,7 +64,7 @@ public class CalendarFragment extends Fragment {
         if (viewModel.isSystemDate()) {
             setDateFromSystemDate();
         } else {
-            setDate(viewModel.getYear(), viewModel.getMonth(), viewModel.getDayOfMonth());
+            setDate(viewModel.getDate());
         }
 
         try {
@@ -90,69 +90,66 @@ public class CalendarFragment extends Fragment {
         @Override
         public void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
 
-            setDateAsDatePickerDate(year, monthOfYear, dayOfMonth);
+            setDateAsDatePickerDate(LocalDate.of(year, monthOfYear+1, dayOfMonth));
 
         }
     }
 
-    private void setDate(int year, int month, int dayOfMonth) {
+    private void setDate(LocalDate date) {
 
-        viewModel.setDate(year, month, dayOfMonth);
+        viewModel.setDate(date);
         viewModel.setSystemDate(false);
 
         binding.datePicker.setOnDateChangedListener(null);
-        binding.datePicker.updateDate(year, month, dayOfMonth+1);
+        binding.datePicker.updateDate(date.getYear(), date.getMonthValue()-1, date.getDayOfMonth());
         binding.datePicker.setOnDateChangedListener(onDateChangedListener);
 
         showUseSystemDate();
 
-        onDateChanged(year, month, dayOfMonth, false);
+        onDateChanged(date, false);
 
     }
 
     public void setDateFromSystemDate() {
 
         LocalDate date = LocalDate.now();
-        int year = date.getYear();
-        int month = date.getMonthValue()-1;
-        int dayOfMonth = date.getDayOfMonth()-1;
 
-        setDateAsSystemDate(year, month, dayOfMonth);
+        setDateAsSystemDate(date);
 
     }
 
-    public void setDateAsSystemDate(int year, int month, int dayOfMonth) {
+    public void setDateAsSystemDate(LocalDate date) {
 
-        viewModel.setDate(year, month, dayOfMonth);
+        viewModel.setDate(date);
         viewModel.setSystemDate(true);
 
         binding.datePicker.setOnDateChangedListener(null);
-        binding.datePicker.updateDate(year, month, dayOfMonth+1);
+        binding.datePicker.updateDate(date.getYear(), date.getMonthValue()-1, date.getDayOfMonth());
         binding.datePicker.setOnDateChangedListener(onDateChangedListener);
 
         hideUseSystemDate();
 
-        onDateChanged(year, month, dayOfMonth, true);
+        onDateChanged(date, true);
 
     }
 
-    private void setDateAsDatePickerDate(int year, int month, int dayOfMonth) {
+    private void setDateAsDatePickerDate(LocalDate date) {
 
-        viewModel.setDate(year, month, dayOfMonth);
+        viewModel.setDate(date);
         viewModel.setSystemDate(false);
 
         showUseSystemDate();
 
-        onDateChanged(year, month, dayOfMonth, false);
+        onDateChanged(date, false);
 
     }
 
-    public void onDateChanged(int year, int monthOfYear, int dayOfMonth, boolean currentDate) {
+    public void onDateChanged(LocalDate date, boolean currentDate) {
 
         Bundle bundle = new Bundle();
-        bundle.putInt("Y", year);
-        bundle.putInt("M", monthOfYear);
-        bundle.putInt("D", dayOfMonth);
+        bundle.putInt("Y", date.getYear());
+        bundle.putInt("M", date.getMonthValue()-1);
+        bundle.putInt("D", date.getDayOfMonth()-1);
         bundle.putBoolean("CURRENT DATE", currentDate);
         try {
             getParentFragmentManagerOrThrowException().setFragmentResult("A", bundle);
@@ -192,21 +189,18 @@ public class CalendarFragment extends Fragment {
             if (viewModel.isSystemDate()) {
 
                 LocalDate date = LocalDate.now();
-                int year = date.getYear();
-                int month = date.getMonthValue()-1;
-                int dayOfMonth = date.getDayOfMonth()-1;
 
                 boolean dateChanged = firstRun
-                    || prevYear != year
-                    || prevMonth != month
-                    || prevDayOfMonth != dayOfMonth;
+                    || prevYear != date.getYear()
+                    || prevMonth != date.getMonthValue()
+                    || prevDayOfMonth != date.getDayOfMonth();
 
                 if (dateChanged) {
-                    setDateAsSystemDate(year, month, dayOfMonth);
+                    setDateAsSystemDate(date);
                     firstRun = false;
-                    prevYear = year;
-                    prevMonth = month;
-                    prevDayOfMonth = dayOfMonth;
+                    prevYear = date.getYear();
+                    prevMonth = date.getMonthValue();
+                    prevDayOfMonth = date.getDayOfMonth();
                 }
 
             }
