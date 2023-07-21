@@ -37,54 +37,6 @@
             android:hint="@string/text_search_hint"
             android:textSize="18sp" />
 
-        <LinearLayout
-            android:id="@+id/linearLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical" >
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingStart="8dp"
-                android:text="@string/use_dst"
-                style="@style/text"/>
-
-            <RadioGroup
-                android:id="@+id/use_dst"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="horizontal">
-
-                <RadioButton
-                    android:id="@+id/use_dst_date"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/use_dst_date"
-                    style="@style/text"/>
-
-                <RadioButton
-                    android:id="@+id/use_dst_always"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/use_dst_always"
-                    style="@style/text"/>
-
-                <RadioButton
-                    android:id="@+id/use_dst_never"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/use_dst_never"
-                    style="@style/text"/>
-            </RadioGroup>
-
-        </LinearLayout>
-
     </merge>
 
 </layout>

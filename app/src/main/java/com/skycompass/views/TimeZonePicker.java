@@ -6,11 +6,9 @@ import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.widget.LinearLayout;
-import android.widget.RadioGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
@@ -20,19 +18,11 @@ import com.skycompass.util.TimeZone;
 
 public class TimeZonePicker extends LinearLayout {
 
-    public enum UseDST {
-        DATE,
-        ALWAYS,
-        NEVER
-    }
-
     private ViewTimeZonePickerBinding binding;
     private TimeZone timeZone;
-    private UseDST useDST = UseDST.NEVER;
     private Database db;
 
     private TimeZonePickerAdapter adapter;
-    private OnCheckedListener onCheckedListener;
 
     private OnTimeZoneChanged onTimeZoneChanged;
 
@@ -60,7 +50,6 @@ public class TimeZonePicker extends LinearLayout {
 
         binding = ViewTimeZonePickerBinding.inflate(LayoutInflater.from(context), this, true);
 
-        onCheckedListener = new OnCheckedListener();
         timeZone = new TimeZone(0);
 
         binding.numberEditText.setOnTimeZOneChanged((hour, minute) -> setTimeZoneAsEditText(new TimeZone(
@@ -75,9 +64,6 @@ public class TimeZonePicker extends LinearLayout {
         binding.textSuggestions.addItemDecoration(dividerItemDecoration);
 
         binding.textSearch.addTextChangedListener(new SearchWatcher());
-
-        binding.useDst.setOnCheckedChangeListener(onCheckedListener);
-        binding.useDst.check(binding.useDstDate.getId());
 
     }
 
@@ -111,34 +97,17 @@ public class TimeZonePicker extends LinearLayout {
     public void setTimeZone(TimeZone timeZone) {
 
         int offset = timeZone.getRawOffset();
-        switch (useDST) {
 
-            case DATE:
-
-                if (timeZone.getID() == null) {
-                    this.timeZone = timeZone;
-                    break;
-                } else {
-                    int dstOffset = TimeZone.getDSTOffset(
-                        java.util.TimeZone.getTimeZone(timeZone.getID()),
-                        year, month, day,
-                        hour, minute, second
-                    );
-                    offset += dstOffset;
-                    this.timeZone = new TimeZone(timeZone, dstOffset != 0);
-                    break;
-                }
-
-            case ALWAYS:
-
-                offset += timeZone.getDST();
-                this.timeZone = new TimeZone(timeZone, true);
-                break;
-
-            default:
-
-                this.timeZone = new TimeZone(timeZone, false);
-
+        if (timeZone.getID() == null) {
+            this.timeZone = timeZone;
+        } else {
+            int dstOffset = TimeZone.getDSTOffset(
+                java.util.TimeZone.getTimeZone(timeZone.getID()),
+                year, month, day,
+                hour, minute, second
+            );
+            offset += dstOffset;
+            this.timeZone = new TimeZone(timeZone, dstOffset != 0);
         }
 
         adapter.setSelectedID(timeZone.getID());
@@ -160,20 +129,6 @@ public class TimeZonePicker extends LinearLayout {
         if (onTimeZoneChanged != null) {
             onTimeZoneChanged.onTimeZoneChanged(this, timeZone);
         }
-
-    }
-
-    private void setTimeZoneAsDSTButton(TimeZone timeZone, UseDST useDST) {
-
-        setUseDSTAsDSTButton(useDST);
-        setTimeZone(timeZone);
-
-    }
-
-    public void setTimeZoneAndUseDST(TimeZone timeZone, UseDST useDST) {
-
-        setUseDST(useDST);
-        setTimeZone(timeZone);
 
     }
 
@@ -202,46 +157,6 @@ public class TimeZonePicker extends LinearLayout {
         public void afterTextChanged(Editable s) {
         }
 
-    }
-
-    public UseDST getUseDST() {
-        return useDST;
-    }
-
-    public void setUseDST(UseDST useDST) {
-
-        this.useDST = useDST;
-
-        switch (useDST) {
-            case DATE:
-                binding.useDst.check(binding.useDstDate.getId());
-                break;
-            case ALWAYS:
-                binding.useDst.check(binding.useDstAlways.getId());
-                break;
-            case NEVER:
-                binding.useDst.check(binding.useDstNever.getId());
-                break;
-        }
-
-    }
-    private void setUseDSTAsDSTButton(UseDST useDST) {
-        this.useDST = useDST;
-    }
-
-    private class OnCheckedListener implements RadioGroup.OnCheckedChangeListener {
-        @Override
-        public void onCheckedChanged(RadioGroup group, int checkedId) {
-            if (binding.useDstDate.isChecked()) {
-                setUseDSTAsDSTButton(UseDST.DATE);
-            } else if (binding.useDstAlways.isChecked()) {
-                setUseDSTAsDSTButton(UseDST.ALWAYS);
-            } else if (binding.useDstNever.isChecked()) {
-                setUseDSTAsDSTButton(UseDST.NEVER);
-            }
-            adapter.setUseDST(useDST);
-            setTimeZoneAsDSTButton(timeZone, useDST);
-        }
     }
 
 }

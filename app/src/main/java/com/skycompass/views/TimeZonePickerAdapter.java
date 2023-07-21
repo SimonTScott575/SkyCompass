@@ -19,14 +19,12 @@ import com.skycompass.util.Format;
 import java.util.TimeZone;
 
 public class TimeZonePickerAdapter extends RecyclerView.Adapter<TimeZonePickerAdapter.ViewHolder> {
-    //TODO background color when selected should respond to Day/Night theme and fit with rest of app.
 
     private final Context context;
 
     private String[] timeZones;
     private int year = 1970, month = 0, day = 0;
     private int hour = 12, minute = 0, second = 0;
-    private TimeZonePicker.UseDST useDST = TimeZonePicker.UseDST.NEVER;
 
     private SelectTimeZoneListener selectTimeZoneListener;
     private int selected = -1;
@@ -73,11 +71,6 @@ public class TimeZonePickerAdapter extends RecyclerView.Adapter<TimeZonePickerAd
         notifyDataSetChanged();
     }
 
-    public void setUseDST(TimeZonePicker.UseDST useDST) {
-        this.useDST = useDST;
-        notifyDataSetChanged();
-    }
-
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -92,18 +85,11 @@ public class TimeZonePickerAdapter extends RecyclerView.Adapter<TimeZonePickerAd
 
         TimeZone timeZone = TimeZone.getTimeZone(timeZones[position]);
         int offset = timeZone.getRawOffset();
-        switch (useDST) {
-            case ALWAYS:
-                offset += timeZone.getDSTSavings();
-                break;
-            case DATE:
-                offset += com.skycompass.util.TimeZone.getDSTOffset(
-                    timeZone,
-                    year, month, day,
-                    hour, minute, second
-                );
-                break;
-        }
+        offset += com.skycompass.util.TimeZone.getDSTOffset(
+            timeZone,
+            year, month, day,
+            hour, minute, second
+        );
 
         String offsetText = "UTC" + Format.TimeZoneOffset(offset);
         holder.getTimeZoneOffset().setText(offsetText);

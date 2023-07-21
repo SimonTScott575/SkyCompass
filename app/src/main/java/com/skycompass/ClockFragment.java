@@ -1,8 +1,5 @@
 package com.skycompass;
 
-import static com.skycompass.views.TimeZonePicker.UseDST.ALWAYS;
-import static com.skycompass.views.TimeZonePicker.UseDST.DATE;
-
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -66,9 +63,6 @@ public class ClockFragment extends Fragment {
         }
         if (viewModel.getTimeZone() == null) {
             viewModel.setTimeZone(new TimeZone(0));
-        }
-        if (viewModel.getUseDST() == null) {
-            viewModel.setUseDST(ALWAYS);
         }
 
         binding.timePicker.setIs24HourView(true);
@@ -153,12 +147,11 @@ public class ClockFragment extends Fragment {
     public class OnTimeZoneChange implements TimeZonePicker.OnTimeZoneChanged {
         @Override
         public void onTimeZoneChanged(TimeZonePicker timeZonePicker, TimeZone timeZone) {
-            viewModel.setUseDST(binding.timeZonePicker.getUseDST());
             setTimeAndTimeZoneAsPickerValues(viewModel.getTime(), timeZone);
         }
     }
 
-    public void setTimeAndTimeZone(LocalTime time, TimeZone timeZone) {
+    private void setTimeAndTimeZone(LocalTime time, TimeZone timeZone) {
 
         viewModel.setTime(time);
         viewModel.setTimeZone(timeZone);
@@ -173,7 +166,7 @@ public class ClockFragment extends Fragment {
 
         binding.timeZonePicker.setOnTimeZoneChangedListener(null);
         binding.timeZonePicker.setTime(time.getHour(), time.getMinute(), time.getSecond());
-        binding.timeZonePicker.setTimeZoneAndUseDST(timeZone, viewModel.getUseDST());
+        binding.timeZonePicker.setTimeZone(timeZone);
         binding.timeZonePicker.setOnTimeZoneChangedListener(onTimeZoneChangedListener);
 
         onTimeAndTimeZoneChanged(time, timeZone);
@@ -205,7 +198,6 @@ public class ClockFragment extends Fragment {
 
         viewModel.setTime(time);
         viewModel.setTimeZone(timeZone);
-        viewModel.setUseDST(DATE);
         viewModel.setUseSystemTime(true);
 
         showHideUseSystemDateAnimation.hide();
@@ -217,7 +209,7 @@ public class ClockFragment extends Fragment {
 
         binding.timeZonePicker.setOnTimeZoneChangedListener(null);
         binding.timeZonePicker.setTime(time.getHour(), time.getMinute(), time.getSecond());
-        binding.timeZonePicker.setTimeZoneAndUseDST(timeZone, viewModel.getUseDST());
+        binding.timeZonePicker.setTimeZone(timeZone);
         binding.timeZonePicker.setOnTimeZoneChangedListener(onTimeZoneChangedListener);
 
         onTimeAndTimeZoneChanged(time, binding.timeZonePicker.getTimeZone());
