@@ -6,8 +6,13 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import androidx.annotation.NonNull;
+
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.ZoneId;
+import java.time.format.TextStyle;
+import java.util.Locale;
 import java.util.TimeZone;
 
 public class Database {
@@ -18,11 +23,13 @@ public class Database {
 
     private final String[] paths = new String[]{
         "database/create_time_zones.sql",
-        "database/insert_time_zone.sql"
+        "database/insert_time_zone.sql",
+        "database/drop_time_zones.sql",
+        "database/select_time_zones.sql"
     };
     private final String[] sqlCommands = new String[paths.length];
 
-    public Database(Context c) {
+    public Database(@NonNull Context c) {
 
         context = c;
 
@@ -50,9 +57,9 @@ public class Database {
         dbHelper = new DatabaseHelper(context);
         db = dbHelper.getWritableDatabase();
 
-        if (getTimeZones("").length == 0) {
-            for (String id : TimeZone.getAvailableIDs()) {
-                insertTimeZone(TimeZone.getTimeZone(id));
+        if (searchTimeZones("").length == 0) {
+            for (String id : ZoneId.getAvailableZoneIds()) {
+                insertTimeZone(id);
             }
         }
 
@@ -63,14 +70,10 @@ public class Database {
         dbHelper.close();
     }
 
-    public String[] getTimeZones(String search) {
+    public String[] searchTimeZones(@NonNull String search) {
 
         Cursor cursor;
-        if (search.trim().equals("")) {
-            cursor = db.rawQuery("SELECT * FROM TimeZones", null);
-        } else {
-            cursor = db.rawQuery("SELECT * FROM TimeZones WHERE ID LIKE '%' || ? || '%';", new String[]{search});
-        }
+        cursor = db.rawQuery(sqlCommands[3], new String[]{search});
 
         String[] result = new String[cursor.getCount()];
         if (!cursor.moveToFirst()) {
@@ -89,33 +92,33 @@ public class Database {
 
     }
 
-    private void insertTimeZone(TimeZone timeZone) {
+    private void insertTimeZone(@NonNull String id) {
         db.execSQL(
             sqlCommands[1],
             new String[]{
-                timeZone.getID(),
-                String.valueOf(timeZone.getRawOffset()),
-                String.valueOf(timeZone.getDSTSavings())
+                id,
+                ZoneId.of(id).getDisplayName(TextStyle.FULL, Locale.getDefault())
             }
         );
     }
 
     private class DatabaseHelper extends SQLiteOpenHelper {
 
-        static final int DB_VERSION = 1;
+        private static final int DB_VERSION = 1;
+        private static final String DB_NAME = "TimeZones";
 
-        public DatabaseHelper(Context context) {
-            super(context, "dbtest.DB", null, DB_VERSION);
+        public DatabaseHelper(@NonNull Context context) {
+            super(context, DB_NAME, null, DB_VERSION);
         }
 
         @Override
-        public void onCreate(SQLiteDatabase db) {
+        public void onCreate(@NonNull SQLiteDatabase db) {
             db.execSQL(sqlCommands[0]);
         }
 
         @Override
-        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-            db.execSQL("DROP TABLE IF EXISTS " + "dbtest.DB");
+        public void onUpgrade(@NonNull SQLiteDatabase db, int oldVersion, int newVersion) {
+            db.execSQL(sqlCommands[2]);
             onCreate(db);
         }
     }

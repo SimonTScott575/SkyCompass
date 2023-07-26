@@ -1,2 +1,2 @@
-INSERT INTO TimeZones (id, raw_offset, dst_offset)
-VALUES (?, ?, ?);
+INSERT INTO TimeZones (id, name)
+VALUES (?, ?);

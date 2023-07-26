@@ -1,17 +1,19 @@
 package com.skycompass;
 
+import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
 
-import com.skycompass.util.TimeZone;
-import com.skycompass.views.TimeZonePicker;
-
+import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.ZoneOffset;
 
 public class ClockViewModel extends ViewModel {
 
     private boolean useSystemTime;
     private LocalTime time;
-    private TimeZone timeZone;
+    private LocalDate date;
+    private ZoneOffset zoneOffset;
+    private String id;
 
     public ClockViewModel() {
         useSystemTime = true;
@@ -25,7 +27,15 @@ public class ClockViewModel extends ViewModel {
         this.useSystemTime = useSystemTime;
     }
 
-    public void setTime(LocalTime time) {
+    public LocalDate getDate() {
+        return date;
+    }
+
+    public void setDate(@NonNull LocalDate date) {
+        this.date = date;
+    }
+
+    public void setTime(@NonNull LocalTime time) {
         this.time = time;
     }
 
@@ -33,12 +43,20 @@ public class ClockViewModel extends ViewModel {
         return time;
     }
 
-    public void setTimeZone(TimeZone timeZone) {
-        this.timeZone = timeZone;
+    public void setZoneOffset(@NonNull ZoneOffset zoneOffset) {
+        this.zoneOffset = zoneOffset;
     }
 
-    public TimeZone getTimeZone() {
-        return timeZone;
+    public ZoneOffset getZoneOffset() {
+        return zoneOffset;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
 }

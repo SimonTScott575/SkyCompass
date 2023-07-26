@@ -16,6 +16,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.skycompass.R;
 import com.skycompass.util.Format;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.TextStyle;
+import java.time.temporal.ChronoField;
+import java.util.Locale;
 import java.util.TimeZone;
 
 public class TimeZonePickerAdapter extends RecyclerView.Adapter<TimeZonePickerAdapter.ViewHolder> {
@@ -23,8 +31,7 @@ public class TimeZonePickerAdapter extends RecyclerView.Adapter<TimeZonePickerAd
     private final Context context;
 
     private String[] timeZones;
-    private int year = 1970, month = 0, day = 0;
-    private int hour = 12, minute = 0, second = 0;
+    private LocalDateTime dateTime = LocalDateTime.of(2000,1,1,0,0,0);
 
     private SelectTimeZoneListener selectTimeZoneListener;
     private int selected = -1;
@@ -58,16 +65,12 @@ public class TimeZonePickerAdapter extends RecyclerView.Adapter<TimeZonePickerAd
         notifyDataSetChanged();
     }
 
-    public void setDate(int year, int month, int day) {
-        this.year = year;
-        this.month = month;
-        this.day = day;
+    public void setDate(LocalDate localDate) {
+        dateTime = LocalDateTime.of(localDate, dateTime.toLocalTime());
         notifyDataSetChanged();
     }
-    public void setTime(int hour, int minute, int second) {
-        this.hour = hour;
-        this.minute = minute;
-        this.second = second;
+    public void setTime(LocalTime time) {
+        dateTime = LocalDateTime.of(dateTime.toLocalDate(), time);
         notifyDataSetChanged();
     }
 
@@ -83,19 +86,15 @@ public class TimeZonePickerAdapter extends RecyclerView.Adapter<TimeZonePickerAd
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 
-        TimeZone timeZone = TimeZone.getTimeZone(timeZones[position]);
-        int offset = timeZone.getRawOffset();
-        offset += com.skycompass.util.TimeZone.getDSTOffset(
-            timeZone,
-            year, month, day,
-            hour, minute, second
-        );
+        ZoneId zoneId = ZoneId.of(timeZones[position]);
+        int offset = (int) ZonedDateTime.of(dateTime, zoneId).getLong(ChronoField.OFFSET_SECONDS)*1000;
 
         String offsetText = "UTC" + Format.TimeZoneOffset(offset);
         holder.getTimeZoneOffset().setText(offsetText);
-        holder.getTimeZoneName().setText(timeZone.getID());
+        holder.getTimeZoneName().setText(zoneId.getId());
         holder.setPos(position);
-        if (position == selected || timeZone.getID().equals(selectedID)) {
+        holder.setId(zoneId.getId());
+        if (position == selected || zoneId.getId().equals(selectedID)) {
             holder.itemView.setBackgroundColor(highlight.toArgb());
         } else {
             TypedValue outValue = new TypedValue();
@@ -115,6 +114,7 @@ public class TimeZonePickerAdapter extends RecyclerView.Adapter<TimeZonePickerAd
         private final TextView timeZoneName;
         private final TextView timeZoneOffset;
         private int pos = -1;
+        private String id = null;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -124,7 +124,7 @@ public class TimeZonePickerAdapter extends RecyclerView.Adapter<TimeZonePickerAd
 
             itemView.setOnClickListener(v -> {
                 if (selectTimeZoneListener != null) {
-                    selectTimeZoneListener.onSelectTimeZone(timeZoneName.getText().toString());
+                    selectTimeZoneListener.onSelectTimeZone(id);
                 }
                 selected = pos;
                 selectedID = timeZones[selected];
@@ -146,6 +146,10 @@ public class TimeZonePickerAdapter extends RecyclerView.Adapter<TimeZonePickerAd
 
         public int getPos() {
             return pos;
+        }
+
+        public void setId(String id) {
+            this.id = id;
         }
 
     }

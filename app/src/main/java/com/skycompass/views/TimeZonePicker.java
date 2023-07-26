@@ -14,20 +14,26 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.skycompass.database.Database;
 import com.skycompass.databinding.ViewTimeZonePickerBinding;
-import com.skycompass.util.TimeZone;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoField;
 
 public class TimeZonePicker extends LinearLayout {
 
     private ViewTimeZonePickerBinding binding;
-    private TimeZone timeZone;
     private Database db;
+    private LocalDateTime dateTime = LocalDateTime.of(2000,1,1,0,0,0);
+    private String zoneId;
+    private int offset;
 
     private TimeZonePickerAdapter adapter;
 
     private OnTimeZoneChanged onTimeZoneChanged;
-
-    private int year = 1970, month = 0, day = 0;
-    private int hour = 12, minute = 0, second = 0;
 
     public TimeZonePicker(@NonNull Context context) {
         super(context);
@@ -49,15 +55,10 @@ public class TimeZonePicker extends LinearLayout {
         setOrientation(VERTICAL);
 
         binding = ViewTimeZonePickerBinding.inflate(LayoutInflater.from(context), this, true);
-
-        timeZone = new TimeZone(0);
-
-        binding.numberEditText.setOnTimeZOneChanged((hour, minute) -> setTimeZoneAsEditText(new TimeZone(
-            hour * TimeZone.MILLISECONDS_IN_HOUR + minute * TimeZone.MILLISECONDS_IN_MINUTE
-        )));
+        binding.numberEditText.setOnTimeZOneChanged(this::setTimeZoneAsEditText);
 
         adapter = new TimeZonePickerAdapter(context);
-        adapter.setSelectTimeZoneListener(id -> setTimeZone(new TimeZone(id, false)));
+        adapter.setSelectTimeZoneListener(id -> setTimeZone(id));
         binding.textSuggestions.setAdapter(adapter);
         binding.textSuggestions.setLayoutManager(new LinearLayoutManager(context));
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(context, DividerItemDecoration.VERTICAL);
@@ -69,65 +70,77 @@ public class TimeZonePicker extends LinearLayout {
 
     public void setDatabase(Database database) {
         db = database;
-        adapter.setTimeZones(db.getTimeZones(""));
+        adapter.setTimeZones(db.searchTimeZones(""));
     }
 
-    public void setDate(int year, int month, int day) {
-        this.year = year;
-        this.month = month;
-        this.day = day;
+    public LocalDateTime getDateTime() {
+        return dateTime;
+    }
+
+    public void setDate(LocalDate date) {
+        dateTime = LocalDateTime.of(date, dateTime.toLocalTime());
         TimeZonePickerAdapter adapter = (TimeZonePickerAdapter) binding.textSuggestions.getAdapter();
-        adapter.setDate(year, month, day);
-        setTimeZone(timeZone);
-    }
-
-    public void setTime(int hour, int second, int minute) {
-        this.hour = hour;
-        this.second = second;
-        this.minute = minute;
-        TimeZonePickerAdapter adapter = (TimeZonePickerAdapter) binding.textSuggestions.getAdapter();
-        adapter.setTime(hour, second, minute);
-        setTimeZone(timeZone);
-    }
-
-    public TimeZone getTimeZone() {
-        return timeZone;
-    }
-
-    public void setTimeZone(TimeZone timeZone) {
-
-        int offset = timeZone.getRawOffset();
-
-        if (timeZone.getID() == null) {
-            this.timeZone = timeZone;
+        adapter.setDate(date);
+        if (zoneId != null) {
+            setTimeZone(zoneId);
         } else {
-            int dstOffset = TimeZone.getDSTOffset(
-                java.util.TimeZone.getTimeZone(timeZone.getID()),
-                year, month, day,
-                hour, minute, second
-            );
-            offset += dstOffset;
-            this.timeZone = new TimeZone(timeZone, dstOffset != 0);
+            setTimeZone(offset);
         }
+    }
 
-        adapter.setSelectedID(timeZone.getID());
+    public void setTime(LocalTime time) {
+        dateTime = LocalDateTime.of(dateTime.toLocalDate(), time);
+        TimeZonePickerAdapter adapter = (TimeZonePickerAdapter) binding.textSuggestions.getAdapter();
+        adapter.setTime(time);
+        if (zoneId != null) {
+            setTimeZone(zoneId);
+        } else {
+            setTimeZone(offset);
+        }
+    }
+
+    // Must have available ID.
+    public void setTimeZone(@NonNull String id) {
+
+        this.zoneId = id;
+        ZoneId zoneId = ZoneId.of(id);
+
+        int offset = (int)ZonedDateTime.of(dateTime, zoneId).getOffset().getLong(ChronoField.OFFSET_SECONDS)*1000;
+
+        adapter.setSelectedID(zoneId.getId());
 
         binding.numberEditText.setOffset(offset);
 
         if (onTimeZoneChanged != null) {
-            onTimeZoneChanged.onTimeZoneChanged(this, this.timeZone);
+            onTimeZoneChanged.onTimeZoneChanged(this, ZonedDateTime.of(dateTime, zoneId).get(ChronoField.OFFSET_SECONDS)*1000, zoneId.getId());
         }
 
     }
 
-    private void setTimeZoneAsEditText(TimeZone timeZone) {
+    public void setTimeZone(int offset) {
 
-        this.timeZone = timeZone;
+        this.zoneId = null;
+        ZoneId zoneId = ZoneOffset.ofTotalSeconds(offset/1000);
 
-        adapter.setSelectedID(timeZone.getID());
+        adapter.setSelectedID(zoneId.getId());
+
+        binding.numberEditText.setOffset(offset);
 
         if (onTimeZoneChanged != null) {
-            onTimeZoneChanged.onTimeZoneChanged(this, timeZone);
+            onTimeZoneChanged.onTimeZoneChanged(this, offset, null);
+        }
+
+    }
+
+    private void setTimeZoneAsEditText(int hour, int minute) {
+
+        this.zoneId = null;
+        int offset = hour*60*60 + minute*60;
+
+        adapter.setSelectedID(null);
+
+        if (onTimeZoneChanged != null) {
+            onTimeZoneChanged.onTimeZoneChanged(this, offset*1000, null);
         }
 
     }
@@ -137,7 +150,7 @@ public class TimeZonePicker extends LinearLayout {
     }
 
     public interface OnTimeZoneChanged {
-        void onTimeZoneChanged(TimeZonePicker timeZonePicker, TimeZone timeZone);
+        void onTimeZoneChanged(TimeZonePicker timeZonePicker, int offset, String id);
     }
 
     private class SearchWatcher implements TextWatcher {
@@ -149,7 +162,7 @@ public class TimeZonePicker extends LinearLayout {
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
             if (db != null) {
-                adapter.setTimeZones(db.getTimeZones(s.toString()));
+                adapter.setTimeZones(db.searchTimeZones(s.toString()));
             }
         }
 

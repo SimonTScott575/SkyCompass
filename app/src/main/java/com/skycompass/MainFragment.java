@@ -16,9 +16,14 @@ import android.view.ViewGroup;
 import com.skycompass.databinding.FragmentMainBinding;
 import com.skycompass.util.Debug;
 import com.skycompass.util.Format;
-import com.skycompass.util.TimeZone;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.OffsetTime;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class MainFragment extends Fragment {
 
@@ -30,9 +35,9 @@ public class MainFragment extends Fragment {
     private final OnClickLeft onClickLeft = new OnClickLeft();
     private final OnClickRight onClickRight = new OnClickRight();
 
-    private Bundle location;
-    private Bundle date;
-    private Bundle time;
+    private Bundle locationBundle;
+    private Bundle dateBundle;
+    private Bundle timeBundle;
 
     @Override
     public View onCreateView(
@@ -109,7 +114,7 @@ public class MainFragment extends Fragment {
         @Override
         public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
 
-            location = result;
+            locationBundle = result;
             double longitude = result.getDouble("Longitude");
             double latitude = result.getDouble("Latitude");
             String location = result.getString("Location");
@@ -119,10 +124,10 @@ public class MainFragment extends Fragment {
         }
     }
 
-    private void setDate(int year, int month, int day, boolean currentDate) {
+    private void setDate(LocalDate date, boolean isCurrentDate) {
 
-        binding.dateText.setText(Format.Date(year, month, day));
-        if (currentDate) {
+        binding.dateText.setText(date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+        if (isCurrentDate) {
             binding.dateSubscript.setText(R.string.using_system_date);
         } else {
             binding.dateSubscript.setText(R.string.tap_to_change_date);
@@ -130,20 +135,19 @@ public class MainFragment extends Fragment {
 
         try {
             CompassFragment compassFragment = getCompassFragment();
-            compassFragment.setDate(year, month, day);
+            compassFragment.setDate(date);
         } catch (Debug.Exception e) {
         }
         try {
             InfoFragment fragment = getInfoFragment();
-            fragment.setDate(year, month, day);
+            fragment.setDate(date);
         } catch (Debug.Exception e) {
         }
         try {
             ClockFragment clockFragment = getClockFragment();
-            clockFragment.setDate(year, month, day, currentDate);
+            clockFragment.setDate(date, isCurrentDate);
         } catch (Debug.Exception e) {
             Debug.error(e);
-            return;
         }
 
     }
@@ -152,13 +156,10 @@ public class MainFragment extends Fragment {
         @Override
         public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
 
-            date = result;
-            int year = result.getInt("Y");
-            int month = result.getInt("M");
-            int day = result.getInt("D");
-            boolean currentDate = result.getBoolean("CURRENT DATE");
+            dateBundle = result;
+            Comms.Date date2 = Comms.Date.from(result);
 
-            setDate(year, month, day, currentDate);
+            setDate(date2.getDate(), date2.isCurrentDate());
 
         }
     }
@@ -175,25 +176,21 @@ public class MainFragment extends Fragment {
             binding.timeLocation.setText(R.string.tap_to_change_time);
         }
 
-        TimeZone timeZone = new TimeZone(offset);
+        ZoneOffset timeZone = ZoneOffset.ofTotalSeconds(offset/1000);
+        LocalDate dummy = LocalDate.of(2000,1,1);
 
         try {
             CompassFragment compassFragment = getCompassFragment();
             compassFragment.setTime(
-                time.getHour() - timeZone.getRawHourOffset(),
-                time.getMinute() - timeZone.getRawMinuteOffset(),
-                time.getSecond() - timeZone.getRawSecondOffset() - timeZone.getRawMillisecondOffset()/1000f
+                ZonedDateTime.of(dummy, time, timeZone)
+                    .withZoneSameInstant(ZoneOffset.ofHours(0))
+                    .toLocalTime()
             );
         } catch (Debug.Exception e) {
         }
         try {
             InfoFragment fragment = getInfoFragment();
-            fragment.setTime(
-                time.getHour() - timeZone.getRawHourOffset(),
-                time.getMinute() - timeZone.getRawMinuteOffset(),
-                time.getSecond() - timeZone.getRawSecondOffset() - timeZone.getRawMillisecondOffset()/1000f,
-                offset
-            );
+            fragment.setTime(time, timeZone);
         } catch (Debug.Exception e) {
         }
 
@@ -203,14 +200,10 @@ public class MainFragment extends Fragment {
         @Override
         public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
 
-            time = result;
-            int hour = result.getInt("HOUR");
-            int minute = result.getInt("MINUTE");
-            int seconds = result.getInt("SECOND");
-            int UTCOffset = result.getInt("OFFSET");
-            String location = result.getString("LOCATION");
+            timeBundle = result;
+            Comms.Time time = Comms.Time.from(result);
 
-            setTime(LocalTime.of(hour, minute, seconds), UTCOffset, location);
+            setTime(time.getTime(), time.getZoneOffset().getTotalSeconds()*1000, time.getLocation());
 
         }
     }
@@ -254,9 +247,9 @@ public class MainFragment extends Fragment {
         public void onClick(View v) {
 
             Bundle bundle = new Bundle();
-            bundle.putAll(location);
-            bundle.putAll(date);
-            bundle.putAll(time);
+            bundle.putAll(locationBundle);
+            bundle.putAll(dateBundle);
+            bundle.putAll(timeBundle);
 
             getChildFragmentManager().beginTransaction()
                 .setReorderingAllowed(true)
@@ -274,9 +267,9 @@ public class MainFragment extends Fragment {
         public void onClick(View v) {
 
             Bundle bundle = new Bundle();
-            bundle.putAll(location);
-            bundle.putAll(date);
-            bundle.putAll(time);
+            bundle.putAll(locationBundle);
+            bundle.putAll(dateBundle);
+            bundle.putAll(timeBundle);
 
             getChildFragmentManager().beginTransaction()
                 .setReorderingAllowed(true)

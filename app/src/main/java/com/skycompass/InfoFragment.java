@@ -13,10 +13,14 @@ import android.view.ViewGroup;
 
 import com.skycompass.databinding.FragmentInfoBinding;
 import com.skycompass.util.Format;
-import com.skycompass.util.TimeZone;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 import io.github.cosinekitty.astronomy.Astronomy;
 import io.github.cosinekitty.astronomy.Body;
@@ -29,10 +33,9 @@ public class InfoFragment extends Fragment {
 
     private FragmentInfoBinding binding;
 
-    double longitude, latitude;
-    int year, month, dayOfMonth;
-    int hour, minute, second; // Time in UTC
-    TimeZone timeZone = new TimeZone(0); // UTC offset for displaying time
+    private double longitude, latitude;
+    private LocalDateTime dateTime = LocalDateTime.of(2000,1,1,0,0,0);
+    private ZoneId timeZone = ZoneOffset.ofHours(0); // UTC offset for displaying time
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -52,18 +55,16 @@ public class InfoFragment extends Fragment {
             double latitude = args.getDouble("Latitude");
             setLocation(longitude, latitude);
 
-            int year = args.getInt("Y");
-            int month = args.getInt("M");
-            int day = args.getInt("D");
-            setDate(year, month, day);
+            Comms.Date date = Comms.Date.from(args);
+            setDate(date.getDate());
 
-            int UTCOffset = args.getInt("OFFSET");
-            TimeZone timeZone = new TimeZone(UTCOffset);
-            int hour = args.getInt("HOUR") - timeZone.getRawHourOffset();
-            int minute = args.getInt("MINUTE") - timeZone.getRawMinuteOffset();
-            float seconds = args.getInt("SECOND") - timeZone.getRawSecondOffset() - timeZone.getRawMillisecondOffset()/1000f;
-
-            setTime(hour, minute, seconds, UTCOffset);
+            Comms.Time time = Comms.Time.from(args);
+            setTime(
+                ZonedDateTime.of(date.getDate(), time.getTime(), time.getZoneOffset())
+                    .withZoneSameInstant(ZoneOffset.ofHours(0))
+                    .toLocalTime(),
+                time.getZoneOffset()
+            );
 
         }
 
@@ -75,29 +76,29 @@ public class InfoFragment extends Fragment {
         update();
     }
 
-    public void setDate(int year, int month, int dayOfMonth) {
-        this.year = year;
-        this.month = month;
-        this.dayOfMonth = dayOfMonth;
+    public void setDate(LocalDate date) {
+        dateTime = LocalDateTime.of(date, dateTime.toLocalTime());
         update();
     }
 
-    public void setTime(int hour, int minute, float second, int UTCOffset) {
-        this.hour = hour;
-        this.minute = minute;
-        this.second = (int)second;
-        this.timeZone = new TimeZone(UTCOffset);
+    public void setTime(LocalTime time, ZoneId zoneId) {
+        dateTime = LocalDateTime.of(dateTime.toLocalDate(), time);
+        this.timeZone = zoneId;
         update();
     }
 
     private void update() {
 
-        int hour = -timeZone.getRawHourOffset();
-        int minute = -timeZone.getRawMinuteOffset();
-        int second = -timeZone.getRawSecondOffset();
+        ZonedDateTime utcDateTime = ZonedDateTime.of(dateTime.toLocalDate(), LocalTime.of(0,0,0), timeZone)
+            .withZoneSameInstant(ZoneOffset.ofHours(0));
+        LocalTime utcTime = utcDateTime.toLocalTime();
+        LocalDate utcDate = utcDateTime.toLocalDate();
 
         Observer observer = new Observer(latitude,longitude,0);
-        Time time = new Time(year, month+1, dayOfMonth+1, hour, minute, second);
+        Time time = new Time(
+            utcDate.getYear(), utcDate.getMonthValue(), utcDate.getDayOfMonth(),
+            utcTime.getHour(), utcTime.getMinute(), utcTime.getSecond()
+        );
         int limitDays = 1;
 
         Time sunrise = Astronomy.searchRiseSet(Body.Sun, observer, Direction.Rise, time, limitDays);
@@ -137,13 +138,20 @@ public class InfoFragment extends Fragment {
 
     private String timeToString(Time time) {
 
-        LocalTime local = timeZone.timeFromUTC(LocalTime.of(
+        LocalTime UTCTime = LocalTime.of(
             time.toDateTime().getHour(),
             time.toDateTime().getMinute(),
             (int)time.toDateTime().getSecond()
-        ));
+        );
+        LocalDate UTCDate = LocalDate.of(
+            time.toDateTime().getYear(),
+            time.toDateTime().getMonth(),
+            time.toDateTime().getDay()
+        );
 
-        return Format.Time(local.getHour(), local.getMinute(), local.getSecond());
+        return ZonedDateTime.of(UTCDate, UTCTime, ZoneOffset.ofHours(0))
+            .withZoneSameInstant(timeZone)
+            .format(DateTimeFormatter.ofPattern("HH:mm:ss"));
 
     }
 

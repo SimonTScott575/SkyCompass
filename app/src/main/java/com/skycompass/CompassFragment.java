@@ -23,7 +23,11 @@ import com.skycompass.compass.CompassSensor;
 import com.skycompass.databinding.FragmentCompassBinding;
 import com.skycompass.util.Debug;
 import com.skycompass.util.Fn;
-import com.skycompass.util.TimeZone;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 
 public class CompassFragment extends Fragment {
 
@@ -85,18 +89,15 @@ public class CompassFragment extends Fragment {
             double latitude = args.getDouble("Latitude");
             setLocation(longitude, latitude);
 
-            int year = args.getInt("Y");
-            int month = args.getInt("M");
-            int day = args.getInt("D");
-            setDate(year, month, day);
+            Comms.Date date = Comms.Date.from(args);
+            setDate(date.getDate());
 
-            int UTCOffset = args.getInt("OFFSET");
-            TimeZone timeZone = new TimeZone(UTCOffset);
-            int hour = args.getInt("HOUR") - timeZone.getRawHourOffset();
-            int minute = args.getInt("MINUTE") - timeZone.getRawMinuteOffset();
-            float seconds = args.getInt("SECOND") - timeZone.getRawSecondOffset() - timeZone.getRawMillisecondOffset()/1000f;
-
-            setTime(hour, minute, seconds);
+            Comms.Time time = Comms.Time.from(args);
+            setTime(
+                ZonedDateTime.of(date.getDate(), time.getTime(), time.getZoneOffset())
+                    .withZoneSameInstant(ZoneOffset.ofHours(0))
+                    .toLocalTime()
+            );
 
         }
 
@@ -137,12 +138,12 @@ public class CompassFragment extends Fragment {
         binding.compassView.invalidate();
     }
 
-    public void setDate(int year, int month, int dayOfMonth) {
-        binding.compassView.setDate(year, month, dayOfMonth);
+    public void setDate(LocalDate date) {
+        binding.compassView.setDate(date.getYear(), date.getMonthValue()-1, date.getDayOfMonth()-1);
     }
 
-    public void setTime(int hour, int minute, float seconds) {
-        binding.compassView.setTime(hour, minute, seconds);
+    public void setTime(LocalTime time) {
+        binding.compassView.setTime(time.getHour(), time.getMinute(), time.getSecond());
     }
 
     public void setRotateToNorth(boolean rotate) {
@@ -160,28 +161,6 @@ public class CompassFragment extends Fragment {
 
     public void setTargetRotation(float rotation) {
         viewModel.setTargetRotation(rotation);
-    }
-
-    private void startUpdateCompassRotation()
-    throws HandlerNoPostException {
-
-        updateCompassRotation = new UpdateCompassRotation();
-        handler = new Handler(requireActivity().getMainLooper());
-        boolean success = handler.post(updateCompassRotation);
-        if (!success) {
-            throw new HandlerNoPostException();
-        }
-
-    }
-
-    private void endUpdateCompassRotation() {
-        updateCompassRotation.end();
-    }
-
-    private static class HandlerNoPostException extends Debug.Exception {
-        public HandlerNoPostException() {
-            super("Handler failed to post.");
-        }
     }
 
     private class UpdateCompassRotation implements Runnable {
@@ -215,6 +194,28 @@ public class CompassFragment extends Fragment {
             end = true;
         }
 
+    }
+
+    private void startUpdateCompassRotation()
+    throws HandlerNoPostException {
+
+        updateCompassRotation = new UpdateCompassRotation();
+        handler = new Handler(requireActivity().getMainLooper());
+        boolean success = handler.post(updateCompassRotation);
+        if (!success) {
+            throw new HandlerNoPostException();
+        }
+
+    }
+
+    private void endUpdateCompassRotation() {
+        updateCompassRotation.end();
+    }
+
+    private static class HandlerNoPostException extends Debug.Exception {
+        public HandlerNoPostException() {
+            super("Handler failed to post.");
+        }
     }
 
     private class MenuListener implements MenuProvider {
