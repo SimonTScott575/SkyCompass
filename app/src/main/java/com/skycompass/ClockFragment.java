@@ -40,12 +40,14 @@ public class ClockFragment extends Fragment {
 
     private final TimePicker.OnTimeChangedListener onTimeChangedListener;
     private final TimeZonePicker.OnTimeZoneChanged onTimeZoneChangedListener;
+    private final OnUseSystemTime onUseSystemTime;
 
     private ShowHideAnimation showHideUseSystemDateAnimation;
 
     public ClockFragment() {
         onTimeChangedListener = new OnTimeChanged();
         onTimeZoneChangedListener = new OnTimeZoneChange();
+        onUseSystemTime = new OnUseSystemTime();
     }
 
     @Override
@@ -54,31 +56,15 @@ public class ClockFragment extends Fragment {
         @Nullable ViewGroup container,
         @Nullable Bundle savedInstanceState
     ) {
-
         viewModel = new ViewModelProvider(this).get(ClockViewModel.class);
         binding = FragmentClockBinding.inflate(inflater, container, false);
-
         return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-
-        if (viewModel.getTime() == null) {
-            viewModel.setTime(LocalTime.of(0, 0, 0));
-        }
-        if (viewModel.getDate() == null) {
-            viewModel.setDate(LocalDate.of(2000, 1, 1));
-        }
-        if (viewModel.getZoneOffset() == null) {
-            viewModel.setZoneOffset(ZoneOffset.ofHours(0));
-        }
-
         binding.timePicker.setIs24HourView(true);
-        binding.useSystemTime.setOnClickListener(v -> setTimeAndTimeZoneFromSystemValues());
-
         showHideUseSystemDateAnimation = new ShowHideAnimation(binding.useSystemTime);
-
     }
 
     @Override
@@ -101,6 +87,7 @@ public class ClockFragment extends Fragment {
 
         binding.timePicker.setOnTimeChangedListener(onTimeChangedListener);
         binding.timeZonePicker.setOnTimeZoneChangedListener(onTimeZoneChangedListener);
+        binding.useSystemTime.setOnClickListener(onUseSystemTime);
 
         if (viewModel.isUseSystemTime()) {
             setTimeAndTimeZoneFromSystemValues();
@@ -108,7 +95,8 @@ public class ClockFragment extends Fragment {
             setTimeAndTimeZone(
                 viewModel.getTime(),
                 ZonedDateTime.of(viewModel.getDate(), viewModel.getTime(), viewModel.getZoneOffset())
-                    .get(ChronoField.OFFSET_SECONDS)
+                    .getOffset()
+                    .getTotalSeconds()
                     * 1000,
                 viewModel.getId()
             );
@@ -144,12 +132,14 @@ public class ClockFragment extends Fragment {
             binding.timeZonePicker.setDate(date);
             binding.timeZonePicker.setOnTimeZoneChangedListener(onTimeZoneChangedListener);
 
-//            viewModel.setTimeZone(binding.timeZonePicker.getTimeZone());
+            viewModel.setId(binding.timeZonePicker.getZoneId());
+            viewModel.setZoneOffset(ZoneOffset.ofTotalSeconds(binding.timeZonePicker.getOffset()/1000));
 
             onTimeAndTimeZoneChanged(
                 viewModel.getTime(),
                 ZonedDateTime.of(viewModel.getDate(), viewModel.getTime(), viewModel.getZoneOffset())
-                    .get(ChronoField.OFFSET_SECONDS)
+                    .getOffset()
+                    .getTotalSeconds()
                     * 1000,
                 viewModel.getId()
             );
@@ -158,6 +148,13 @@ public class ClockFragment extends Fragment {
             binding.timeZonePicker.setDate(date);
         }
 
+    }
+
+    public class OnUseSystemTime implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            setTimeAndTimeZoneFromSystemValues();
+        }
     }
 
     public class OnTimeChanged implements TimePicker.OnTimeChangedListener {
@@ -253,7 +250,7 @@ public class ClockFragment extends Fragment {
 
         onTimeAndTimeZoneChanged(
             time,
-            ZonedDateTime.of(viewModel.getDate(), viewModel.getTime(), timeZone).get(ChronoField.OFFSET_SECONDS)*1000,
+            ZonedDateTime.of(viewModel.getDate(), viewModel.getTime(), timeZone).getOffset().getTotalSeconds()*1000,
             timeZone.getId()
         );
 
@@ -261,12 +258,7 @@ public class ClockFragment extends Fragment {
 
     public void onTimeAndTimeZoneChanged(LocalTime time, int offset, String id) {
 
-        Bundle bundle = new Bundle();
-        bundle.putInt("HOUR", time.getHour());
-        bundle.putInt("MINUTE", time.getMinute());
-        bundle.putInt("SECOND", time.getSecond());
-        bundle.putInt("OFFSET", offset);
-        bundle.putString("LOCATION", id);
+        Bundle bundle = Comms.Time.putInto(time, offset, id, new Bundle());
         try {
             getParentFragmentManagerOrThrowException().setFragmentResult("C", bundle);
         } catch (NoParentFragmentManagerAttachedException e) {

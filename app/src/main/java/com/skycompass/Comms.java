@@ -47,6 +47,18 @@ public class Comms {
         private Time() {
         }
 
+        public static Bundle putInto(LocalTime time, int offset, String id, @NonNull Bundle bundle) {
+
+            bundle.putInt("HOUR", time.getHour());
+            bundle.putInt("MINUTE", time.getMinute());
+            bundle.putInt("SECOND", time.getSecond());
+            bundle.putInt("OFFSET", offset);
+            bundle.putString("LOCATION", id);
+
+            return bundle;
+
+        }
+
         public static Time from(@NonNull Bundle bundle) {
 
             Time time = new Time();

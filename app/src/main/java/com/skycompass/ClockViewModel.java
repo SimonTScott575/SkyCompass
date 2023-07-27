@@ -17,6 +17,9 @@ public class ClockViewModel extends ViewModel {
 
     public ClockViewModel() {
         useSystemTime = true;
+        time = LocalTime.of(0, 0, 0);
+        date = LocalDate.of(2000, 1, 1);
+        zoneOffset = ZoneOffset.ofHours(0);
     }
 
     public boolean isUseSystemTime() {

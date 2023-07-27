@@ -102,10 +102,10 @@ public class TimeZonePicker extends LinearLayout {
     // Must have available ID.
     public void setTimeZone(@NonNull String id) {
 
-        this.zoneId = id;
         ZoneId zoneId = ZoneId.of(id);
 
-        int offset = (int)ZonedDateTime.of(dateTime, zoneId).getOffset().getLong(ChronoField.OFFSET_SECONDS)*1000;
+        this.zoneId = id;
+        offset = (int)ZonedDateTime.of(dateTime, zoneId).getOffset().getTotalSeconds()*1000;
 
         adapter.setSelectedID(zoneId.getId());
 
@@ -120,6 +120,8 @@ public class TimeZonePicker extends LinearLayout {
     public void setTimeZone(int offset) {
 
         this.zoneId = null;
+        this.offset = offset;
+
         ZoneId zoneId = ZoneOffset.ofTotalSeconds(offset/1000);
 
         adapter.setSelectedID(zoneId.getId());
@@ -132,15 +134,30 @@ public class TimeZonePicker extends LinearLayout {
 
     }
 
+    public int getOffset() {
+
+        if (zoneId == null) {
+            return this.offset;
+        } else {
+            return ZonedDateTime.of(dateTime, ZoneId.of(zoneId)).getOffset().getTotalSeconds()*1000;
+        }
+
+    }
+
+    public String getZoneId() {
+        return zoneId;
+    }
+
     private void setTimeZoneAsEditText(int hour, int minute) {
 
         this.zoneId = null;
-        int offset = hour*60*60 + minute*60;
+        offset = hour*60*60 + minute*60;
+        offset *= 1000;
 
         adapter.setSelectedID(null);
 
         if (onTimeZoneChanged != null) {
-            onTimeZoneChanged.onTimeZoneChanged(this, offset*1000, null);
+            onTimeZoneChanged.onTimeZoneChanged(this, offset, null);
         }
 
     }
