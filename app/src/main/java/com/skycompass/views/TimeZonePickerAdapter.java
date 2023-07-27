@@ -21,9 +21,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.format.TextStyle;
-import java.time.temporal.ChronoField;
-import java.util.Locale;
 import java.util.TimeZone;
 
 public class TimeZonePickerAdapter extends RecyclerView.Adapter<TimeZonePickerAdapter.ViewHolder> {
@@ -38,14 +35,19 @@ public class TimeZonePickerAdapter extends RecyclerView.Adapter<TimeZonePickerAd
     private String selectedID = "";
 
     private Color highlight = Color.valueOf(Color.parseColor("#f0c02e"));
+    private int bgColorRedId;
 
     public TimeZonePickerAdapter(Context context) {
+
         this.context = context;
         timeZones = TimeZone.getAvailableIDs();
 
         if ((context.getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES) {
             highlight = Color.valueOf(Color.parseColor("#414141"));
         }
+        TypedValue outValue = new TypedValue();
+        context.getTheme().resolveAttribute(android.R.attr.selectableItemBackground, outValue, true);
+        bgColorRedId = outValue.resourceId;
 
     }
 
@@ -87,19 +89,18 @@ public class TimeZonePickerAdapter extends RecyclerView.Adapter<TimeZonePickerAd
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 
         ZoneId zoneId = ZoneId.of(timeZones[position]);
-        int offset = (int) ZonedDateTime.of(dateTime, zoneId).getLong(ChronoField.OFFSET_SECONDS)*1000;
-
+        int offset = ZonedDateTime.of(dateTime, zoneId).getOffset().getTotalSeconds()*1000;
         String offsetText = "UTC" + Format.TimeZoneOffset(offset);
+
         holder.getTimeZoneOffset().setText(offsetText);
         holder.getTimeZoneName().setText(zoneId.getId());
         holder.setPos(position);
         holder.setId(zoneId.getId());
+
         if (position == selected || zoneId.getId().equals(selectedID)) {
             holder.itemView.setBackgroundColor(highlight.toArgb());
         } else {
-            TypedValue outValue = new TypedValue();
-            context.getTheme().resolveAttribute(android.R.attr.selectableItemBackground, outValue, true);
-            holder.itemView.setBackgroundResource(outValue.resourceId);
+            holder.itemView.setBackgroundResource(bgColorRedId);
         }
 
     }
@@ -142,10 +143,6 @@ public class TimeZonePickerAdapter extends RecyclerView.Adapter<TimeZonePickerAd
 
         public void setPos(int pos) {
             this.pos = pos;
-        }
-
-        public int getPos() {
-            return pos;
         }
 
         public void setId(String id) {

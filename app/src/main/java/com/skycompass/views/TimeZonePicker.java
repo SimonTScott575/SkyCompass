@@ -19,14 +19,13 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.time.temporal.ChronoField;
 
 public class TimeZonePicker extends LinearLayout {
 
     private ViewTimeZonePickerBinding binding;
     private Database db;
+
     private LocalDateTime dateTime = LocalDateTime.of(2000,1,1,0,0,0);
     private String zoneId;
     private int offset;
@@ -37,20 +36,20 @@ public class TimeZonePicker extends LinearLayout {
 
     public TimeZonePicker(@NonNull Context context) {
         super(context);
-        init(context, null);
+        init(context);
     }
 
     public TimeZonePicker(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        init(context, attrs);
+        init(context);
     }
 
     public TimeZonePicker(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init(context, attrs);
+        init(context);
     }
 
-    private void init(Context context, @Nullable AttributeSet attrs) {
+    private void init(@NonNull Context context) {
 
         setOrientation(VERTICAL);
 
@@ -58,7 +57,7 @@ public class TimeZonePicker extends LinearLayout {
         binding.numberEditText.setOnTimeZOneChanged(this::setTimeZoneAsEditText);
 
         adapter = new TimeZonePickerAdapter(context);
-        adapter.setSelectTimeZoneListener(id -> setTimeZone(id));
+        adapter.setSelectTimeZoneListener(this::setTimeZone);
         binding.textSuggestions.setAdapter(adapter);
         binding.textSuggestions.setLayoutManager(new LinearLayoutManager(context));
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(context, DividerItemDecoration.VERTICAL);
@@ -73,46 +72,47 @@ public class TimeZonePicker extends LinearLayout {
         adapter.setTimeZones(db.searchTimeZones(""));
     }
 
-    public LocalDateTime getDateTime() {
-        return dateTime;
-    }
+    public void setDate(@NonNull LocalDate date) {
 
-    public void setDate(LocalDate date) {
         dateTime = LocalDateTime.of(date, dateTime.toLocalTime());
+
         TimeZonePickerAdapter adapter = (TimeZonePickerAdapter) binding.textSuggestions.getAdapter();
         adapter.setDate(date);
+
         if (zoneId != null) {
             setTimeZone(zoneId);
         } else {
             setTimeZone(offset);
         }
+
     }
 
-    public void setTime(LocalTime time) {
+    public void setTime(@NonNull LocalTime time) {
+
         dateTime = LocalDateTime.of(dateTime.toLocalDate(), time);
+
         TimeZonePickerAdapter adapter = (TimeZonePickerAdapter) binding.textSuggestions.getAdapter();
         adapter.setTime(time);
+
         if (zoneId != null) {
             setTimeZone(zoneId);
         } else {
             setTimeZone(offset);
         }
+
     }
 
     // Must have available ID.
     public void setTimeZone(@NonNull String id) {
 
-        ZoneId zoneId = ZoneId.of(id);
-
         this.zoneId = id;
-        offset = (int)ZonedDateTime.of(dateTime, zoneId).getOffset().getTotalSeconds()*1000;
+        offset = ZonedDateTime.of(dateTime, ZoneId.of(id)).getOffset().getTotalSeconds()*1000;
 
-        adapter.setSelectedID(zoneId.getId());
-
+        adapter.setSelectedID(zoneId);
         binding.numberEditText.setOffset(offset);
 
         if (onTimeZoneChanged != null) {
-            onTimeZoneChanged.onTimeZoneChanged(this, ZonedDateTime.of(dateTime, zoneId).get(ChronoField.OFFSET_SECONDS)*1000, zoneId.getId());
+            onTimeZoneChanged.onTimeZoneChanged(this, offset, id);
         }
 
     }
@@ -122,10 +122,7 @@ public class TimeZonePicker extends LinearLayout {
         this.zoneId = null;
         this.offset = offset;
 
-        ZoneId zoneId = ZoneOffset.ofTotalSeconds(offset/1000);
-
-        adapter.setSelectedID(zoneId.getId());
-
+        adapter.setSelectedID(null);
         binding.numberEditText.setOffset(offset);
 
         if (onTimeZoneChanged != null) {
