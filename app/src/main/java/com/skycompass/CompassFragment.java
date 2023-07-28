@@ -245,7 +245,7 @@ public class CompassFragment extends Fragment {
 
             if (menuItem.getItemId() == R.id.menu_item_compass) {
 
-                setRotateToNorth(viewModel.isRotateToNorth());
+                setRotateToNorth(!viewModel.isRotateToNorth());
 
                 if (viewModel.isRotateToNorth()) {
                     menuItem.setIcon(R.drawable.compass_off);
