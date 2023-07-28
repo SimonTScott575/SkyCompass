@@ -18,9 +18,7 @@ import com.skycompass.util.Debug;
 import com.skycompass.util.Format;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.OffsetTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -54,9 +52,9 @@ public class MainFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
 
-        binding.changeLocation.setOnClickListener(view1 -> binding.mapCardView.show());
-        binding.changeDate.setOnClickListener(view1 -> binding.calendarCardView.show());
-        binding.changeTime.setOnClickListener(view1 -> binding.clockCardView.show());
+        binding.changeLocation.setOnClickListener(v -> binding.mapCardView.show());
+        binding.changeDate.setOnClickListener(v -> binding.calendarCardView.show());
+        binding.changeTime.setOnClickListener(v -> binding.clockCardView.show());
 
         binding.right.setOnClickListener(onClickRight);
         binding.left.setOnClickListener(onClickLeft);
@@ -87,7 +85,7 @@ public class MainFragment extends Fragment {
 
     }
 
-    private void setLocation(double longitude, double latitude, @Nullable String location) {
+    private void setLocation(double latitude, double longitude, @Nullable String location) {
 
         binding.locationText.setText(Format.LatitudeLongitude(latitude, longitude));
 
@@ -113,14 +111,9 @@ public class MainFragment extends Fragment {
     private class OnChangeLocationListener implements FragmentResultListener {
         @Override
         public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
-
             locationBundle = result;
-            double longitude = result.getDouble("Longitude");
-            double latitude = result.getDouble("Latitude");
-            String location = result.getString("Location");
-
-            setLocation(longitude, latitude, location);
-
+            Comms.Location location = Comms.Location.from(result);
+            setLocation(location.getLatitude(), location.getLongitude(), location.getLocation());
         }
     }
 
@@ -221,6 +214,7 @@ public class MainFragment extends Fragment {
             binding.left.setColorFilter(b.getColor(0, 0));
             binding.right.setColorFilter(a.getColor(0, 0));
         } catch (Exception e){
+            Debug.error(e.getMessage());
         }
 
     }
@@ -238,6 +232,7 @@ public class MainFragment extends Fragment {
             binding.left.setColorFilter(a.getColor(0, 0));
             binding.right.setColorFilter(b.getColor(0, 0));
         } catch (Exception e){
+            Debug.error(e.getMessage());
         }
 
     }
@@ -285,12 +280,12 @@ public class MainFragment extends Fragment {
     private CompassFragment getCompassFragment()
     throws FragmentNotFound, NoChildFragmentManagerAttached {
 
-        Fragment fragment2 = getChildFragmentManagerOrThrowException()
+        Fragment childFragment = getChildFragmentManagerOrThrowException()
             .findFragmentById(R.id.fragment_compass);
 
         CompassFragment fragment;
-        if (fragment2 instanceof CompassFragment) {
-            fragment = (CompassFragment) fragment2;
+        if (childFragment instanceof CompassFragment) {
+            fragment = (CompassFragment) childFragment;
         } else {
             throw new FragmentNotFound();
         }
@@ -302,12 +297,12 @@ public class MainFragment extends Fragment {
     private InfoFragment getInfoFragment()
     throws FragmentNotFound, NoChildFragmentManagerAttached {
 
-        Fragment fragment2 = getChildFragmentManagerOrThrowException()
+        Fragment childFragment = getChildFragmentManagerOrThrowException()
             .findFragmentById(R.id.fragment_compass);
 
         InfoFragment fragment;
-        if (fragment2 instanceof InfoFragment) {
-            fragment = (InfoFragment) fragment2;
+        if (childFragment instanceof InfoFragment) {
+            fragment = (InfoFragment) childFragment;
         } else {
             throw new FragmentNotFound();
         }

@@ -10,7 +10,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
 
-import android.preference.PreferenceManager;
+import androidx.preference.PreferenceManager;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
@@ -50,10 +50,8 @@ public class MapFragment extends Fragment {
         @Nullable ViewGroup container,
         @Nullable Bundle savedInstanceState
     ) {
-
         viewModel = new ViewModelProvider(this).get(MapViewModel.class);
         binding = FragmentMapBinding.inflate(inflater);
-
         return binding.getRoot();
     }
 
@@ -61,27 +59,11 @@ public class MapFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        Context ctx = requireActivity();
-        Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
+        Context context = requireActivity();
+        Configuration.getInstance().load(context, PreferenceManager.getDefaultSharedPreferences(context));
 
         binding.mapView.setUp();
-        binding.mapView.setOnMarkerDragListener(new Marker.OnMarkerDragListener() {
-            @Override
-            public void onMarkerDrag(Marker marker) {
-
-                double longitude = marker.getPosition().getLongitude();
-                double latitude = marker.getPosition().getLatitude();
-
-                setLocationAsMapMarker(latitude, longitude, null);
-
-            }
-            @Override
-            public void onMarkerDragEnd(Marker marker) {
-            }
-            @Override
-            public void onMarkerDragStart(Marker marker) {
-            }
-        });
+        binding.mapView.setOnMarkerDragListener(new OnMarkerDragListener());
 
         binding.myLocation.setOnClickListener(new OnClickSetToMyLocation());
 
@@ -89,14 +71,17 @@ public class MapFragment extends Fragment {
             setLocationFromMyLocation();
         } else {
             setLocation(
-                viewModel.getMarkerLongitude(), viewModel.getMarkerLatitude(),
+                viewModel.getMarkerLatitude(), viewModel.getMarkerLongitude(),
                 viewModel.getMarkerLocationDescription()
             );
         }
 
         binding.copyright.setMovementMethod(LinkMovementMethod.getInstance());
         binding.copyright.setClickable(true);
-        binding.copyright.setText(Html.fromHtml("© <a href='https://www.openstreetmap.org/copyright/en'>OpenStreetMap</a> contributors", Html.FROM_HTML_MODE_COMPACT));
+        binding.copyright.setText(Html.fromHtml(
+            "© <a href='https://www.openstreetmap.org/copyright/en'>OpenStreetMap</a> contributors",
+            Html.FROM_HTML_MODE_COMPACT
+        ));
 
     }
 
@@ -120,7 +105,7 @@ public class MapFragment extends Fragment {
         super.onDetach();
     }
 
-    public void setMyLocation(double longitude, double latitude) {
+    public void setMyLocation(double latitude, double longitude) {
         viewModel.setMyLocation(new GeoPoint(latitude, longitude));
         binding.myLocation.setImageDrawable(
             ResourcesCompat.getDrawable(
@@ -129,11 +114,26 @@ public class MapFragment extends Fragment {
         );
     }
 
-    public void setLocation(double longitude, double latitude, String location) {
-
+    public void setLocation(double latitude, double longitude, String location) {
         binding.mapView.setMarkerLocation(latitude, longitude);
         setLocationAsMapMarker(latitude, longitude, location);
+    }
 
+    public class OnMarkerDragListener implements Marker.OnMarkerDragListener {
+        @Override
+        public void onMarkerDrag(Marker marker) {
+            setLocationAsMapMarker(
+                marker.getPosition().getLatitude(),
+                marker.getPosition().getLongitude(),
+                null
+            );
+        }
+        @Override
+        public void onMarkerDragEnd(Marker marker) {
+        }
+        @Override
+        public void onMarkerDragStart(Marker marker) {
+        }
     }
 
     private void setLocationAsMapMarker(double latitude, double longitude, String location) {
@@ -155,14 +155,10 @@ public class MapFragment extends Fragment {
     }
 
     public void setLocationFromMyLocation() {
-
         viewModel.setAutoSetAsMyLocation(true);
-
-        if (viewModel.getMyLocation() == null) {
+        if (viewModel.getMyLocation() == null)
             return;
-        }
         setLocationAsMyLocation(viewModel.getMyLocation().getLatitude(), viewModel.getMyLocation().getLongitude());
-
     }
 
     private void setLocationAsMyLocation(double latitude, double longitude) {
@@ -184,17 +180,12 @@ public class MapFragment extends Fragment {
     }
 
     public void onLocationChanged(double longitude, double latitude, String location) {
-
-        Bundle bundle = new Bundle();
-        bundle.putDouble("Longitude", longitude);
-        bundle.putDouble("Latitude", latitude);
-        bundle.putString("Location", location);
+        Bundle bundle = Comms.Location.putInto(latitude, longitude, location, new Bundle());
         try {
             getParentFragmentManagerOrThrowException().setFragmentResult("B", bundle);
         } catch (NoParentFragmentManagerAttachedException e) {
             Debug.log(e);
         }
-
     }
 
     private class OnClickSetToMyLocation implements View.OnClickListener {
@@ -222,25 +213,21 @@ public class MapFragment extends Fragment {
     }
 
     private void notifyUserLocationPermissionDenied() {
-
         try {
             Toast toast = Toast.makeText(requireContext(), "Location access denied in permission settings", Toast.LENGTH_LONG);
             toast.show();
         } catch (IllegalStateException e) {
             Debug.log("No context associated with MapFragment.");
         }
-
     }
 
     private void notifyUserLocationDisabled() {
-
         try {
             Toast toast = Toast.makeText(requireContext(), "Location updates disabled in settings", Toast.LENGTH_LONG);
             toast.show();
         } catch (IllegalStateException e) {
             Debug.log("No context associated with MapFragment.");
         }
-
     }
 
     private class OnReceivedMyLocationRequester implements LocationRequester.OnLocationChanged {
@@ -255,7 +242,7 @@ public class MapFragment extends Fragment {
             }
 
             if (differentLatitude || differentLongitude) {
-                setMyLocation(longitude, latitude);
+                setMyLocation(latitude, longitude);
                 setLocationAsMyLocation(latitude, longitude);
             }
 
@@ -269,15 +256,12 @@ public class MapFragment extends Fragment {
             if (granted) {
                 setLocationFromMyLocation();
             } else {
-
                 binding.myLocation.setImageDrawable(
-                        ResourcesCompat.getDrawable(
-                                getResources(), R.drawable.no_location, requireActivity().getTheme()
-                        )
+                    ResourcesCompat.getDrawable(
+                        getResources(), R.drawable.no_location, requireActivity().getTheme()
+                    )
                 );
-
                 notifyUserLocationPermissionDenied();
-
             }
 
             if (locationRequester.enabled() == LocationRequester.EnabledState.DISABLED) {
@@ -289,13 +273,11 @@ public class MapFragment extends Fragment {
 
     private FragmentManager getParentFragmentManagerOrThrowException()
     throws NoParentFragmentManagerAttachedException {
-
         try {
             return getParentFragmentManager();
         } catch (IllegalStateException e) {
             throw new NoParentFragmentManagerAttachedException();
         }
-
     }
 
     private static class NoParentFragmentManagerAttachedException extends Debug.Exception {

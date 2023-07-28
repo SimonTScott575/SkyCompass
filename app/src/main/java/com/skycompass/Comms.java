@@ -10,6 +10,46 @@ import java.time.ZoneOffset;
 
 public class Comms {
 
+    public static class Location {
+
+        private double latitude;
+        private double longitude;
+        private String location;
+
+        public static Bundle putInto(double latitude, double longitude, String location, Bundle bundle) {
+
+            bundle.putDouble("Longitude", longitude);
+            bundle.putDouble("Latitude", latitude);
+            bundle.putString("Location", location);
+
+            return bundle;
+
+        }
+
+        public static Location from(@NonNull Bundle bundle) {
+
+            Location location = new Location();
+            location.latitude = bundle.getDouble("Longitude");
+            location.longitude = bundle.getDouble("Latitude");
+            location.location = bundle.getString("Location");
+
+            return location;
+
+        }
+
+        public double getLatitude() {
+            return latitude;
+        }
+
+        public double getLongitude() {
+            return longitude;
+        }
+
+        public String getLocation() {
+            return location;
+        }
+    }
+
     public static class Date {
 
         private LocalDate date;
