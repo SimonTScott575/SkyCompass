@@ -17,6 +17,10 @@ public class Format {
 
     }
 
+    public static String Time(LocalTime time) {
+        return time.format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+    }
+
     public static String TimeZoneOffset(int offset) {
 
         int hoursOffset = getRawHourOffset(offset);
@@ -42,22 +46,22 @@ public class Format {
     private static final int MILLISECONDS_IN_MINUTE = 60*1000;
     private static final int MILLISECONDS_IN_HOUR = 60*MILLISECONDS_IN_MINUTE;
 
-    public static final int getRawHourOffset(int rawOffset) {
+    public static int getRawHourOffset(int rawOffset) {
         return rawOffset / MILLISECONDS_IN_HOUR;
     }
 
-    public static final int getRawMinuteOffset(int rawOffset) {
+    public static int getRawMinuteOffset(int rawOffset) {
         return (rawOffset - getRawHourOffset(rawOffset)*MILLISECONDS_IN_HOUR) / MILLISECONDS_IN_MINUTE;
     }
 
-    public static final int getRawSecondOffset(int rawOffset) {
+    public static int getRawSecondOffset(int rawOffset) {
         int result = rawOffset;
         result -= getRawHourOffset(rawOffset) * MILLISECONDS_IN_HOUR;
         result -= getRawMinuteOffset(rawOffset) * MILLISECONDS_IN_MINUTE;
         return result/MILLISECONDS_IN_SECOND;
     }
 
-    public static final int getRawMillisecondOffset(int rawOffset) {
+    public static int getRawMillisecondOffset(int rawOffset) {
         int result = rawOffset;
         result -= getRawHourOffset(rawOffset) * MILLISECONDS_IN_HOUR;
         result -= getRawMinuteOffset(rawOffset) * MILLISECONDS_IN_MINUTE;

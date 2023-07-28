@@ -142,9 +142,11 @@ public class InfoFragment extends Fragment {
             time.toDateTime().getDay()
         );
 
-        return ZonedDateTime.of(UTCDate, UTCTime, ZoneOffset.ofHours(0))
-            .withZoneSameInstant(timeZone)
-            .format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+        return Format.Time(
+            ZonedDateTime.of(UTCDate, UTCTime, ZoneOffset.ofHours(0))
+                .withZoneSameInstant(timeZone)
+                .toLocalTime()
+        );
 
     }
 
