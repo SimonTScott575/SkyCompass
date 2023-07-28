@@ -40,23 +40,12 @@ public class CompassFragment extends Fragment {
     private UpdateCompassRotation updateCompassRotation;
 
     public CompassFragment() {
-        sensor = new CompassSensor(orientation -> {
-            switch (requireContext().getDisplay().getRotation()) {
-                case Surface.ROTATION_90:
-                    orientation[0] += Math.PI / 2d;
-                    break;
-                case Surface.ROTATION_180:
-                    orientation[0] += 2 * Math.PI / 2d;
-                    break;
-                case Surface.ROTATION_270:
-                    orientation[0] += 3 * Math.PI / 2d;
-                    break;
-            }
-            orientation[0] = Fn.clampAngle(orientation[0]);
-            setTargetRotation(orientation[0]);
-        });
+
+        sensor = new CompassSensor(new OnOrientationChanged());
+
         menuProvider = new MenuListener();
         updateCompassRotation = new UpdateCompassRotation();
+
     }
 
     @Override
@@ -65,10 +54,8 @@ public class CompassFragment extends Fragment {
         ViewGroup container,
         Bundle savedInstanceState
     ) {
-
         binding = FragmentCompassBinding.inflate(inflater);
         viewModel = new ViewModelProvider(this).get(CompassFragmentViewModel.class);
-
         return binding.getRoot();
     }
 
@@ -123,19 +110,14 @@ public class CompassFragment extends Fragment {
 
     @Override
     public void onPause() {
-
         requireActivity().removeMenuProvider(menuProvider);
-
         sensor.destroy();
-
         endUpdateCompassRotation();
-
         super.onPause();
     }
 
     public void setLocation(double longitude, double latitude) {
         binding.compassView.setLocation(latitude, longitude);
-        binding.compassView.invalidate();
     }
 
     public void setDate(LocalDate date) {
@@ -146,8 +128,32 @@ public class CompassFragment extends Fragment {
         binding.compassView.setTime(time.getHour(), time.getMinute(), time.getSecond());
     }
 
+    public class OnOrientationChanged implements CompassSensor.OnOrientationChanged {
+        @Override
+        public void onOrientationChanged(float[] orientation) {
+
+            switch (requireContext().getDisplay().getRotation()) {
+                case Surface.ROTATION_90:
+                    orientation[0] += Math.PI / 2d;
+                    break;
+                case Surface.ROTATION_180:
+                    orientation[0] += 2 * Math.PI / 2d;
+                    break;
+                case Surface.ROTATION_270:
+                    orientation[0] += 3 * Math.PI / 2d;
+                    break;
+            }
+
+            orientation[0] = Fn.clampAngle(orientation[0]);
+            setTargetRotation(orientation[0]);
+
+        }
+    }
+
     public void setRotateToNorth(boolean rotate) {
+
         viewModel.setRotateToNorth(rotate);
+
         if (rotate && !sensor.requested()) {
             sensor.request(requireContext());
             viewModel.setTargetRotation(0);
@@ -157,6 +163,7 @@ public class CompassFragment extends Fragment {
             viewModel.setTargetRotation(0);
             binding.compassView.setNorthRotation(0);
         }
+
     }
 
     public void setTargetRotation(float rotation) {
@@ -238,11 +245,9 @@ public class CompassFragment extends Fragment {
 
             if (menuItem.getItemId() == R.id.menu_item_compass) {
 
-                boolean rotateToNorth = !viewModel.isRotateToNorth();
+                setRotateToNorth(viewModel.isRotateToNorth());
 
-                setRotateToNorth(rotateToNorth);
-
-                if (rotateToNorth) {
+                if (viewModel.isRotateToNorth()) {
                     menuItem.setIcon(R.drawable.compass_off);
                 } else {
                     menuItem.setIcon(R.drawable.compass);

@@ -49,6 +49,7 @@ public class CompassView extends View {
 
     public void setLocation(double latitude, double longitude) {
         compass.setLocation(latitude, longitude);
+        invalidate();
     }
 
     public int getYear() {
