@@ -26,11 +26,15 @@ public class CalendarFragment extends Fragment {
     private FragmentCalendarBinding binding;
     private Handler handler;
     private RetrieveSystemDate retrieveSystemDate;
-    private final OnDateChangedListener onDateChangedListener;
+
     private ShowHideAnimation showHideUseSystemDateAnimation;
+
+    private final OnDateChangedListener onDateChangedListener;
+    private final OnClickUseSystemDate onClickUseSystemDate;
 
     public CalendarFragment() {
         onDateChangedListener = new OnDateChangedListener();
+        onClickUseSystemDate = new OnClickUseSystemDate();
     }
 
     @Override
@@ -39,20 +43,15 @@ public class CalendarFragment extends Fragment {
         ViewGroup container,
         Bundle savedInstanceState
     ) {
-
         viewModel = new ViewModelProvider(this).get(CalendarViewModel.class);
         binding = FragmentCalendarBinding.inflate(inflater);
-
         return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-
-        binding.useSystemDate.setOnClickListener(v -> setDateFromSystemDate());
-
+        binding.useSystemDate.setOnClickListener(onClickUseSystemDate);
         showHideUseSystemDateAnimation = new ShowHideAnimation(binding.useSystemDate);
-
     }
 
     @Override
@@ -78,24 +77,26 @@ public class CalendarFragment extends Fragment {
 
     @Override
     public void onPause() {
-        super.onPause();
-
         binding.datePicker.setOnDateChangedListener(null);
-
         endRetrieveSystemDate();
-
+        super.onPause();
     }
 
     private class OnDateChangedListener implements DatePicker.OnDateChangedListener {
         @Override
         public void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-
             setDateAsDatePickerDate(LocalDate.of(year, monthOfYear+1, dayOfMonth));
-
         }
     }
 
-    private void setDate(LocalDate date) {
+    private class OnClickUseSystemDate implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            setDateFromSystemDate();
+        }
+    }
+
+    private void setDate(@NonNull LocalDate date) {
 
         viewModel.setDate(date);
         viewModel.setSystemDate(false);
@@ -118,7 +119,7 @@ public class CalendarFragment extends Fragment {
 
     }
 
-    public void setDateAsSystemDate(LocalDate date) {
+    public void setDateAsSystemDate(@NonNull LocalDate date) {
 
         viewModel.setDate(date);
         viewModel.setSystemDate(true);
@@ -133,7 +134,7 @@ public class CalendarFragment extends Fragment {
 
     }
 
-    private void setDateAsDatePickerDate(LocalDate date) {
+    private void setDateAsDatePickerDate(@NonNull LocalDate date) {
 
         viewModel.setDate(date);
         viewModel.setSystemDate(false);
@@ -144,13 +145,12 @@ public class CalendarFragment extends Fragment {
 
     }
 
-    public void onDateChanged(LocalDate date, boolean currentDate) {
+    public void onDateChanged(@NonNull LocalDate date, boolean currentDate) {
 
-        Bundle bundle = new Bundle();
-        bundle.putInt("Y", date.getYear());
-        bundle.putInt("M", date.getMonthValue()-1);
-        bundle.putInt("D", date.getDayOfMonth()-1);
-        bundle.putBoolean("CURRENT DATE", currentDate);
+        Bundle bundle = Comms.Date.putInto(
+            date.getYear(), date.getMonthValue()-1, date.getDayOfMonth()-1, currentDate,
+            new Bundle()
+        );
         try {
             getParentFragmentManagerOrThrowException().setFragmentResult("A", bundle);
         } catch (NoParentFragmentManagerAttachedException e) {

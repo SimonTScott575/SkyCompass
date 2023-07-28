@@ -18,6 +18,17 @@ public class Comms {
         private Date() {
         }
 
+        public static Bundle putInto(int year, int month, int day, boolean currentDate, @NonNull Bundle  bundle) {
+
+            bundle.putInt("Y", year);
+            bundle.putInt("M", month);
+            bundle.putInt("D", day);
+            bundle.putBoolean("CURRENT DATE", currentDate);
+
+            return bundle;
+
+        }
+
         public static Date from(@NonNull Bundle bundle) {
 
             Date result = new Date();
