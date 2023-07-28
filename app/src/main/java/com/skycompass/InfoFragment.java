@@ -10,9 +10,12 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.skycompass.databinding.FragmentInfoBinding;
 import com.skycompass.util.Format;
+
+import org.w3c.dom.Text;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -33,7 +36,7 @@ public class InfoFragment extends Fragment {
 
     private FragmentInfoBinding binding;
 
-    private double longitude, latitude;
+    private double latitude, longitude;
     private LocalDateTime dateTime = LocalDateTime.of(2000,1,1,0,0,0);
     private ZoneId timeZone = ZoneOffset.ofHours(0); // UTC offset for displaying time
 
@@ -51,9 +54,7 @@ public class InfoFragment extends Fragment {
         Bundle args = getArguments();
         if (args != null) {
 
-            double longitude = args.getDouble("Longitude");
-            double latitude = args.getDouble("Latitude");
-            setLocation(longitude, latitude);
+            setLocation(args.getDouble("Longitude"), args.getDouble("Latitude"));
 
             Comms.Date date = Comms.Date.from(args);
             setDate(date.getDate());
@@ -103,36 +104,28 @@ public class InfoFragment extends Fragment {
 
         Time sunrise = Astronomy.searchRiseSet(Body.Sun, observer, Direction.Rise, time, limitDays);
         Time sunset = Astronomy.searchRiseSet(Body.Sun, observer, Direction.Set, time, limitDays);
-
-        if (sunrise != null) {
-            binding.sunriseTime.setText(timeToString(sunrise));
-        } else {
-            binding.sunriseTime.setText("N/A");
-        }
-        if (sunset != null) {
-            binding.sunsetTime.setText(timeToString(sunset));
-        } else {
-            binding.sunsetTime.setText("N/A");
-        }
-
         Time moonrise = Astronomy.searchRiseSet(Body.Moon, observer, Direction.Rise, time, limitDays);
         Time moonset = Astronomy.searchRiseSet(Body.Moon, observer, Direction.Set, time, limitDays);
 
-        if (moonrise != null) {
-            binding.moonrise.setText(timeToString(moonrise));
-        } else {
-            binding.moonrise.setText("N/A");
-        }
-        if (moonset != null) {
-            binding.moonset.setText(timeToString(moonset));
-        } else {
-            binding.moonset.setText("N/A");
-        }
+        setRiseSeTimeText(binding.sunriseTime, sunrise);
+        setRiseSeTimeText(binding.sunsetTime, sunset);
+        setRiseSeTimeText(binding.moonrise, moonrise);
+        setRiseSeTimeText(binding.moonset, moonset);
 
         MoonQuarterInfo moonQuarterInfo = Astronomy.searchMoonQuarter(time);
         int quarter = moonQuarterInfo.getQuarter() == 0 ? 3 : moonQuarterInfo.getQuarter()-1;
         binding.moonPhase.setText(quarterName(quarter));
         binding.moonPhaseImg.setImageDrawable(ContextCompat.getDrawable(requireContext(), quarterImage(quarter)));
+
+    }
+
+    private void setRiseSeTimeText(TextView textView, @Nullable Time time) {
+
+        if (time != null) {
+            textView.setText(timeToString(time));
+        } else {
+            textView.setText("N/A");
+        }
 
     }
 
