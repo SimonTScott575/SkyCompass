@@ -19,55 +19,56 @@ import java.util.Map;
 public class LocationRequester {
 
     private ActivityResultLauncher<String[]> register;
-    private ResultCallback resultCallback;
+    private RequestCallback requestCallback;
+    public enum RequestState {
+        UNREQUESTED,
+        REQUESTED,
+        GRANTED,
+        DENIED
+    }
+    private RequestState state;
+    private OnRequestResult onRequestResult;
+
     private LocationManager locationManager;
     private LocationListener locationListener;
-    private OnPermissionResult onPermissionResult;
     private OnLocationChanged onLocationChanged;
 
-    private PermissionState state = PermissionState.UNREQUESTED;
     private boolean resumed;
 
     public LocationRequester(OnLocationChanged onLocationChanged) {
+        state = RequestState.UNREQUESTED;
         this.onLocationChanged = onLocationChanged;
     }
 
-    public void resume() {
+    public final void resume() {
         resumed = true;
         if (locationManager != null) {
             requestLocationUpdatesFromLocationManager();
         }
     }
 
-    public void pause() {
+    public final void pause() {
         resumed = false;
         if (locationManager != null) {
             cancelLocationUpdatesFromLocationManager();
         }
     }
 
-    public void setOnPermissionResult(OnPermissionResult onPermissionResult) {
-        this.onPermissionResult = onPermissionResult;
-    }
-
-    public void setOnLocationChanged(OnLocationChanged onLocationChanged) {
-        this.onLocationChanged = onLocationChanged;
-    }
-
-    public void register(Fragment fragment) {
+    public final void register(Fragment fragment) {
 
         if (register != null) {
             throw new RuntimeException("Must unregister previous register.");
         }
 
-        resultCallback = new ResultCallback(fragment.requireActivity());
+        requestCallback = new RequestCallback(fragment.requireActivity());
         register = fragment.registerForActivityResult(
-            new ActivityResultContracts.RequestMultiplePermissions(), resultCallback
+            new ActivityResultContracts.RequestMultiplePermissions(),
+            requestCallback
         );
 
     }
 
-    public void unregister() {
+    public final void unregister() {
 
         if (register == null) {
             throw new RuntimeException("Must register before unregister.");
@@ -75,17 +76,17 @@ public class LocationRequester {
 
         register.unregister();
         register = null;
-        resultCallback = null;
+        requestCallback = null;
 
     }
 
-    public void request(Fragment fragment) {
+    public final void request(Fragment fragment) {
 
         if (register == null) {
             throw new RuntimeException("Must register before request.");
         }
 
-        state = PermissionState.REQUESTED;
+        state = RequestState.REQUESTED;
 
         if (!permissionsGranted(fragment.requireContext()) || locationManager == null) {
             register.launch(new String[]{
@@ -98,19 +99,6 @@ public class LocationRequester {
 
     }
 
-    public EnabledState enabled() {
-        if (locationManager != null) {
-            return locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
-                ? EnabledState.ENABLED : EnabledState.DISABLED;
-        } else {
-            return EnabledState.UNKNOWN;
-        }
-    }
-
-    public PermissionState permissionState() {
-        return state;
-    }
-
     private boolean permissionsGranted(Context context) {
 
         boolean coarseLocationPermissionGranted =
@@ -118,7 +106,7 @@ public class LocationRequester {
         boolean fineLocationPermissionGranted =
             ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
 
-        return coarseLocationPermissionGranted && fineLocationPermissionGranted;
+        return coarseLocationPermissionGranted || fineLocationPermissionGranted;
 
     }
 
@@ -144,48 +132,55 @@ public class LocationRequester {
 
     }
 
-    private class ResultCallback implements ActivityResultCallback<Map<String,Boolean>> {
+    private class RequestCallback implements ActivityResultCallback<Map<String,Boolean>> {
 
         private final FragmentActivity activity;
 
-        public ResultCallback(FragmentActivity activity) {
+        public RequestCallback(FragmentActivity activity) {
             this.activity = activity;
         }
 
         @Override
         public void onActivityResult(Map<String,Boolean> result) {
 
-            if (result.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false) == Boolean.TRUE
-                || result.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false) == Boolean.TRUE) {
+            boolean accessFineLocationGranted = result.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false) == Boolean.TRUE;
+            boolean accessCoarseLocationGranted = result.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false) == Boolean.TRUE;
+
+            if (accessFineLocationGranted || accessCoarseLocationGranted) {
 
                 try {
-
-                    state = PermissionState.GRANTED;
-
                     locationManager = (LocationManager) activity.getSystemService(Context.LOCATION_SERVICE);
-
-                    if (onPermissionResult != null) {
-                        onPermissionResult.onResult(true);
+                    state = RequestState.GRANTED;
+                    if (onRequestResult != null) {
+                        onRequestResult.onResult(true);
                     }
-
                     requestLocationUpdatesFromLocationManager();
-
                 } catch (SecurityException e) {
-                    Debug.error(new Debug.Exception("LocationRequester SecurityException."));
+                    Debug.error("LocationRequester SecurityException.");
                 }
 
             } else {
-                state = PermissionState.DENIED;
-
-                if (onPermissionResult != null) {
-                    onPermissionResult.onResult(false);
+                state = RequestState.DENIED;
+                if (onRequestResult != null) {
+                    onRequestResult.onResult(false);
                 }
-
                 Debug.log("Failed to get permission ACCESS_FINE_LOCATION.");
             }
 
         }
 
+    }
+
+    public final RequestState getPermissionState() {
+        return state;
+    }
+
+    public final void setOnPermissionResult(OnRequestResult onRequestResult) {
+        this.onRequestResult = onRequestResult;
+    }
+
+    public interface OnRequestResult {
+        void onResult(boolean granted);
     }
 
     private class LocationListener implements android.location.LocationListener {
@@ -211,11 +206,12 @@ public class LocationRequester {
 
     }
 
-    public enum PermissionState {
-        UNREQUESTED,
-        REQUESTED,
-        GRANTED,
-        DENIED
+    public final void setOnLocationChanged(OnLocationChanged onLocationChanged) {
+        this.onLocationChanged = onLocationChanged;
+    }
+
+    public interface OnLocationChanged {
+        void onLocationChanged(double latitude, double longitude);
     }
 
     public enum EnabledState {
@@ -224,12 +220,13 @@ public class LocationRequester {
         UNKNOWN
     }
 
-    public interface OnPermissionResult {
-        void onResult(boolean granted);
-    }
-
-    public interface OnLocationChanged {
-        void onLocationChanged(double latitude, double longitude);
+    public final EnabledState getEnabledState() {
+        if (locationManager != null) {
+            return locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+                    ? EnabledState.ENABLED : EnabledState.DISABLED;
+        } else {
+            return EnabledState.UNKNOWN;
+        }
     }
 
 }

@@ -35,7 +35,7 @@ public class MapFragment extends Fragment {
 
     public MapFragment() {
         locationRequester = new LocationRequester(new OnReceivedMyLocationRequester());
-        locationRequester.setOnPermissionResult(new OnPermissionResult());
+        locationRequester.setOnPermissionResult(new OnRequestResult());
     }
 
     @Override
@@ -192,7 +192,7 @@ public class MapFragment extends Fragment {
         @Override
         public void onClick(View v) {
 
-            LocationRequester.PermissionState state = locationRequester.permissionState();
+            LocationRequester.RequestState state = locationRequester.getPermissionState();
 
             switch (state) {
                 case REQUESTED:
@@ -205,7 +205,7 @@ public class MapFragment extends Fragment {
                     break;
             }
 
-            if (locationRequester.enabled() == LocationRequester.EnabledState.DISABLED) {
+            if (locationRequester.getEnabledState() == LocationRequester.EnabledState.DISABLED) {
                 notifyUserLocationDisabled();
             }
 
@@ -249,7 +249,7 @@ public class MapFragment extends Fragment {
         }
     }
 
-    private class OnPermissionResult implements LocationRequester.OnPermissionResult {
+    private class OnRequestResult implements LocationRequester.OnRequestResult {
         @Override
         public void onResult(boolean granted) {
 
@@ -264,7 +264,7 @@ public class MapFragment extends Fragment {
                 notifyUserLocationPermissionDenied();
             }
 
-            if (locationRequester.enabled() == LocationRequester.EnabledState.DISABLED) {
+            if (locationRequester.getEnabledState() == LocationRequester.EnabledState.DISABLED) {
                 notifyUserLocationDisabled();
             }
 
