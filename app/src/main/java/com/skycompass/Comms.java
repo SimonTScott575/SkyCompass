@@ -18,8 +18,8 @@ public class Comms {
 
         public static Bundle putInto(double latitude, double longitude, String location, Bundle bundle) {
 
-            bundle.putDouble("Longitude", longitude);
             bundle.putDouble("Latitude", latitude);
+            bundle.putDouble("Longitude", longitude);
             bundle.putString("Location", location);
 
             return bundle;
@@ -29,8 +29,8 @@ public class Comms {
         public static Location from(@NonNull Bundle bundle) {
 
             Location location = new Location();
-            location.latitude = bundle.getDouble("Longitude");
-            location.longitude = bundle.getDouble("Latitude");
+            location.latitude = bundle.getDouble("Latitude");
+            location.longitude = bundle.getDouble("Longitude");
             location.location = bundle.getString("Location");
 
             return location;
