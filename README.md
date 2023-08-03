@@ -1,14 +1,21 @@
 # Sky Compass
 
-Android app for tracking the sun and moon - past, present and future.
+Sky Compass tracks the sun and moon positions in the sky - past, present and future.  Set any date, time and location.
 
 Features:
 
- - Sun and moon positions in the sky
- - Sunset and sunrise times
- - Phases of the moon
+- Sunrise, sunset, moonrise and moonset times
+- Moon phases
+- Azimuth and altitude of the sun and moon
+- Night mode
+- Auto-rotate to North
+- Find location with GPS
 
-For education and entertainment purposes only.
+For entertainment and educational purposes only.
+
+System requirements:
+
+ - Android API Level 31 (Android 12.0)
 
 ![Screenshot](https://github.com/SimonTScott575/Icarus/blob/master/screenshot.jpg?raw=true)
 
