@@ -152,10 +152,10 @@ public class InfoFragment extends Fragment {
 
     private static String quarterName(int quarter) {
         switch (quarter) {
-            case 0: return "New Moon - First Quarter";
-            case 1: return "First Quarter - Full Moon";
-            case 2: return "Full Moon - Third Quarter";
-            case 3: return "Third Quarter - New Moon";
+            case 0: return "New Moon / First Quarter";
+            case 1: return "First Quarter / Full Moon";
+            case 2: return "Full Moon / Third Quarter";
+            case 3: return "Third Quarter / New Moon";
             default: return "INVALID QUARTER";
         }
     }
