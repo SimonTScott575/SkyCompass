@@ -163,11 +163,11 @@ public class CompassView extends View {
         CelestialObject[] bodies = new CelestialObject[]{CelestialObject.SUN, CelestialObject.MOON};
 
         for (CelestialObject body : bodies) {
-            track.drawTracks(hour, compass, body, canvas);
+            track.drawTracks(body, compass, hour, canvas);
         }
 
         for (CelestialObject body : bodies) {
-            track.drawCurrentPosition(hour, minutes, seconds, compass, body, canvas);
+            track.drawCurrentPosition(body, compass, seconds, hour, minutes, canvas);
         }
 
         canvas.restore();

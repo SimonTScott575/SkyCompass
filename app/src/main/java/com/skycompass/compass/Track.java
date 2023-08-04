@@ -8,6 +8,8 @@ import android.graphics.Paint;
 import android.graphics.RadialGradient;
 import android.graphics.Shader;
 
+import java.time.LocalDateTime;
+
 class Track {
 
     private static final Paint GLOW_PAINT = new Paint(CelestialObject.SUN.getPaint().getColor());
@@ -18,84 +20,46 @@ class Track {
 
     private float radius;
     private float diameter;
-
-    private float width;
+    private float trackWidth;
     private float objectRadius;
 
     public Track(float radius) {
-
         setDimensions(radius);
-
     }
 
     public final void setDimensions(float radius) {
-
         this.radius = radius;
         diameter = 2*radius;
-
-        width = radius * TRACK_WIDTH_FRACTION;
-        objectRadius = TRACK_MARKER_FRACTION * radius;
-
+        trackWidth = radius * TRACK_WIDTH_FRACTION;
+        objectRadius = radius * TRACK_MARKER_FRACTION;
     }
 
-    public void drawTracks(int currentHour, CompassModel compass, CelestialObject body, Canvas canvas) {
+    public void drawTracks(CelestialObject body, CompassModel compass, int currentHour, Canvas canvas) {
 
-        double[] x = new double[25];
-        double[] y = new double[25];
-        double[] altitude = new double[25];
+        Coordinate[] coordinates = AstronomyUtil.coordinateRangeAndHorizon(
+            body,
+            compass.getLatitude(), compass.getLongitude(),
+            LocalDateTime.of(
+                compass.getYear(), compass.getMonth(), compass.getDayOfMonth(),
+                currentHour, 0, 0
+            ).minusHours(12),
+            LocalDateTime.of(
+                compass.getYear(), compass.getMonth(), compass.getDayOfMonth(),
+                currentHour, 0, 0
+            ).plusHours(13),
+            60*60
+        );
 
-        {
-            Coordinate coordinate = compass.getCoordinate(body, currentHour - 12, 0, 0);
-            x[0] = coordinate.getX();
-            y[0] = coordinate.getY();
-            altitude[0] = coordinate.getAltitude();
-            for (int i = 1; i < 25; i++) {
-
-                int hour = currentHour - 12 + i;
-
-                coordinate = compass.getCoordinate(body, hour, 0, 0);
-
-                x[i] = coordinate.getX();
-                y[i] = coordinate.getY();
-                altitude[i] = coordinate.getAltitude();
-
-                if (altitude[i] > 0 && altitude[i-1] < 0) {
-
-                    Coordinate c = getHorizonCoordinate(false, hour - 1, compass, body);
-
-                    x[i-1] = c.getX();
-                    y[i-1] = c.getY();
-
-                } else if (altitude[i] < 0 && altitude[i-1] > 0) {
-
-                    Coordinate c = getHorizonCoordinate(true, hour - 1, compass, body);
-
-                    x[i] = c.getX();
-                    y[i] = c.getY();
-
-                }
-
-            }
-        }
-
-        for (int i = 0; i < 24; i++) {
+        for (int i = 0; i < coordinates.length-1; i++) {
 
             int hour = currentHour - 12 + i;
 
-            double startX = x[i];
-            double startY = y[i];
-            double endX = x[i+1];
-            double endY = y[i+1];
+            double startX = coordinates[i].getX();
+            double startY = coordinates[i].getY();
+            double endX = coordinates[i+1].getX();
+            double endY = coordinates[i+1].getY();
 
-            if (altitude[i] < 0 && altitude[i+1] > 0) {
-                double length = Math.sqrt( Math.pow(startX, 2) + Math.pow(startY, 2) );
-                startX /= length;
-                startY /= length;
-            } else if (altitude[i] > 0 && altitude[i+1] < 0) {
-                double length = Math.sqrt( Math.pow(endX, 2) + Math.pow(endY, 2) );
-                endX /= length;
-                endY /= length;
-            } else if (altitude[i] < 0 && altitude[i+1] < 0) {
+            if (coordinates[i].getAltitude() < 0 || coordinates[i+1].getAltitude() < 0) {
                 continue;
             }
 
@@ -104,15 +68,9 @@ class Track {
             float angle = (float) Math.atan2(endY - startY, endX - startX);
 
             length *= radius;
-
             padding *= radius;
-
-            startX *= radius;
-            startY *= radius;
-
-            startX += radius;
-            startY += radius;
-
+            startX = startX*radius + radius;
+            startY = startY*radius + radius;
             startY = diameter - startY;
 
             canvas.save();
@@ -124,7 +82,7 @@ class Track {
                 (float) startX + padding,
                 (float) startY,
                 (float) startX + length - padding,
-                (float) startY + width, body.getPaint()
+                (float) startY + trackWidth, body.getPaint()
             );
             body.getPaint().setAlpha(prevAlpha);
 
@@ -134,7 +92,7 @@ class Track {
 
     }
 
-    public void drawCurrentPosition(int hour, int minute, double seconds, CompassModel compass, CelestialObject body, Canvas canvas) {
+    public void drawCurrentPosition(CelestialObject body, CompassModel compass, double seconds, int hour, int minute, Canvas canvas) {
 
         Coordinate coordinate = compass.getCoordinate(body, hour, minute, seconds);
 
@@ -167,68 +125,6 @@ class Track {
         }
 
         canvas.drawCircle(x, y, r, body.getPaint());
-
-    }
-
-    private static Coordinate getHorizonCoordinate(boolean stopWhenNegativeAltitude, int startingHour, CompassModel compass, CelestialObject body) {
-
-        HorizonCoordinate firstSweepCoordinate = HorizonCoordinate.get(
-            stopWhenNegativeAltitude,
-            startingHour,
-            0, 60, 10,
-            compass,
-            body
-        );
-        HorizonCoordinate secondSweepCoordinate = HorizonCoordinate.get(
-            stopWhenNegativeAltitude,
-            startingHour,
-            firstSweepCoordinate.minute, firstSweepCoordinate.minute + 10, 1,
-            compass,
-            body
-        );
-
-        return secondSweepCoordinate.coordinate;
-
-    }
-
-    private static class HorizonCoordinate {
-
-        public final Coordinate coordinate;
-        public final int minute;
-
-        public HorizonCoordinate(Coordinate coordinate, int minute) {
-            this.coordinate = coordinate;
-            this.minute = minute;
-        }
-
-        public static HorizonCoordinate get(
-            boolean stopWhenNegativeAltitude,
-            int startingHour,
-            int startingMinute, int endingMinute, int step,
-            CompassModel compass,
-            CelestialObject body
-        ) {
-
-            Coordinate coordinate = null;
-            int prevMinute = startingMinute;
-
-            for (int minute = startingMinute; minute <= endingMinute; minute += step) {
-
-                coordinate = compass.getCoordinate(body, startingHour, minute, 0);
-
-                double altitude = coordinate.getAltitude();
-
-                if (stopWhenNegativeAltitude ? altitude < 0 : altitude > 0) {
-                    break;
-                }
-
-                prevMinute = minute;
-
-            }
-
-            return new HorizonCoordinate(coordinate, prevMinute);
-
-        }
 
     }
 
