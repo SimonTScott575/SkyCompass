@@ -121,11 +121,11 @@ public class CompassFragment extends Fragment {
     }
 
     public void setDate(LocalDate date) {
-        binding.compassView.setDate(date.getYear(), date.getMonthValue()-1, date.getDayOfMonth()-1);
+        binding.compassView.setDate(date);
     }
 
     public void setTime(LocalTime time) {
-        binding.compassView.setTime(time.getHour(), time.getMinute(), time.getSecond());
+        binding.compassView.setTime(time);
     }
 
     public class OnOrientationChanged implements OrientationSensor.OnOrientationChanged {

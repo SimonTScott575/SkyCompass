@@ -29,22 +29,24 @@ class Track {
 
     public final void setDimensions(float radius) {
         this.radius = radius;
-        diameter = 2*radius;
+        diameter = 2 * radius;
         trackWidth = radius * TRACK_WIDTH_FRACTION;
         objectRadius = radius * TRACK_MARKER_FRACTION;
     }
 
-    public void drawTracks(CelestialObject body, CompassModel compass, int currentHour, Canvas canvas) {
+    public void drawTracks(CelestialObject body, double latitude, double longitude, LocalDateTime dateTime, Canvas canvas) {
+
+        int currentHour = dateTime.getHour();
 
         Coordinate[] coordinates = AstronomyUtil.coordinateRangeAndHorizon(
             body,
-            compass.getLatitude(), compass.getLongitude(),
+            latitude, longitude,
             LocalDateTime.of(
-                compass.getYear(), compass.getMonth(), compass.getDayOfMonth(),
+                dateTime.getYear(), dateTime.getMonth().getValue(), dateTime.getDayOfMonth(),
                 currentHour, 0, 0
             ).minusHours(12),
             LocalDateTime.of(
-                compass.getYear(), compass.getMonth(), compass.getDayOfMonth(),
+                dateTime.getYear(), dateTime.getMonth().getValue(), dateTime.getDayOfMonth(),
                 currentHour, 0, 0
             ).plusHours(13),
             60*60
@@ -92,9 +94,9 @@ class Track {
 
     }
 
-    public void drawCurrentPosition(CelestialObject body, CompassModel compass, double seconds, int hour, int minute, Canvas canvas) {
+    public void drawCurrentPosition(CelestialObject body, double latitude, double longitude, LocalDateTime dateTime, Canvas canvas) {
 
-        Coordinate coordinate = compass.getCoordinate(body, hour, minute, seconds);
+        Coordinate coordinate = AstronomyUtil.coordinate(body, latitude, longitude, dateTime);
 
         if (coordinate.getAltitude() < 0) {
             return;

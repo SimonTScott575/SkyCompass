@@ -10,6 +10,10 @@ import android.view.View;
 
 import androidx.annotation.Nullable;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+
 public class CompassView extends View {
 
     private float offsetHorizontal;
@@ -22,10 +26,8 @@ public class CompassView extends View {
     private final Foreground foreground = new Foreground(innerRadius, innerRadius + ringThickness);
     private final Track track = new Track(innerRadius);
 
-    private final CompassModel compass = new CompassModel(0,0);
-    private int hour;
-    private int minutes;
-    private float seconds;
+    private double latitude, longitude;
+    private LocalDateTime dateTime = LocalDateTime.of(2000,1,1,0,0,0);
 
     public CompassView(Context context) {
         super(context);
@@ -39,33 +41,34 @@ public class CompassView extends View {
         super(context, attrs, defStyleAttr);
     }
 
-    public double getLongitude() {
-        return compass.getLongitude();
+    public double getLatitude() {
+        return latitude;
     }
 
-    public double getLatitude() {
-        return compass.getLatitude();
+    public double getLongitude() {
+        return longitude;
     }
 
     public void setLocation(double latitude, double longitude) {
-        compass.setLocation(latitude, longitude);
+        this.latitude = latitude;
+        this.longitude = longitude;
         invalidate();
     }
 
     public int getYear() {
-        return compass.getYear();
+        return dateTime.getYear();
     }
 
     public int getMonth() {
-        return compass.getMonth();
+        return dateTime.getMonth().getValue();
     }
 
     public int getDayOfMonth() {
-        return compass.getDayOfMonth();
+        return dateTime.getDayOfMonth();
     }
 
-    public void setDate(int year, int month, int dayOfMonth) {
-        compass.setDate(year, month, dayOfMonth);
+    public void setDate(LocalDate date) {
+        dateTime = LocalDateTime.of(date, dateTime.toLocalTime());
         invalidate();
     }
 
@@ -84,10 +87,8 @@ public class CompassView extends View {
         invalidate();
     }
 
-    public void setTime(int hour, int minutes, float seconds) {
-        this.hour = hour;
-        this.minutes = minutes;
-        this.seconds = seconds;
+    public void setTime(LocalTime time) {
+        dateTime = LocalDateTime.of(dateTime.toLocalDate(), time);
         invalidate();
     }
 
@@ -163,11 +164,11 @@ public class CompassView extends View {
         CelestialObject[] bodies = new CelestialObject[]{CelestialObject.SUN, CelestialObject.MOON};
 
         for (CelestialObject body : bodies) {
-            track.drawTracks(body, compass, hour, canvas);
+            track.drawTracks(body, latitude, longitude, dateTime, canvas);
         }
 
         for (CelestialObject body : bodies) {
-            track.drawCurrentPosition(body, compass, seconds, hour, minutes, canvas);
+            track.drawCurrentPosition(body, latitude, longitude, dateTime, canvas);
         }
 
         canvas.restore();
