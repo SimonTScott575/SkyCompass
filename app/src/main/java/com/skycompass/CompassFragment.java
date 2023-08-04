@@ -19,7 +19,7 @@ import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.skycompass.compass.CompassSensor;
+import com.skycompass.util.OrientationSensor;
 import com.skycompass.databinding.FragmentCompassBinding;
 import com.skycompass.util.Debug;
 import com.skycompass.util.Fn;
@@ -35,13 +35,13 @@ public class CompassFragment extends Fragment {
     private CompassFragmentViewModel viewModel;
 
     private final MenuProvider menuProvider;
-    private final CompassSensor sensor;
+    private final OrientationSensor sensor;
     private Handler handler;
     private UpdateCompassRotation updateCompassRotation;
 
     public CompassFragment() {
 
-        sensor = new CompassSensor(new OnOrientationChanged());
+        sensor = new OrientationSensor(new OnOrientationChanged());
 
         menuProvider = new MenuListener();
         updateCompassRotation = new UpdateCompassRotation();
@@ -128,7 +128,7 @@ public class CompassFragment extends Fragment {
         binding.compassView.setTime(time.getHour(), time.getMinute(), time.getSecond());
     }
 
-    public class OnOrientationChanged implements CompassSensor.OnOrientationChanged {
+    public class OnOrientationChanged implements OrientationSensor.OnOrientationChanged {
         @Override
         public void onOrientationChanged(float[] orientation) {
 

@@ -1,4 +1,4 @@
-package com.skycompass.compass;
+package com.skycompass.util;
 
 import android.content.Context;
 import android.hardware.Sensor;
@@ -6,18 +6,16 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventCallback;
 import android.hardware.SensorManager;
 
-import com.skycompass.util.Debug;
-
-public class CompassSensor {
+public class OrientationSensor {
 
     private SensorManager sensorManager;
     private final SensorEventCallback sensorListener = new SensorListener();
     private OnOrientationChanged onOrientationChanged;
 
-    public CompassSensor() {
+    public OrientationSensor() {
     }
 
-    public CompassSensor(OnOrientationChanged onOrientationChanged) {
+    public OrientationSensor(OnOrientationChanged onOrientationChanged) {
         setOnOrientationChanged(onOrientationChanged);
     }
 
