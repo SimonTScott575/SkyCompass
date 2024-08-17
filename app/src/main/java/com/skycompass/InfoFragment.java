@@ -54,14 +54,18 @@ public class InfoFragment extends Fragment {
         Bundle args = getArguments();
         if (args != null) {
 
+            // Location
             setLocation(args.getDouble("Longitude"), args.getDouble("Latitude"));
 
-            Comms.Date date = Comms.Date.from(args);
-            setDate(date.getDate());
+            // Date
+            LocalDate date = LocalDate.of(args.getInt("Y"), args.getInt("M")+1, args.getInt("D")+1);
 
+            setDate(date);
+
+            // Time
             Comms.Time time = Comms.Time.from(args);
             setTime(
-                ZonedDateTime.of(date.getDate(), time.getTime(), time.getZoneOffset())
+                ZonedDateTime.of(date, time.getTime(), time.getZoneOffset())
                     .withZoneSameInstant(ZoneOffset.ofHours(0))
                     .toLocalTime(),
                 time.getZoneOffset()

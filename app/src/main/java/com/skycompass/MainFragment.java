@@ -77,7 +77,7 @@ public class MainFragment extends Fragment {
         super.onResume();
 
         getChildFragmentManager()
-            .setFragmentResultListener("A", this, onChangeDateListener);
+            .setFragmentResultListener("CalendarFragment/DateChanged", this, onChangeDateListener);
         getChildFragmentManager()
             .setFragmentResultListener("MapFragment/LocationChanged", this, onChangeLocationListener);
         getChildFragmentManager()
@@ -152,9 +152,11 @@ public class MainFragment extends Fragment {
         public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
 
             dateBundle = result;
-            Comms.Date date2 = Comms.Date.from(result);
 
-            setDate(date2.getDate(), date2.isCurrentDate());
+            setDate(
+                LocalDate.of(result.getInt("Y"), result.getInt("M") + 1, result.getInt("D") + 1),
+                result.getBoolean("CURRENT DATE")
+            );
 
         }
     }

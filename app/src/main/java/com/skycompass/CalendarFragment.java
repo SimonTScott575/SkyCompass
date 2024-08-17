@@ -33,8 +33,10 @@ public class CalendarFragment extends Fragment {
     private final OnClickUseSystemDate onClickUseSystemDate;
 
     public CalendarFragment() {
+
         onDateChangedListener = new OnDateChangedListener();
         onClickUseSystemDate = new OnClickUseSystemDate();
+
     }
 
     @Override
@@ -43,15 +45,21 @@ public class CalendarFragment extends Fragment {
         ViewGroup container,
         Bundle savedInstanceState
     ) {
+
         viewModel = new ViewModelProvider(this).get(CalendarViewModel.class);
+
         binding = FragmentCalendarBinding.inflate(inflater);
+
         return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+
         binding.useSystemDate.setOnClickListener(onClickUseSystemDate);
+
         showHideUseSystemDateAnimation = new ShowHideAnimation(binding.useSystemDate);
+
     }
 
     @Override
@@ -60,11 +68,10 @@ public class CalendarFragment extends Fragment {
 
         binding.datePicker.setOnDateChangedListener(onDateChangedListener);
 
-        if (viewModel.isSystemDate()) {
+        if (viewModel.isSystemDate())
             setDateFromSystemDate();
-        } else {
+        else
             setDate(viewModel.getDate());
-        }
 
         try {
             startRetrieveSystemDate();
@@ -77,8 +84,11 @@ public class CalendarFragment extends Fragment {
 
     @Override
     public void onPause() {
+
         binding.datePicker.setOnDateChangedListener(null);
+
         endRetrieveSystemDate();
+
         super.onPause();
     }
 
@@ -147,12 +157,15 @@ public class CalendarFragment extends Fragment {
 
     public void onDateChanged(@NonNull LocalDate date, boolean currentDate) {
 
-        Bundle bundle = Comms.Date.putInto(
-            date.getYear(), date.getMonthValue()-1, date.getDayOfMonth()-1, currentDate,
-            new Bundle()
-        );
+        Bundle bundle = new Bundle();
+
+        bundle.putInt("Y", date.getYear());
+        bundle.putInt("M", date.getMonthValue() - 1);
+        bundle.putInt("D", date.getDayOfMonth() - 1);
+        bundle.putBoolean("CURRENT DATE", currentDate);
+
         try {
-            getParentFragmentManagerOrThrowException().setFragmentResult("A", bundle);
+            getParentFragmentManagerOrThrowException().setFragmentResult("CalendarFragment/DateChanged", bundle);
         } catch (NoParentFragmentManagerAttachedException e) {
             Debug.log(e);
         }
@@ -163,11 +176,11 @@ public class CalendarFragment extends Fragment {
     throws HandlerNoPostException {
 
         retrieveSystemDate = new RetrieveSystemDate();
+
         handler = new Handler(requireActivity().getMainLooper());
-        boolean success = handler.post(retrieveSystemDate);
-        if (!success) {
+
+        if (!handler.post(retrieveSystemDate))
             throw new HandlerNoPostException();
-        }
 
     }
 
@@ -205,12 +218,8 @@ public class CalendarFragment extends Fragment {
 
             }
 
-            if (!end) {
-                boolean success = handler.postDelayed(this, 10);
-                if (!success) {
+                if (!end && !handler.postDelayed(this, 10))
                     Debug.error(new HandlerNoPostException());
-                }
-            }
 
         }
 
