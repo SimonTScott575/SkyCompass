@@ -81,7 +81,7 @@ public class MainFragment extends Fragment {
         getChildFragmentManager()
             .setFragmentResultListener("MapFragment/LocationChanged", this, onChangeLocationListener);
         getChildFragmentManager()
-            .setFragmentResultListener("C", this, onChangeTimeListener);
+            .setFragmentResultListener("ClockFragment/TimeChanged", this, onChangeTimeListener);
 
     }
 
@@ -198,9 +198,12 @@ public class MainFragment extends Fragment {
         public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
 
             timeBundle = result;
-            Comms.Time time = Comms.Time.from(result);
 
-            setTime(time.getTime(), time.getZoneOffset().getTotalSeconds()*1000, time.getLocation());
+            LocalTime time = LocalTime.of(result.getInt("HOUR"), result.getInt("MINUTE"), result.getInt("SECOND"));
+            String location = result.getString("LOCATION");
+            ZoneOffset zoneOffset = ZoneOffset.ofTotalSeconds(result.getInt("OFFSET")/1000);
+
+            setTime(time, zoneOffset.getTotalSeconds()*1000, location);
 
         }
     }

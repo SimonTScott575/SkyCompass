@@ -63,12 +63,14 @@ public class InfoFragment extends Fragment {
             setDate(date);
 
             // Time
-            Comms.Time time = Comms.Time.from(args);
+            LocalTime time = LocalTime.of(args.getInt("HOUR"), args.getInt("MINUTE"), args.getInt("SECOND"));
+            ZoneOffset zoneOffset = ZoneOffset.ofTotalSeconds(args.getInt("OFFSET")/1000);
+
             setTime(
-                ZonedDateTime.of(date, time.getTime(), time.getZoneOffset())
+                ZonedDateTime.of(date, time, zoneOffset)
                     .withZoneSameInstant(ZoneOffset.ofHours(0))
                     .toLocalTime(),
-                time.getZoneOffset()
+                    zoneOffset
             );
 
         }

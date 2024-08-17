@@ -56,28 +56,40 @@ public class ClockFragment extends Fragment {
         @Nullable ViewGroup container,
         @Nullable Bundle savedInstanceState
     ) {
+
         viewModel = new ViewModelProvider(this).get(ClockViewModel.class);
+
         binding = FragmentClockBinding.inflate(inflater, container, false);
+
         return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+
         binding.timePicker.setIs24HourView(true);
+
         showHideUseSystemDateAnimation = new ShowHideAnimation(binding.useSystemTime);
+
     }
 
     @Override
     public void onStart() {
         super.onStart();
+
         db = new Database(requireContext());
+
         db.open();
+
         binding.timeZonePicker.setDatabase(db);
+
     }
 
     @Override
     public void onStop() {
+
         db.close();
+
         super.onStop();
     }
 
@@ -145,7 +157,9 @@ public class ClockFragment extends Fragment {
             );
 
         } else {
+
             binding.timeZonePicker.setDate(date);
+
         }
 
     }
@@ -193,11 +207,12 @@ public class ClockFragment extends Fragment {
 
         binding.timeZonePicker.setOnTimeZoneChangedListener(null);
         binding.timeZonePicker.setTime(time);
-        if (id != null) {
+
+        if (id != null)
             binding.timeZonePicker.setTimeZone(id);
-        } else {
+        else
             binding.timeZonePicker.setTimeZone(offset);
-        }
+
         binding.timeZonePicker.setOnTimeZoneChangedListener(onTimeZoneChangedListener);
 
         onTimeAndTimeZoneChanged(time, offset, id);
@@ -224,6 +239,7 @@ public class ClockFragment extends Fragment {
     public void setTimeAndTimeZoneFromSystemValues() {
 
         LocalTime systemTime = LocalTime.now();
+
         ZoneId timeZone = ZoneId.systemDefault();
 
         setTimeAndTimeZoneAsSystemValues(systemTime, timeZone);
@@ -258,9 +274,16 @@ public class ClockFragment extends Fragment {
 
     public void onTimeAndTimeZoneChanged(LocalTime time, int offset, String id) {
 
-        Bundle bundle = Comms.Time.putInto(time, offset, id, new Bundle());
+        Bundle bundle = new Bundle();
+
+        bundle.putInt("HOUR", time.getHour());
+        bundle.putInt("MINUTE", time.getMinute());
+        bundle.putInt("SECOND", time.getSecond());
+        bundle.putInt("OFFSET", offset);
+        bundle.putString("LOCATION", id);
+
         try {
-            getParentFragmentManagerOrThrowException().setFragmentResult("C", bundle);
+            getParentFragmentManagerOrThrowException().setFragmentResult("ClockFragment/TimeChanged", bundle);
         } catch (NoParentFragmentManagerAttachedException e) {
             Debug.log(e);
         }
@@ -271,11 +294,11 @@ public class ClockFragment extends Fragment {
     throws HandlerNoPostException {
 
         retrieveSystemTime = new RetrieveSystemTime();
+
         handler = new Handler(requireActivity().getMainLooper());
-        boolean success = handler.post(retrieveSystemTime);
-        if (!success) {
+
+        if (!handler.post(retrieveSystemTime))
             throw new HandlerNoPostException();
-        }
 
     }
 
@@ -314,12 +337,8 @@ public class ClockFragment extends Fragment {
 
             }
 
-            if (!end) {
-                boolean success = handler.postDelayed(this, 10);
-                if (!success) {
-                    Debug.error(new HandlerNoPostException());
-                }
-            }
+            if (!end && !handler.postDelayed(this, 10))
+                Debug.error(new HandlerNoPostException());
 
         }
 
@@ -331,13 +350,11 @@ public class ClockFragment extends Fragment {
 
     private FragmentManager getParentFragmentManagerOrThrowException()
     throws NoParentFragmentManagerAttachedException {
-
         try {
             return getParentFragmentManager();
         } catch (IllegalStateException e) {
             throw new NoParentFragmentManagerAttachedException();
         }
-
     }
 
     private static class HandlerNoPostException extends Debug.Exception {
