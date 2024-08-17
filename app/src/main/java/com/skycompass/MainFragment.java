@@ -79,7 +79,7 @@ public class MainFragment extends Fragment {
         getChildFragmentManager()
             .setFragmentResultListener("A", this, onChangeDateListener);
         getChildFragmentManager()
-            .setFragmentResultListener("B", this, onChangeLocationListener);
+            .setFragmentResultListener("MapFragment/LocationChanged", this, onChangeLocationListener);
         getChildFragmentManager()
             .setFragmentResultListener("C", this, onChangeTimeListener);
 
@@ -111,9 +111,11 @@ public class MainFragment extends Fragment {
     private class OnChangeLocationListener implements FragmentResultListener {
         @Override
         public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
+
             locationBundle = result;
-            Comms.Location location = Comms.Location.from(result);
-            setLocation(location.getLatitude(), location.getLongitude(), location.getLocation());
+
+            setLocation(result.getDouble("Latitude"), result.getDouble("Longitude"), result.getString("Location"));
+
         }
     }
 

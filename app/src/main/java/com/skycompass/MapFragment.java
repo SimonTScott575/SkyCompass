@@ -34,14 +34,19 @@ public class MapFragment extends Fragment {
     private final LocationRequester locationRequester;
 
     public MapFragment() {
+
         locationRequester = new LocationRequester(new OnReceivedMyLocationRequester());
+
         locationRequester.setOnPermissionResult(new OnRequestResult());
+
     }
 
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
+
         locationRequester.register(this);
+
     }
 
     @Override
@@ -50,8 +55,11 @@ public class MapFragment extends Fragment {
         @Nullable ViewGroup container,
         @Nullable Bundle savedInstanceState
     ) {
+
         viewModel = new ViewModelProvider(this).get(MapViewModel.class);
+
         binding = FragmentMapBinding.inflate(inflater);
+
         return binding.getRoot();
     }
 
@@ -60,21 +68,20 @@ public class MapFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         Context context = requireActivity();
+
         Configuration.getInstance().load(context, PreferenceManager.getDefaultSharedPreferences(context));
 
         binding.mapView.setUp();
         binding.mapView.setOnMarkerDragListener(new OnMarkerDragListener());
-
         binding.myLocation.setOnClickListener(new OnClickSetToMyLocation());
 
-        if (viewModel.autoSetAsMyLocation() && viewModel.getMyLocation() != null) {
+        if (viewModel.autoSetAsMyLocation() && viewModel.getMyLocation() != null)
             setLocationFromMyLocation();
-        } else {
+        else
             setLocation(
                 viewModel.getMarkerLatitude(), viewModel.getMarkerLongitude(),
                 viewModel.getMarkerLocationDescription()
             );
-        }
 
         binding.copyright.setMovementMethod(LinkMovementMethod.getInstance());
         binding.copyright.setClickable(true);
@@ -88,38 +95,53 @@ public class MapFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+
         binding.mapView.onResume();
+
         locationRequester.resume();
+
     }
 
     @Override
     public void onPause() {
+
         locationRequester.pause();
+
         binding.mapView.onPause();
+
         super.onPause();
     }
 
     @Override
     public void onDetach() {
+
         locationRequester.unregister();
+
         super.onDetach();
     }
 
     public void setMyLocation(double latitude, double longitude) {
+
         viewModel.setMyLocation(new GeoPoint(latitude, longitude));
+
         binding.myLocation.setImageDrawable(
             ResourcesCompat.getDrawable(
                 getResources(), R.drawable.set_as_my_location, requireActivity().getTheme()
             )
         );
+
     }
 
     public void setLocation(double latitude, double longitude, String location) {
+
         binding.mapView.setMarkerLocation(latitude, longitude);
+
         setLocationAsMapMarker(latitude, longitude, location);
+
     }
 
     public class OnMarkerDragListener implements Marker.OnMarkerDragListener {
+
         @Override
         public void onMarkerDrag(Marker marker) {
             setLocationAsMapMarker(
@@ -128,12 +150,13 @@ public class MapFragment extends Fragment {
                 null
             );
         }
+
         @Override
-        public void onMarkerDragEnd(Marker marker) {
-        }
+        public void onMarkerDragEnd(Marker marker) { }
+
         @Override
-        public void onMarkerDragStart(Marker marker) {
-        }
+        public void onMarkerDragStart(Marker marker) { }
+
     }
 
     private void setLocationAsMapMarker(double latitude, double longitude, String location) {
@@ -142,6 +165,7 @@ public class MapFragment extends Fragment {
         viewModel.setMarkerLocation(latitude, longitude, location);
 
         binding.markerLocation.setText(Format.LatitudeLongitude(latitude, longitude));
+
         if (viewModel.getMyLocation() != null) {
             binding.myLocation.setImageDrawable(
                 ResourcesCompat.getDrawable(
@@ -155,10 +179,14 @@ public class MapFragment extends Fragment {
     }
 
     public void setLocationFromMyLocation() {
+
         viewModel.setAutoSetAsMyLocation(true);
+
         if (viewModel.getMyLocation() == null)
             return;
+
         setLocationAsMyLocation(viewModel.getMyLocation().getLatitude(), viewModel.getMyLocation().getLongitude());
+
     }
 
     private void setLocationAsMyLocation(double latitude, double longitude) {
@@ -180,12 +208,19 @@ public class MapFragment extends Fragment {
     }
 
     public void onLocationChanged(double longitude, double latitude, String location) {
-        Bundle bundle = Comms.Location.putInto(latitude, longitude, location, new Bundle());
+
+        Bundle bundle = new Bundle();
+
+        bundle.putDouble("Latitude", latitude);
+        bundle.putDouble("Longitude", longitude);
+        bundle.putString("Location", location);
+
         try {
-            getParentFragmentManagerOrThrowException().setFragmentResult("B", bundle);
+            getParentFragmentManagerOrThrowException().setFragmentResult("MapFragment/LocationChanged", bundle);
         } catch (NoParentFragmentManagerAttachedException e) {
             Debug.log(e);
         }
+
     }
 
     private class OnClickSetToMyLocation implements View.OnClickListener {
@@ -205,9 +240,8 @@ public class MapFragment extends Fragment {
                     break;
             }
 
-            if (locationRequester.getEnabledState() == LocationRequester.EnabledState.DISABLED) {
+            if (locationRequester.getEnabledState() == LocationRequester.EnabledState.DISABLED)
                 notifyUserLocationDisabled();
-            }
 
         }
     }
@@ -236,6 +270,7 @@ public class MapFragment extends Fragment {
 
             boolean differentLatitude = true;
             boolean differentLongitude = true;
+
             if (viewModel.getMyLocation() != null) {
                 differentLatitude = viewModel.getMyLocation().getLatitude() != latitude;
                 differentLongitude = viewModel.getMyLocation().getLongitude() != longitude;
@@ -254,19 +289,23 @@ public class MapFragment extends Fragment {
         public void onResult(boolean granted) {
 
             if (granted) {
+
                 setLocationFromMyLocation();
+
             } else {
+
                 binding.myLocation.setImageDrawable(
                     ResourcesCompat.getDrawable(
                         getResources(), R.drawable.no_location, requireActivity().getTheme()
                     )
                 );
+
                 notifyUserLocationPermissionDenied();
+
             }
 
-            if (locationRequester.getEnabledState() == LocationRequester.EnabledState.DISABLED) {
+            if (locationRequester.getEnabledState() == LocationRequester.EnabledState.DISABLED)
                 notifyUserLocationDisabled();
-            }
 
         }
     }
