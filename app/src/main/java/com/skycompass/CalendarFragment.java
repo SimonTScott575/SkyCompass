@@ -24,6 +24,7 @@ public class CalendarFragment extends Fragment {
 
     private CalendarViewModel viewModel;
     private FragmentCalendarBinding binding;
+
     private Handler handler;
     private RetrieveSystemDate retrieveSystemDate;
 
@@ -68,16 +69,23 @@ public class CalendarFragment extends Fragment {
 
         binding.datePicker.setOnDateChangedListener(onDateChangedListener);
 
-        if (viewModel.isSystemDate())
-            setDateFromSystemDate();
-        else
-            setDate(viewModel.getDate());
+        if (viewModel.useSystemDate()) {
+
+            setDateAsSystemDate(LocalDate.now());
+
+        } else {
+
+            LocalDate date = viewModel.getDate();
+
+            binding.datePicker.updateDate(date.getYear(), date.getMonthValue() - 1, date.getDayOfMonth());
+
+        }
 
         try {
             startRetrieveSystemDate();
         } catch (HandlerNoPostException e) {
             Debug.error(e);
-            setDateFromSystemDate();
+            setDateAsSystemDate(LocalDate.now());
         }
 
     }
@@ -93,69 +101,51 @@ public class CalendarFragment extends Fragment {
     }
 
     private class OnDateChangedListener implements DatePicker.OnDateChangedListener {
+
+        public boolean flagIsSystemDate = false;
+
         @Override
         public void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-            setDateAsDatePickerDate(LocalDate.of(year, monthOfYear+1, dayOfMonth));
+
+            LocalDate date = LocalDate.of(year, monthOfYear + 1, dayOfMonth);
+
+            if (!flagIsSystemDate) {
+
+                viewModel.setDate(date);
+                viewModel.setUseSystemDate(false);
+
+                showUseSystemDate();
+
+                notifyDateChanged(date, false);
+
+            }
+
+            flagIsSystemDate = false;
+
         }
     }
 
     private class OnClickUseSystemDate implements View.OnClickListener {
         @Override
         public void onClick(View v) {
-            setDateFromSystemDate();
+            setDateAsSystemDate(LocalDate.now());
         }
     }
 
-    private void setDate(@NonNull LocalDate date) {
+    private void setDateAsSystemDate(LocalDate date) {
 
         viewModel.setDate(date);
-        viewModel.setSystemDate(false);
-
-        binding.datePicker.setOnDateChangedListener(null);
-        binding.datePicker.updateDate(date.getYear(), date.getMonthValue()-1, date.getDayOfMonth());
-        binding.datePicker.setOnDateChangedListener(onDateChangedListener);
-
-        showUseSystemDate();
-
-        onDateChanged(date, false);
-
-    }
-
-    public void setDateFromSystemDate() {
-
-        LocalDate date = LocalDate.now();
-
-        setDateAsSystemDate(date);
-
-    }
-
-    public void setDateAsSystemDate(@NonNull LocalDate date) {
-
-        viewModel.setDate(date);
-        viewModel.setSystemDate(true);
-
-        binding.datePicker.setOnDateChangedListener(null);
-        binding.datePicker.updateDate(date.getYear(), date.getMonthValue()-1, date.getDayOfMonth());
-        binding.datePicker.setOnDateChangedListener(onDateChangedListener);
+        viewModel.setUseSystemDate(true);
 
         hideUseSystemDate();
+        onDateChangedListener.flagIsSystemDate = true;
+        binding.datePicker.updateDate(date.getYear(), date.getMonthValue() - 1, date.getDayOfMonth());
 
-        onDateChanged(date, true);
-
-    }
-
-    private void setDateAsDatePickerDate(@NonNull LocalDate date) {
-
-        viewModel.setDate(date);
-        viewModel.setSystemDate(false);
-
-        showUseSystemDate();
-
-        onDateChanged(date, false);
+        notifyDateChanged(date, true);
 
     }
 
-    public void onDateChanged(@NonNull LocalDate date, boolean currentDate) {
+    private void notifyDateChanged(@NonNull LocalDate date, boolean currentDate) {
 
         Bundle bundle = new Bundle();
 
@@ -199,7 +189,7 @@ public class CalendarFragment extends Fragment {
         @Override
         public void run() {
 
-            if (viewModel.isSystemDate()) {
+            if (viewModel.useSystemDate()) {
 
                 LocalDate date = LocalDate.now();
 
