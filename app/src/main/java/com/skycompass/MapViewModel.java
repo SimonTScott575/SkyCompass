@@ -2,48 +2,54 @@ package com.skycompass;
 
 import androidx.lifecycle.ViewModel;
 
-import org.osmdroid.util.GeoPoint;
-
 public class MapViewModel extends ViewModel {
 
-    private double markerLatitude;
-    private double markerLongitude;
-    private String markerLocationDescription;
-    private GeoPoint myLocation;
-    private boolean autoSetAsMyLocation;
+    private double latitude;
+    private double longitude;
 
-    public double getMarkerLatitude() {
-        return markerLatitude;
+    private boolean hasMyLocation;
+    private double myLatitude;
+    private double myLongitude;
+
+    private boolean useMyLocation;
+
+    public void setLocation(double latitude, double longitude, boolean myLocation) {
+
+        if (myLocation) {
+            myLatitude = latitude;
+            myLongitude = longitude;
+            hasMyLocation = true;
+        }
+
+        this.latitude = latitude;
+        this.longitude = longitude;
+
     }
 
-    public double getMarkerLongitude() {
-        return markerLongitude;
+    public double getLatitude() {
+        if (useMyLocation && hasMyLocation)
+            return myLatitude;
+        else
+            return latitude;
     }
 
-    public String getMarkerLocationDescription() {
-        return markerLocationDescription;
+    public double getLongitude() {
+        if (useMyLocation && hasMyLocation)
+            return myLongitude;
+        else
+            return longitude;
     }
 
-    public void setMarkerLocation(double latitude, double longitude, String description) {
-        this.markerLatitude = latitude;
-        this.markerLongitude = longitude;
-        this.markerLocationDescription = description;
+    public boolean hasMyLocation() {
+        return hasMyLocation;
     }
 
-    public GeoPoint getMyLocation() {
-        return myLocation;
+    public boolean useMyLocation() {
+        return useMyLocation;
     }
 
-    public void setMyLocation(GeoPoint userLocation) {
-        this.myLocation = userLocation;
-    }
-
-    public boolean autoSetAsMyLocation() {
-        return autoSetAsMyLocation;
-    }
-
-    public void setAutoSetAsMyLocation(boolean autoSetAsMyLocation) {
-        this.autoSetAsMyLocation = autoSetAsMyLocation;
+    public void setUseMyLocation(boolean autoSetAsMyLocation) {
+        this.useMyLocation = autoSetAsMyLocation;
     }
 
 }
