@@ -5,48 +5,54 @@ import android.util.Log;
 public class Debug {
 
     private static final boolean ENABLED = true;
-    private static final boolean LOG_THROW_EXCEPTION = false;
-    private static final boolean ERROR_THROW_EXCEPTION = true;
+
+    private enum LogType {
+        LOG,
+        ERROR
+    }
 
     private Debug() {
     }
 
     public static void log(String msg) {
-        if (ENABLED) {
-            postLog(new Debug.Exception(msg));
-        }
+        if (ENABLED)
+            post(LogType.LOG, msg);
     }
 
-    public static void log(Exception e) {
-        if (ENABLED) {
-            postLog(e);
-        }
+    public static void log(Debug.Exception e) {
+        if (ENABLED)
+            post(LogType.LOG, e.getMessage());
     }
 
     public static void error(String msg) {
-        if (ENABLED) {
-            postError(new Debug.Exception(msg));
-        }
+        if (ENABLED)
+            post(LogType.ERROR, msg);
     }
 
-    public static void error(Exception e) {
-        if (ENABLED) {
-            postError(e);
-        }
+    public static void error(Debug.Exception e) {
+        if (ENABLED)
+            post(LogType.ERROR, e.getMessage());
     }
 
-    private static void postLog(Exception e) {
-        Log.d("Icarus", e.getMessage());
-        if (LOG_THROW_EXCEPTION) {
-            throw new RuntimeException(e);
-        }
-    }
+    private static void post(LogType type, String msg) {
 
-    private static void postError(Exception e) {
-        Log.e("Icarus", e.getMessage());
-        if (ERROR_THROW_EXCEPTION) {
-            throw new RuntimeException(e);
+        StackTraceElement stackTrace = Thread.currentThread().getStackTrace()[4];
+
+        String fullClassName = stackTrace.getClassName();
+        String className = fullClassName.substring(fullClassName.lastIndexOf(".") + 1);
+        int lineNumber = stackTrace.getLineNumber();
+
+        String tag = String.format("Icarus/%s/%s", className, lineNumber);
+
+        switch (type) {
+            case LOG:
+                Log.v(tag, msg);
+                break;
+            case ERROR:
+                Log.e(tag, msg);
+                break;
         }
+
     }
 
     public static class Exception extends java.lang.Exception {
