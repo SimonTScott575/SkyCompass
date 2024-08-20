@@ -81,12 +81,7 @@ public class CalendarFragment extends Fragment {
 
         }
 
-        try {
-            startRetrieveSystemDate();
-        } catch (HandlerNoPostException e) {
-            Debug.error(e);
-            setDateAsSystemDate(LocalDate.now());
-        }
+        startRetrieveSystemDate();
 
     }
 
@@ -156,23 +151,18 @@ public class CalendarFragment extends Fragment {
         bundle.putInt("D", date.getDayOfMonth() - 1);
         bundle.putBoolean("CURRENT DATE", currentDate);
 
-        try {
-            getParentFragmentManagerOrThrowException().setFragmentResult("CalendarFragment/DateChanged", bundle);
-        } catch (NoParentFragmentManagerAttachedException e) {
-            Debug.log(e);
-        }
+        getParentFragmentManager().setFragmentResult("CalendarFragment/DateChanged", bundle);
 
     }
 
-    private void startRetrieveSystemDate()
-    throws HandlerNoPostException {
+    private void startRetrieveSystemDate() {
 
         retrieveSystemDate = new RetrieveSystemDate();
 
         handler = new Handler(requireActivity().getMainLooper());
 
         if (!handler.post(retrieveSystemDate))
-            throw new HandlerNoPostException();
+            Debug.warn("Handle failed to post.");
 
     }
 
@@ -210,8 +200,8 @@ public class CalendarFragment extends Fragment {
 
             }
 
-                if (!end && !handler.postDelayed(this, 10))
-                    Debug.error(new HandlerNoPostException());
+            if (!end && !handler.postDelayed(this, 10))
+                Debug.warn("Handle failed to post.");
 
         }
 
@@ -219,28 +209,6 @@ public class CalendarFragment extends Fragment {
             end = true;
         }
 
-    }
-
-    private FragmentManager getParentFragmentManagerOrThrowException()
-    throws NoParentFragmentManagerAttachedException {
-
-        try {
-            return getParentFragmentManager();
-        } catch (IllegalStateException e) {
-            throw new NoParentFragmentManagerAttachedException();
-        }
-
-    }
-
-    private static class HandlerNoPostException extends Debug.Exception {
-        public HandlerNoPostException() {
-            super("Handler failed to post.");
-        }
-    }
-    private static class NoParentFragmentManagerAttachedException extends Debug.Exception {
-        public NoParentFragmentManagerAttachedException() {
-            super("No parent fragment manager attached.");
-        }
     }
 
     private void showUseSystemDate() {

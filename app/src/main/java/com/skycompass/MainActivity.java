@@ -95,11 +95,8 @@ public class MainActivity extends AppCompatActivity {
 
         Fragment mainFragmentContainer = getSupportFragmentManager().findFragmentById(R.id.main_fragment_container);
 
-        if (mainFragmentContainer == null) {
-            Debug.error(new FragmentNotFoundException());
-            finish();
-            return;
-        }
+        if (mainFragmentContainer == null)
+            throw new RuntimeException("Main fragment not found.");
 
         NavHostFragment mainNavHostFragment = (NavHostFragment) mainFragmentContainer;
 
@@ -226,12 +223,5 @@ public class MainActivity extends AppCompatActivity {
 
         }
     }
-
-    private static class FragmentNotFoundException extends Debug.Exception {
-        private FragmentNotFoundException() {
-            super("Fragment Not Found.");
-        }
-    }
-
 
 }

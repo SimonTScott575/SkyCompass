@@ -146,11 +146,7 @@ public class MapFragment extends Fragment {
         bundle.putDouble("Longitude", longitude);
         bundle.putString("Location", description);
 
-        try {
-            getParentFragmentManagerOrThrowException().setFragmentResult("MapFragment/LocationChanged", bundle);
-        } catch (NoParentFragmentManagerAttachedException e) {
-            Debug.log(e);
-        }
+        getParentFragmentManager().setFragmentResult("MapFragment/LocationChanged", bundle);
 
     }
 
@@ -289,21 +285,6 @@ public class MapFragment extends Fragment {
             toast.show();
         } catch (IllegalStateException e) {
             Debug.log("No context associated with MapFragment.");
-        }
-    }
-
-    private FragmentManager getParentFragmentManagerOrThrowException()
-    throws NoParentFragmentManagerAttachedException {
-        try {
-            return getParentFragmentManager();
-        } catch (IllegalStateException e) {
-            throw new NoParentFragmentManagerAttachedException();
-        }
-    }
-
-    private static class NoParentFragmentManagerAttachedException extends Debug.Exception {
-        public NoParentFragmentManagerAttachedException() {
-            super("No parent fragment manager attached.");
         }
     }
 

@@ -88,11 +88,7 @@ public class ClockFragment extends Fragment implements TimeZonePicker.TimeZoneAd
             notifyTimeAndTimeZoneChanged();
         }
 
-        try {
-            startRetrieveSystemTime();
-        } catch (HandlerNoPostException e) {
-            Debug.error(e);
-        }
+        startRetrieveSystemTime();
 
     }
 
@@ -235,11 +231,7 @@ public class ClockFragment extends Fragment implements TimeZonePicker.TimeZoneAd
         bundle.putInt("OFFSET", offset);
         bundle.putString("LOCATION", id);
 
-        try {
-            getParentFragmentManagerOrThrowException().setFragmentResult("ClockFragment/TimeChanged", bundle);
-        } catch (NoParentFragmentManagerAttachedException e) {
-            Debug.log(e);
-        }
+        getParentFragmentManager().setFragmentResult("ClockFragment/TimeChanged", bundle);
 
     }
 
@@ -259,15 +251,14 @@ public class ClockFragment extends Fragment implements TimeZonePicker.TimeZoneAd
         return viewModel.timeZones.size();
     }
 
-    private void startRetrieveSystemTime()
-    throws HandlerNoPostException {
+    private void startRetrieveSystemTime() {
 
         retrieveSystemTime = new RetrieveSystemTime();
 
         handler = new Handler(requireActivity().getMainLooper());
 
         if (!handler.post(retrieveSystemTime))
-            throw new HandlerNoPostException();
+            Debug.warn("Handler failed to post.");
 
     }
 
@@ -307,7 +298,7 @@ public class ClockFragment extends Fragment implements TimeZonePicker.TimeZoneAd
             }
 
             if (!end && !handler.postDelayed(this, 10))
-                Debug.error(new HandlerNoPostException());
+                Debug.warn("Handler failed to post.");
 
         }
 
@@ -315,26 +306,6 @@ public class ClockFragment extends Fragment implements TimeZonePicker.TimeZoneAd
             end = true;
         }
 
-    }
-
-    private FragmentManager getParentFragmentManagerOrThrowException()
-    throws NoParentFragmentManagerAttachedException {
-        try {
-            return getParentFragmentManager();
-        } catch (IllegalStateException e) {
-            throw new NoParentFragmentManagerAttachedException();
-        }
-    }
-
-    private static class HandlerNoPostException extends Debug.Exception {
-        public HandlerNoPostException() {
-            super("Handler failed to post.");
-        }
-    }
-    private static class NoParentFragmentManagerAttachedException extends Debug.Exception {
-        public NoParentFragmentManagerAttachedException() {
-            super("No parent fragment manager attached.");
-        }
     }
 
 }

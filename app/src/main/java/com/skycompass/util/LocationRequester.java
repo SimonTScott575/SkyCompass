@@ -117,7 +117,7 @@ public class LocationRequester {
             locationListener = new LocationListener();
             locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 10000, 10, locationListener);
         } catch (SecurityException e) {
-            Debug.error(new Debug.Exception("LocationRequester SecurityException."));
+            throw new RuntimeException("LocationRequester SecurityException.");
         }
 
     }

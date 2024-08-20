@@ -8,6 +8,7 @@ public class Debug {
 
     private enum LogType {
         LOG,
+        WARN,
         ERROR
     }
 
@@ -19,19 +20,14 @@ public class Debug {
             post(LogType.LOG, msg);
     }
 
-    public static void log(Debug.Exception e) {
+    public static void warn(String msg) {
         if (ENABLED)
-            post(LogType.LOG, e.getMessage());
+            post(LogType.WARN, msg);
     }
 
     public static void error(String msg) {
         if (ENABLED)
             post(LogType.ERROR, msg);
-    }
-
-    public static void error(Debug.Exception e) {
-        if (ENABLED)
-            post(LogType.ERROR, e.getMessage());
     }
 
     private static void post(LogType type, String msg) {
@@ -53,12 +49,6 @@ public class Debug {
                 break;
         }
 
-    }
-
-    public static class Exception extends java.lang.Exception {
-        public Exception(String msg) {
-            super(msg);
-        }
     }
 
 }

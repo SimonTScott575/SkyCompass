@@ -107,11 +107,7 @@ public class CompassFragment extends Fragment {
 
         requireActivity().addMenuProvider(menuProvider);
 
-        try {
-            startUpdateCompassRotation();
-        } catch (HandlerNoPostException e) {
-            Debug.error(e);
-        }
+        startUpdateCompassRotation();
 
     }
 
@@ -195,12 +191,8 @@ public class CompassFragment extends Fragment {
 
             }
 
-            if (!end) {
-                boolean success = handler.postDelayed(this, 20);
-                if (!success) {
-                    Debug.error(new HandlerNoPostException());
-                }
-            }
+            if (!end && !handler.postDelayed(this, 20))
+                Debug.warn("Rotation handler failed to post.");
 
         }
 
@@ -210,26 +202,19 @@ public class CompassFragment extends Fragment {
 
     }
 
-    private void startUpdateCompassRotation()
-    throws HandlerNoPostException {
+    private void startUpdateCompassRotation() {
 
         updateCompassRotation = new UpdateCompassRotation();
+
         handler = new Handler(requireActivity().getMainLooper());
-        boolean success = handler.post(updateCompassRotation);
-        if (!success) {
-            throw new HandlerNoPostException();
-        }
+
+        if (!handler.post(updateCompassRotation))
+            Debug.warn("Rotation handler failed to post.");
 
     }
 
     private void endUpdateCompassRotation() {
         updateCompassRotation.end();
-    }
-
-    private static class HandlerNoPostException extends Debug.Exception {
-        public HandlerNoPostException() {
-            super("Handler failed to post.");
-        }
     }
 
     private class MenuListener implements MenuProvider {
