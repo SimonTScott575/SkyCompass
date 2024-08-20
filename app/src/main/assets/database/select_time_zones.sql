@@ -1,1 +1,0 @@
-SELECT * FROM TimeZones WHERE id LIKE '%' || ? || '%' ORDER BY id;
