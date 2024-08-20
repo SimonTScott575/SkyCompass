@@ -65,12 +65,11 @@ public class MainFragment extends Fragment {
         binding.left.setOnClickListener(onClickLeft);
 
         switch (viewModel.currentFragment) {
-            case COMPASS:
-                setFragmentCompass();
-                break;
             case INFO:
                 setFragmentInfo();
                 break;
+            default:
+                setFragmentCompass();
         }
 
     }
