@@ -123,6 +123,8 @@ public class ClockFragment extends Fragment implements TimeZonePicker.TimeZoneAd
         viewModel.setZoneId(timeZone);
         viewModel.setUseSystemTime(true);
 
+        Debug.log(String.format("System: %s %s %d", time.toString(), timeZone.toString(), viewModel.getZoneOffset().getTotalSeconds() * 1000));
+
         showHideUseSystemDateAnimation.hide();
         updateTimePicker();
         updateTimeZonePicker();
@@ -171,7 +173,11 @@ public class ClockFragment extends Fragment implements TimeZonePicker.TimeZoneAd
             if (!isUserInput)
                 return;
 
-            viewModel.setTime(LocalTime.of(hourOfDay, minute));
+            LocalTime time = LocalTime.of(hourOfDay, minute);
+
+            Debug.log(String.format("User: %s", time.toString()));
+
+            viewModel.setTime(time);
             viewModel.setUseSystemTime(false);
 
             showHideUseSystemDateAnimation.show();
@@ -200,6 +206,11 @@ public class ClockFragment extends Fragment implements TimeZonePicker.TimeZoneAd
                 viewModel.setZoneId(ZoneId.of(id));
             else
                 viewModel.setZoneOffset(ZoneOffset.ofTotalSeconds(offset/1000));
+
+            Debug.log(String.format("User: %s %d",
+                viewModel.getZoneId() != null ? viewModel.getZoneId().toString() : null,
+                viewModel.getZoneOffset().getTotalSeconds() * 1000
+            ));
 
             viewModel.setUseSystemTime(false);
 

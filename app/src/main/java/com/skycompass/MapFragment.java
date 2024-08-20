@@ -162,6 +162,8 @@ public class MapFragment extends Fragment {
             double latitude = marker.getPosition().getLatitude();
             double longitude = marker.getPosition().getLongitude();
 
+            Debug.log(String.format("Marker: %.2f %.2f", latitude, longitude));
+
             viewModel.setLocation(latitude, longitude, false);
             viewModel.setUseMyLocation(false);
 
@@ -194,6 +196,8 @@ public class MapFragment extends Fragment {
 
                     if (viewModel.hasMyLocation()) {
 
+                        Debug.log(String.format("System: %.2f %.2f", viewModel.getLatitude(), viewModel.getLongitude()));
+
                         updateOverlayLocation();
                         updateMapViewLocation();
 
@@ -223,6 +227,8 @@ public class MapFragment extends Fragment {
 
                 // TODO Remove so updated with latest position - but why doesn't onLocationChanged trigger after request granted?
                 if (viewModel.hasMyLocation()) {
+
+                    Debug.log(String.format("System: %.2f %.2f", viewModel.getLatitude(), viewModel.getLongitude()));
 
                     updateOverlayLocation();
                     updateMapViewLocation();
@@ -255,6 +261,8 @@ public class MapFragment extends Fragment {
             viewModel.setLocation(latitude, longitude, true);
 
             if (viewModel.useMyLocation()) {
+
+                Debug.log(String.format("System: %.2f %.2f", latitude, longitude));
 
                 updateOverlayLocation();
                 updateMapViewLocation();

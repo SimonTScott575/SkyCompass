@@ -90,7 +90,7 @@ public class MainFragment extends Fragment {
 
     private void setLocation(double latitude, double longitude, @Nullable String location) {
 
-        Debug.log(String.format("Location: %f.2 %f.2 %s", latitude, longitude, location));
+        Debug.log(String.format("Location: %.2f %.2f %s", latitude, longitude, location));
 
         binding.locationText.setText(Format.LatitudeLongitude(latitude, longitude));
 

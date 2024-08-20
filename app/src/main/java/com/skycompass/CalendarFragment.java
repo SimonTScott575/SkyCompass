@@ -112,6 +112,8 @@ public class CalendarFragment extends Fragment {
 
             LocalDate date = LocalDate.of(year, monthOfYear + 1, dayOfMonth);
 
+            Debug.log(String.format("User input: %s", date.toString()));
+
             viewModel.setDate(date);
             viewModel.setUseSystemDate(false);
 
@@ -130,6 +132,8 @@ public class CalendarFragment extends Fragment {
     }
 
     private void setDateAsSystemDate(LocalDate date) {
+
+        Debug.log(String.format("System: %s", date.toString()));
 
         viewModel.setDate(date);
         viewModel.setUseSystemDate(true);
