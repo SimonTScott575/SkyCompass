@@ -13,7 +13,6 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.preference.PreferenceManager;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -75,15 +74,11 @@ public class MapFragment extends Fragment {
         binding.mapView.setOnMarkerDragListener(new OnMarkerDragListener());
         binding.myLocation.setOnClickListener(new OnClickSetToMyLocation());
 
-        //
-        double latitude = viewModel.getLatitude();
-        double longitude = viewModel.getLongitude();
+        updateOverlayLocation();
+        updateMapViewLocation();
 
-        setOverlayLocation(latitude, longitude, viewModel.useMyLocation());
-        setMapViewLocation(latitude, longitude);
         notifyLocationChanged();
 
-        //
         binding.copyright.setMovementMethod(LinkMovementMethod.getInstance());
         binding.copyright.setClickable(true);
         binding.copyright.setText(Html.fromHtml(
@@ -121,28 +116,21 @@ public class MapFragment extends Fragment {
         super.onDetach();
     }
 
-    private void setModelLocation(double latitude, double longitude, Boolean myLocation) {
+    private void updateOverlayLocation() {
 
-        viewModel.setLocation(latitude, longitude, myLocation);
-        viewModel.setUseMyLocation(myLocation);
-
-    }
-
-    private void setOverlayLocation(double latitude, double longitude, Boolean myLocation) {
-
-        binding.markerLocation.setText(Format.LatitudeLongitude(latitude, longitude));
+        binding.markerLocation.setText(Format.LatitudeLongitude(viewModel.getLatitude(), viewModel.getLongitude()));
 
         binding.myLocation.setImageDrawable(
             ResourcesCompat.getDrawable(
-                getResources(), myLocation ? R.drawable.my_location : R.drawable.set_as_my_location, requireActivity().getTheme()
+                getResources(), viewModel.useMyLocation() ? R.drawable.my_location : R.drawable.set_as_my_location, requireActivity().getTheme()
             )
         );
 
     }
 
-    private void setMapViewLocation(double latitude, double longitude) {
+    private void updateMapViewLocation() {
 
-        binding.mapView.setMarkerLocation(latitude, longitude);
+        binding.mapView.setMarkerLocation(viewModel.getLatitude(), viewModel.getLongitude());
 
     }
 
@@ -176,7 +164,9 @@ public class MapFragment extends Fragment {
 
             viewModel.setLocation(latitude, longitude, false);
             viewModel.setUseMyLocation(false);
-            setOverlayLocation(latitude, longitude, false);
+
+            updateOverlayLocation();
+
             notifyLocationChanged();
 
         }
@@ -204,11 +194,9 @@ public class MapFragment extends Fragment {
 
                     if (viewModel.hasMyLocation()) {
 
-                        double latitude = viewModel.getLatitude();
-                        double longitude = viewModel.getLongitude();
+                        updateOverlayLocation();
+                        updateMapViewLocation();
 
-                        setOverlayLocation(latitude, longitude, true);
-                        setMapViewLocation(latitude, longitude);
                         notifyLocationChanged();
 
                     }
@@ -236,11 +224,8 @@ public class MapFragment extends Fragment {
                 // TODO Remove so updated with latest position - but why doesn't onLocationChanged trigger after request granted?
                 if (viewModel.hasMyLocation()) {
 
-                    double latitude = viewModel.getLatitude();
-                    double longitude = viewModel.getLongitude();
-
-                    setOverlayLocation(latitude, longitude, true);
-                    setMapViewLocation(latitude, longitude);
+                    updateOverlayLocation();
+                    updateMapViewLocation();
                     notifyLocationChanged();
 
                 }
@@ -271,8 +256,8 @@ public class MapFragment extends Fragment {
 
             if (viewModel.useMyLocation()) {
 
-                setOverlayLocation(latitude, longitude, true);
-                setMapViewLocation(latitude, longitude);
+                updateOverlayLocation();
+                updateMapViewLocation();
 
                 notifyLocationChanged();
 

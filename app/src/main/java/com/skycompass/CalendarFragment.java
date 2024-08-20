@@ -102,25 +102,22 @@ public class CalendarFragment extends Fragment {
 
     private class OnDateChangedListener implements DatePicker.OnDateChangedListener {
 
-        public boolean flagIsSystemDate = false;
+        public boolean isUserInput = true;
 
         @Override
         public void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
 
+            if (!isUserInput)
+                return;
+
             LocalDate date = LocalDate.of(year, monthOfYear + 1, dayOfMonth);
 
-            if (!flagIsSystemDate) {
+            viewModel.setDate(date);
+            viewModel.setUseSystemDate(false);
 
-                viewModel.setDate(date);
-                viewModel.setUseSystemDate(false);
+            showUseSystemDate();
 
-                showUseSystemDate();
-
-                notifyDateChanged(date, false);
-
-            }
-
-            flagIsSystemDate = false;
+            notifyDateChanged(date, false);
 
         }
     }
@@ -138,8 +135,9 @@ public class CalendarFragment extends Fragment {
         viewModel.setUseSystemDate(true);
 
         hideUseSystemDate();
-        onDateChangedListener.flagIsSystemDate = true;
+        onDateChangedListener.isUserInput = false;
         binding.datePicker.updateDate(date.getYear(), date.getMonthValue() - 1, date.getDayOfMonth());
+        onDateChangedListener.isUserInput = true;
 
         notifyDateChanged(date, true);
 
