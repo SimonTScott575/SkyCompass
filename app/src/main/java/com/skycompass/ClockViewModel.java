@@ -5,21 +5,36 @@ import androidx.lifecycle.ViewModel;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 public class ClockViewModel extends ViewModel {
+
+    public List<String> timeZones;
 
     private boolean useSystemTime;
     private LocalTime time;
     private LocalDate date;
+    private ZoneId zoneId;
     private ZoneOffset zoneOffset;
-    private String id;
 
     public ClockViewModel() {
+
+        timeZones = new ArrayList<>();
+        timeZones.addAll(ZoneId.getAvailableZoneIds());
+        Collections.sort(timeZones);
+
         useSystemTime = true;
+
         time = LocalTime.of(0, 0, 0);
         date = LocalDate.of(2000, 1, 1);
         zoneOffset = ZoneOffset.ofHours(0);
+
     }
 
     public boolean isUseSystemTime() {
@@ -46,20 +61,25 @@ public class ClockViewModel extends ViewModel {
         return time;
     }
 
-    public void setZoneOffset(@NonNull ZoneOffset zoneOffset) {
-        this.zoneOffset = zoneOffset;
+    public void setZoneId(ZoneId zoneId) {
+        this.zoneId = zoneId;
+        zoneOffset = null;
+    }
+
+    public ZoneId getZoneId() {
+        return zoneId;
+    }
+
+    public void setZoneOffset(ZoneOffset offset) {
+        zoneOffset = offset;
+        zoneId = null;
     }
 
     public ZoneOffset getZoneOffset() {
-        return zoneOffset;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
+        if (zoneId != null)
+            return ZonedDateTime.of(date, time, zoneId).getOffset();
+        else
+            return zoneOffset;
     }
 
 }

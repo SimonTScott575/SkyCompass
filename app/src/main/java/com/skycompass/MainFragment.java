@@ -140,7 +140,7 @@ public class MainFragment extends Fragment {
         }
         try {
             ClockFragment clockFragment = getClockFragment();
-            clockFragment.setDate(date, isCurrentDate);
+            clockFragment.setDate(date);
         } catch (Debug.Exception e) {
             Debug.error(e);
         }
