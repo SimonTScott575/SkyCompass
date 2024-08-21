@@ -1,6 +1,5 @@
 package com.skycompass;
 
-import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.os.Bundle;
@@ -236,9 +235,11 @@ public class ClockFragment extends Fragment implements TimeZonePicker.TimeZoneAd
     }
 
     @Override
-    public void getTimeZone(int position, TimeZonePicker.TimeZone meta) {
+    public void getTimeZone(TimeZonePicker picker, int position, TimeZonePicker.TimeZone meta) {
 
-        meta.name = viewModel.timeZones.get(position);
+        viewModel.setTimeZoneSearch(picker.getSearchText());
+
+        meta.name = viewModel.getTimeZonesSearch().get(position);
 
         ZonedDateTime timeZone = ZonedDateTime.of(viewModel.getDate(), viewModel.getTime(), ZoneId.of(meta.name));
 
@@ -247,8 +248,11 @@ public class ClockFragment extends Fragment implements TimeZonePicker.TimeZoneAd
     }
 
     @Override
-    public int getTimeZoneCount() {
-        return viewModel.timeZones.size();
+    public int getTimeZoneCount(TimeZonePicker picker) {
+
+        viewModel.setTimeZoneSearch(picker.getSearchText());
+
+        return viewModel.getTimeZonesSearch().size();
     }
 
     private void startRetrieveSystemTime() {

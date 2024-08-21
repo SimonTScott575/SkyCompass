@@ -27,13 +27,15 @@ public class TimeZonePicker extends LinearLayout {
 
     private ViewTimeZonePickerBinding binding;
 
-    private String selectedTimeZoneName;
-    private int selectedTimeZoneOffsetMilliseconds;
-
     private TimeZoneListAdapter listAdapter;
     private TimeZoneAdapter timeZoneAdapter;
 
     private OnTimeZoneChanged onTimeZoneChanged;
+
+    private String selectedTimeZoneName;
+    private int selectedTimeZoneOffsetMilliseconds;
+
+    private String searchText;
 
     public TimeZonePicker(@NonNull Context context) {
         super(context);
@@ -66,6 +68,8 @@ public class TimeZonePicker extends LinearLayout {
 
         binding.textSearch.addTextChangedListener(new SearchWatcher());
 
+        searchText = "";
+
     }
 
     public void setTimeZone(String name, int offset) {
@@ -94,11 +98,17 @@ public class TimeZonePicker extends LinearLayout {
         listAdapter.notifyDataSetChanged();
     }
 
+    public String getSearchText() {
+        return searchText;
+    }
+
     private void onTimeZoneChangedEditText(int hour, int minute) {
 
         selectedTimeZoneName = null;
         selectedTimeZoneOffsetMilliseconds = hour * 60 * 60 + minute * 60;
         selectedTimeZoneOffsetMilliseconds *= 1000;
+
+        notifyDataSetChanged();
 
         if (onTimeZoneChanged != null)
             onTimeZoneChanged.onTimeZoneChanged(this, selectedTimeZoneOffsetMilliseconds, null);
@@ -140,7 +150,7 @@ public class TimeZonePicker extends LinearLayout {
             TimeZone meta = new TimeZone();
 
             if (timeZoneAdapter != null)
-                timeZoneAdapter.getTimeZone(position, meta);
+                timeZoneAdapter.getTimeZone(TimeZonePicker.this, position, meta);
 
             String name = meta.name;
             int offset = meta.offsetMilliseconds;
@@ -161,7 +171,7 @@ public class TimeZonePicker extends LinearLayout {
 
         @Override
         public int getItemCount() {
-            return timeZoneAdapter != null ? timeZoneAdapter.getTimeZoneCount() : 0;
+            return timeZoneAdapter != null ? timeZoneAdapter.getTimeZoneCount(TimeZonePicker.this) : 0;
         }
 
     }
@@ -217,7 +227,8 @@ public class TimeZonePicker extends LinearLayout {
 
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
-            // TODO
+            searchText = s.toString();
+            notifyDataSetChanged();
         }
 
         @Override
@@ -239,9 +250,9 @@ public class TimeZonePicker extends LinearLayout {
 
     public interface TimeZoneAdapter {
 
-        void getTimeZone(int position, TimeZone meta);
+        void getTimeZone(TimeZonePicker picker, int position, TimeZone meta);
 
-        int getTimeZoneCount();
+        int getTimeZoneCount(TimeZonePicker picker);
 
     }
 
