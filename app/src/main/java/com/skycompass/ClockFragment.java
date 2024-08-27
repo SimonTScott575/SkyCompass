@@ -84,6 +84,7 @@ public class ClockFragment extends Fragment implements TimeZonePicker.TimeZoneAd
         } else {
             updateTimePicker();
             updateTimeZonePicker();
+            showHideUseSystemDateAnimation.show();
             notifyTimeAndTimeZoneChanged();
         }
 
@@ -92,7 +93,7 @@ public class ClockFragment extends Fragment implements TimeZonePicker.TimeZoneAd
     }
 
     @Override
-    public void onPause() { // TODO onPause ? but when new Retrieve* ?
+    public void onPause() {
 
         binding.timePicker.setOnTimeChangedListener(null);
         binding.timeZonePicker.setOnTimeZoneChangedListener(null);
@@ -267,7 +268,9 @@ public class ClockFragment extends Fragment implements TimeZonePicker.TimeZoneAd
     }
 
     private void endRetrieveSystemTime() {
+
         retrieveSystemTime.end();
+
     }
 
     private class RetrieveSystemTime implements Runnable {
@@ -280,6 +283,9 @@ public class ClockFragment extends Fragment implements TimeZonePicker.TimeZoneAd
 
         @Override
         public void run() {
+
+            if (end)
+                return;
 
             if (viewModel.isUseSystemTime()) {
 
@@ -301,7 +307,7 @@ public class ClockFragment extends Fragment implements TimeZonePicker.TimeZoneAd
 
             }
 
-            if (!end && !handler.postDelayed(this, 10))
+            if (!handler.postDelayed(this, 10))
                 Debug.warn("Handler failed to post.");
 
         }

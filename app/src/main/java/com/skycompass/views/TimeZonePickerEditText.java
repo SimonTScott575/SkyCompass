@@ -11,6 +11,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.LinearLayoutCompat;
 
 import com.skycompass.databinding.ViewTimeZonePickerEditTextBinding;
+import com.skycompass.util.Debug;
 import com.skycompass.util.Format;
 
 public class TimeZonePickerEditText extends LinearLayoutCompat {
@@ -80,10 +81,22 @@ public class TimeZonePickerEditText extends LinearLayoutCompat {
             String text = binding.numberEditText.getText().toString();
 
             int[] times = parseTimes(text);
-            times[0] += shift;
-            int offset = times[0] * MILLISECONDS_IN_HOUR + times[1] * MILLISECONDS_IN_MINUTE;
 
-            binding.numberEditText.setText(Format.TimeZoneOffset(offset));
+            if (times == null) {
+                Debug.warn(String.format("Invalid time: %s", text));
+                return;
+            }
+
+            int hours = times[0];
+            int minutes = times[1];
+
+            hours += shift;
+
+            int offset = hours * MILLISECONDS_IN_HOUR + (hours >= 0 ? 1 : -1)  * minutes * MILLISECONDS_IN_MINUTE;
+
+            text = Format.TimeZoneOffset(offset);
+
+            binding.numberEditText.setText(text);
 
         }
 
@@ -91,96 +104,86 @@ public class TimeZonePickerEditText extends LinearLayoutCompat {
 
     private class OffsetWatcher implements TextWatcher {
 
-        private String textToSelection = "";
-        private String textAfterSelection = "";
+        private String textPrevious = "+00:00";
+        private int selectionPrevious = 0;
+        private int previousHours = 0;
+        private int previousMinutes = 0;
+        private boolean first = true;
 
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            textToSelection = s.toString().substring(0,start);
+
+            if (parseTimes(s.toString()) != null) {
+                textPrevious = s.toString();
+                selectionPrevious = start;
+            }
+
         }
 
         @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-            textAfterSelection = s.toString().substring(start+count);
-        }
+        public void onTextChanged(CharSequence s, int start, int before, int count) { }
 
         @Override
         public void afterTextChanged(Editable s) {
 
-            String text = s.toString();
+            int[] times = parseTimes(s.toString());
 
-            int hour;
-            int minute;
+            if (times == null) {
 
-            if (!text.contains(":")) {
-
-                int start = textToSelection.length();
-                String newText = textToSelection+":"+textAfterSelection;
-                binding.numberEditText.setText(newText);
-                binding.numberEditText.setSelection(start);
+                binding.numberEditText.setText(textPrevious);
+                binding.numberEditText.setSelection(selectionPrevious);
 
                 return;
-
-            } else {
-
-                int[] times = parseTimes(text);
-
-                hour = times[0];
-                minute = times[1];
-
             }
 
-            if (Math.abs(hour) > 23) {
 
-                String newText = ((Math.signum(hour)>0?1:-1)*23) + ":" + minute;
-                int start;
-                if (textToSelection.length() > text.indexOf(':')) {
-                    start = newText.length();
-                } else {
-                    start = newText.indexOf(':');
-                }
+            int hours = times[0];
+            int minutes = times[1];
 
-                binding.numberEditText.setText(newText);
-                binding.numberEditText.setSelection(start);
+            Debug.log(String.format("Hours: %s Minutes: %s", hours, minutes));
 
-                return;
+            if (first || hours != previousHours || minutes != previousMinutes) {
 
-            }
-            if (minute > 59 || minute < 0) {
+                previousHours = hours;
+                previousMinutes = minutes;
+                first = false;
 
-                String newText = hour + ":" + (minute > 59 ? 59 : 0);
-                int start;
-                if (textToSelection.length() > text.indexOf(':')) {
-                    start = newText.length();
-                } else {
-                    start = newText.indexOf(':');
-                }
+                if (onTimeZoneChanged != null)
+                    onTimeZoneChanged.onTimeZoneChanged(hours, minutes);
 
-                binding.numberEditText.setText(newText);
-                binding.numberEditText.setSelection(start);
-
-                return;
-
-            }
-
-            if (onTimeZoneChanged != null) {
-                onTimeZoneChanged.onTimeZoneChanged(hour, minute);
             }
 
         }
     }
 
-    private static int[] parseTimes(String offset) {
+    private static int[] parseTimes(String input) {
 
-        String[] times = offset.split(":",2);
+        if (!input.contains(":"))
+            return null;
+
+        String[] parts = input.split(":");
+
+        String first = "";
+        String second = "";
+
+        if (parts.length >= 1)
+            first = parts[0];
+        if (parts.length >= 2)
+            second = parts[1];
 
         int hours = 0;
         int minutes = 0;
+
         try {
-            hours = Integer.parseInt(times[0]);
-            minutes = Integer.parseInt(times[1]);
+
+            hours = first.length() > 0 && !(first.equals("-") || first.equals("+")) ? Integer.parseInt(first) : 0;
+            minutes = second.length() > 0 ? Integer.parseInt(second) : 0;
+
+            if (Math.abs(hours) > 18 || minutes < 0 || 59 < minutes || (Math.abs(hours) == 18 && minutes != 0))
+                return null;
+
         } catch (NumberFormatException e) {
-        } catch (IndexOutOfBoundsException e) {
+            return null;
         }
 
         return new int[]{hours, minutes};

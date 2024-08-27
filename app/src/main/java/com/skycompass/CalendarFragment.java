@@ -181,6 +181,9 @@ public class CalendarFragment extends Fragment {
         @Override
         public void run() {
 
+            if (end)
+                return;
+
             if (viewModel.useSystemDate()) {
 
                 LocalDate date = LocalDate.now();
@@ -200,7 +203,7 @@ public class CalendarFragment extends Fragment {
 
             }
 
-            if (!end && !handler.postDelayed(this, 10))
+            if (!handler.postDelayed(this, 10))
                 Debug.warn("Handle failed to post.");
 
         }
