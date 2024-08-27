@@ -7,7 +7,7 @@
             android:defaultValue="1"
             android:entries="@array/night_modes"
             android:entryValues="@array/night_mode_keys"
-            android:key="night_mode_preference"
+            android:key="NightMode"
             android:title="Night mode" />
 
     </PreferenceCategory>

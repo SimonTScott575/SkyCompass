@@ -33,7 +33,7 @@
 
     <fragment
         android:id="@+id/navigation_main_fragment_settings"
-        android:name="com.skycompass.settings.PreferenceFragment"
+        android:name="com.skycompass.PreferenceFragment"
         android:label="@string/page_settings" />
 
 </navigation>

@@ -1,23 +1,12 @@
-package com.skycompass.settings;
+package com.skycompass;
 
 import android.content.res.Configuration;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.util.TypedValue;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.view.MenuProvider;
 import androidx.preference.PreferenceFragmentCompat;
-
-import com.skycompass.R;
-import com.skycompass.util.Debug;
 
 public class PreferenceFragment extends PreferenceFragmentCompat {
 
@@ -25,11 +14,10 @@ public class PreferenceFragment extends PreferenceFragmentCompat {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        if ((getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES) {
+        if ((getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES)
             view.setBackgroundColor(requireContext().getColor(R.color.grey_dark));
-        } else {
+        else
             view.setBackgroundColor(requireContext().getColor(R.color.cream_light));
-        }
 
     }
 
@@ -37,5 +25,4 @@ public class PreferenceFragment extends PreferenceFragmentCompat {
     public void onCreatePreferences(@Nullable Bundle savedInstanceState, @Nullable String rootKey) {
         addPreferencesFromResource(R.xml.preferences);
     }
-
 }
