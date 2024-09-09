@@ -14,7 +14,8 @@
         <com.skycompass.compass.CompassView
             android:id="@+id/compassView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            app:color="?attr/colorOnSurface"/>
 
     </FrameLayout>
 

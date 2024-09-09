@@ -64,10 +64,10 @@ public class CompassFragment extends Fragment {
 
         binding.compassView.setNorthRotation(viewModel.getTargetRotation());
 
-        int nightMode = (getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK);
-        if (nightMode == Configuration.UI_MODE_NIGHT_YES) {
-            binding.compassView.setColor(Color.valueOf(Color.parseColor("#F55353")));
-        }
+//        int nightMode = (getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK);
+//        if (nightMode == Configuration.UI_MODE_NIGHT_YES) {
+//            binding.compassView.setColor(Color.valueOf(Color.parseColor("#F55353")));
+//        }
 
         Bundle args = getArguments();
         if (args != null) {

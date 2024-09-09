@@ -7,5 +7,9 @@
             <enum name="left" value="1"/>
         </attr>
     </declare-styleable>
+    
+    <declare-styleable name="CompassView">
+        <attr name="color" format="color">#000000</attr>
+    </declare-styleable>
 
 </resources>

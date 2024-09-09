@@ -3,12 +3,16 @@ package com.skycompass.compass;
 import static com.skycompass.compass.Values.*;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.util.AttributeSet;
 import android.view.View;
 
 import androidx.annotation.Nullable;
+
+import com.skycompass.R;
+import com.skycompass.util.Debug;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -22,6 +26,8 @@ public class CompassView extends View {
     private float ringThickness;
     private float northRotation;
 
+    private Color color = Color.valueOf(Color.parseColor("#FF00FF"));
+
     private final Background background = new Background(innerRadius);
     private final Foreground foreground = new Foreground(innerRadius, innerRadius + ringThickness);
     private final Track track = new Track(innerRadius);
@@ -31,14 +37,45 @@ public class CompassView extends View {
 
     public CompassView(Context context) {
         super(context);
+        init(context, null, 0);
     }
 
     public CompassView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
+        init(context, attrs, 0);
     }
 
     public CompassView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        init(context, attrs, defStyleAttr);
+    }
+
+    private void init(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+
+        TypedArray array = context.getTheme().obtainStyledAttributes(attrs, R.styleable.CompassView, defStyleAttr, 0);
+
+        String attribute = "color";
+
+        try {
+
+            color = Color.valueOf(array.getColor(
+                R.styleable.CompassView_color,
+                color.toArgb()
+            ));
+
+            foreground.setColor(color);
+            background.setColor(color);
+
+        } catch (Exception e) {
+
+            Debug.warn(String.format("Missing attribute: %s", attribute));
+
+        } finally {
+
+            array.recycle();
+
+        }
+
     }
 
     public double getLatitude() {
