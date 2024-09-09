@@ -11,9 +11,11 @@ import androidx.fragment.app.FragmentResultListener;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.material.navigation.NavigationBarView;
 import com.skycompass.databinding.FragmentMainBinding;
 import com.skycompass.util.Debug;
 import com.skycompass.util.Format;
@@ -28,11 +30,10 @@ public class MainFragment extends Fragment {
 
     private FragmentMainBinding binding;
 
+    private final OnItemSelectedListener onItemSelectedListener = new OnItemSelectedListener();
     private final OnChangeLocationListener onChangeLocationListener = new OnChangeLocationListener();
     private final OnChangeDateListener onChangeDateListener = new OnChangeDateListener();
     private final OnChangeTimeListener onChangeTimeListener = new OnChangeTimeListener();
-    private final OnClickLeft onClickLeft = new OnClickLeft();
-    private final OnClickRight onClickRight = new OnClickRight();
 
     private Bundle locationBundle;
     private Bundle dateBundle;
@@ -61,9 +62,6 @@ public class MainFragment extends Fragment {
         binding.changeDate.setOnClickListener(v -> binding.calendarCardView.show());
         binding.changeTime.setOnClickListener(v -> binding.clockCardView.show());
 
-        binding.right.setOnClickListener(onClickRight);
-        binding.left.setOnClickListener(onClickLeft);
-
         switch (viewModel.currentFragment) {
             case INFO:
                 setFragmentInfo();
@@ -71,6 +69,8 @@ public class MainFragment extends Fragment {
             default:
                 setFragmentCompass();
         }
+
+        binding.bottomNavigation.setOnItemSelectedListener(onItemSelectedListener);
 
     }
 
@@ -87,17 +87,68 @@ public class MainFragment extends Fragment {
 
     }
 
+    private class OnItemSelectedListener implements NavigationBarView.OnItemSelectedListener {
+        @Override
+        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+
+            int id = item.getItemId();
+
+            Debug.log(String.format("Selected %d", id));
+
+            Bundle bundle = new Bundle();
+            bundle.putAll(locationBundle);
+            bundle.putAll(dateBundle);
+            bundle.putAll(timeBundle);
+
+            if (id == R.id.bottom_item_compass) {
+
+                if (viewModel.currentFragment == MainViewModel.FragmentView.COMPASS)
+                    return false;
+
+                getChildFragmentManager().beginTransaction()
+                        .setReorderingAllowed(true)
+                        .setCustomAnimations(R.anim.fade_in, R.anim.fade_out)
+                        .replace(R.id.fragment_compass, CompassFragment.class, bundle)
+                        .commit();
+
+                setFragmentCompass();
+
+                return true;
+
+            }
+
+            if (id == R.id.bottom_item_times) {
+
+                if (viewModel.currentFragment == MainViewModel.FragmentView.INFO)
+                    return false;
+
+                getChildFragmentManager().beginTransaction()
+                        .setReorderingAllowed(true)
+                        .setCustomAnimations(R.anim.fade_in, R.anim.fade_out)
+                        .replace(R.id.fragment_compass, InfoFragment.class, bundle)
+                        .commit();
+
+                setFragmentInfo();
+
+                return true;
+
+            }
+
+
+            return false;
+        }
+    }
+
     private void setLocation(double latitude, double longitude, @Nullable String location) {
 
         Debug.log(String.format("Location: %.2f %.2f %s", latitude, longitude, location));
 
         binding.locationText.setText(Format.LatitudeLongitude(latitude, longitude));
 
-        if (location != null) {
+        if (location != null)
             binding.locationAddress.setText(location);
-        } else {
+        else
             binding.locationAddress.setText(R.string.tap_to_change_location);
-        }
 
         switch (viewModel.currentFragment) {
             case COMPASS:
@@ -128,11 +179,11 @@ public class MainFragment extends Fragment {
         Debug.log(String.format("Date: %s Current: %b", date.toString(), isCurrentDate));
 
         binding.dateText.setText(date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
-        if (isCurrentDate) {
+
+        if (isCurrentDate)
             binding.dateSubscript.setText(R.string.using_system_date);
-        } else {
+        else
             binding.dateSubscript.setText(R.string.tap_to_change_date);
-        }
 
         switch (viewModel.currentFragment) {
             case COMPASS:
@@ -172,11 +223,11 @@ public class MainFragment extends Fragment {
         text += " (UTC" + Format.TimeZoneOffset(offset) + ")";
 
         binding.timeText.setText(text);
-        if (location != null) {
+
+        if (location != null)
             binding.timeLocation.setText(location);
-        } else {
+        else
             binding.timeLocation.setText(R.string.tap_to_change_time);
-        }
 
         ZoneOffset timeZone = ZoneOffset.ofTotalSeconds(offset/1000);
         LocalDate dummy = LocalDate.of(2000,1,1);
@@ -219,20 +270,6 @@ public class MainFragment extends Fragment {
 
         viewModel.currentFragment = MainViewModel.FragmentView.COMPASS;
 
-        binding.textView.setText(R.string.compass);
-
-        binding.left.setClickable(false);
-        binding.right.setClickable(true);
-        try (
-                TypedArray a = requireContext().obtainStyledAttributes(new int[] { R.attr.colorSecondaryVariant });
-                TypedArray b = requireContext().obtainStyledAttributes(new int[] { R.attr.colorSecondary })
-        ) {
-            binding.left.setColorFilter(a.getColor(0, 0));
-            binding.right.setColorFilter(b.getColor(0, 0));
-        } catch (Exception e){
-            Debug.error(e.getMessage());
-        }
-
     }
 
     private void setFragmentInfo() {
@@ -241,60 +278,6 @@ public class MainFragment extends Fragment {
 
         viewModel.currentFragment = MainViewModel.FragmentView.INFO;
 
-        binding.textView.setText(R.string.info);
-
-        binding.left.setClickable(true);
-        binding.right.setClickable(false);
-        try (
-            TypedArray a = requireContext().obtainStyledAttributes(new int[] { R.attr.colorSecondaryVariant });
-            TypedArray b = requireContext().obtainStyledAttributes(new int[] { R.attr.colorSecondary })
-        ) {
-            binding.left.setColorFilter(b.getColor(0, 0));
-            binding.right.setColorFilter(a.getColor(0, 0));
-        } catch (Exception e){
-            Debug.error(e.getMessage());
-        }
-
-    }
-
-    private class OnClickLeft implements View.OnClickListener {
-        @Override
-        public void onClick(View v) {
-
-            Bundle bundle = new Bundle();
-            bundle.putAll(locationBundle);
-            bundle.putAll(dateBundle);
-            bundle.putAll(timeBundle);
-
-            getChildFragmentManager().beginTransaction()
-                .setReorderingAllowed(true)
-                .setCustomAnimations(R.anim.fade_in, R.anim.fade_out)
-                .replace(R.id.fragment_compass, CompassFragment.class, bundle)
-                .commit();
-
-            setFragmentCompass();
-
-        }
-    }
-
-    private class OnClickRight implements View.OnClickListener {
-        @Override
-        public void onClick(View v) {
-
-            Bundle bundle = new Bundle();
-            bundle.putAll(locationBundle);
-            bundle.putAll(dateBundle);
-            bundle.putAll(timeBundle);
-
-            getChildFragmentManager().beginTransaction()
-                .setReorderingAllowed(true)
-                .setCustomAnimations(R.anim.fade_in, R.anim.fade_out)
-                .replace(R.id.fragment_compass, InfoFragment.class, bundle)
-                .commit();
-
-            setFragmentInfo();
-
-        }
     }
 
     private <T> T getChildFragment(Class<T> fragmentClass) {

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/bottom_item_compass"
+        android:enabled="true"
+        android:icon="@drawable/compass"
+        android:title="@string/menu_compass"/>
+    <item
+        android:id="@+id/bottom_item_times"
+        android:enabled="true"
+        android:icon="@drawable/light_mode"
+        android:title="@string/info"/>
+
+</menu>

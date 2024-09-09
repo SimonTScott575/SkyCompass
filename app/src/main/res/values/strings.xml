@@ -46,6 +46,7 @@
 
     <string name="help">Help</string>
     <string name="info">Times</string>
+    <string name="menu_compass">Compass</string>
 
     <string name="sunrise">Sunrise</string>
     <string name="sunset">Sunset</string>
