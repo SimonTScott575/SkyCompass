@@ -6,9 +6,9 @@
         android:id="@+id/menu_item_compass"
         android:icon="@drawable/compass"
         android:title=""
-        app:iconTint="?attr/colorOnPrimary"
         app:showAsAction="ifRoom"
-        android:visible="false" />
+        android:visible="false"
+        app:iconTint="?attr/colorControlNormal" />
 
     <group
         android:id="@+id/menu_group_core">
@@ -16,20 +16,21 @@
             android:id="@+id/menu_item_dark_mode"
             android:icon="@drawable/dark_mode"
             android:title="@string/dark_mode"
-            app:iconTint="?attr/colorOnPrimary"
-            app:showAsAction="ifRoom" />
+            app:showAsAction="ifRoom"
+            app:iconTint="?attr/colorControlNormal" />
         <item
             android:id="@+id/menu_item_help"
             android:icon="@drawable/help"
             android:title="@string/help"
-            app:iconTint="?attr/colorOnPrimary"
-            app:showAsAction="ifRoom" />
+            app:showAsAction="ifRoom"
+            app:iconTint="?attr/colorControlNormal" />
+
         <item
             android:id="@+id/menu_item_settings"
             android:icon="@drawable/settings"
             android:title="@string/page_settings"
-            app:iconTint="?attr/colorOnPrimary"
-            app:showAsAction="ifRoom" />
+            app:showAsAction="ifRoom"
+            app:iconTint="?attr/colorControlNormal" />
     </group>
 
 </menu>

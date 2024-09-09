@@ -7,18 +7,40 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        style="@style/background">
 
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/toolbarContainer"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:theme="@style/ToolbarTheme"
-            app:title="@string/app_name"
-            style="@style/toolbar"/>
+            app:layout_constraintTop_toTopOf="parent">
+
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="?attr/actionBarSize"
+                android:fitsSystemWindows="true"
+                app:title="@string/app_name"/>
+<!--                app:menu="@menu/top_app_bar"-->
+<!--                app:navigationIcon="@drawable/ic_close_24dp" />-->
+
+        </com.google.android.material.appbar.AppBarLayout>
+
+<!--        <androidx.appcompat.widget.Toolbar-->
+<!--            android:id="@+id/toolbar"-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            app:layout_constraintTop_toTopOf="parent"-->
+<!--            app:title="@string/app_name"/>-->
+
+<!--        style="@style/toolbar"-->
+<!--        app:theme="@style/ToolbarTheme"-->
 
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/main_fragment_container"
@@ -28,7 +50,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/toolbar"
+            app:layout_constraintTop_toBottomOf="@+id/toolbarContainer"
             app:navGraph="@navigation/main"
             app:defaultNavHost="true"
             tools:layout="@layout/fragment_main" />
