@@ -1,7 +1,7 @@
 package com.skycompass.views;
 
 import android.content.Context;
-import android.content.res.Configuration;
+import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -21,9 +21,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.skycompass.R;
 import com.skycompass.databinding.ViewTimeZonePickerBinding;
+import com.skycompass.util.Debug;
 import com.skycompass.util.Format;
 
 public class TimeZonePicker extends LinearLayout {
+
+    private Color colorHighlight = Color.valueOf(Color.parseColor("#FF00FF"));
 
     private ViewTimeZonePickerBinding binding;
 
@@ -39,20 +42,55 @@ public class TimeZonePicker extends LinearLayout {
 
     public TimeZonePicker(@NonNull Context context) {
         super(context);
-        init(context);
+        init(context, null, 0);
     }
 
     public TimeZonePicker(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        init(context);
+        init(context, attrs, 0);
     }
 
     public TimeZonePicker(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init(context);
+        init(context, attrs, defStyleAttr);
     }
 
-    private void init(@NonNull Context context) {
+    private void init(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+
+        TypedArray attributes = context.getTheme().obtainStyledAttributes(attrs, R.styleable.TimeZonePicker, defStyleAttr, 0);
+
+        try {
+
+            if (attributes.hasValue(R.styleable.TimeZonePicker_colorHighlight)) {
+
+                colorHighlight = Color.valueOf(attributes.getColor(
+                    R.styleable.TimeZonePicker_colorHighlight,
+                    colorHighlight.toArgb()
+                ));
+            } else {
+
+                TypedValue highlightValue = new TypedValue();
+
+                context.getTheme().resolveAttribute(
+                    android.R.attr.colorControlHighlight,
+                    highlightValue,
+                    true
+                );
+
+                colorHighlight = Color.valueOf(highlightValue.data);
+
+            }
+
+
+        } catch (UnsupportedOperationException e) {
+
+            Debug.warn("Unsupported attribute value: colorHighlight");
+
+        } finally {
+
+            attributes.recycle();
+
+        }
 
         setOrientation(VERTICAL);
 
@@ -117,17 +155,19 @@ public class TimeZonePicker extends LinearLayout {
 
     private class TimeZoneListAdapter extends RecyclerView.Adapter<ViewHolder> {
 
-        private Color highlight = Color.valueOf(Color.parseColor("#f0c02e"));
-        private int bgColorRedId;
+        private final int selectableItemBackgroundResourceId;
 
         public TimeZoneListAdapter(Context context) {
 
-            if ((context.getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES) {
-                highlight = Color.valueOf(Color.parseColor("#414141"));
-            }
-            TypedValue outValue = new TypedValue();
-            context.getTheme().resolveAttribute(android.R.attr.selectableItemBackground, outValue, true);
-            bgColorRedId = outValue.resourceId;
+            TypedValue selectableItemBackgroundResource = new TypedValue();
+
+            context.getTheme().resolveAttribute(
+                android.R.attr.selectableItemBackground,
+                selectableItemBackgroundResource,
+                true
+            );
+
+            selectableItemBackgroundResourceId = selectableItemBackgroundResource.resourceId;
 
         }
 
@@ -138,8 +178,6 @@ public class TimeZonePicker extends LinearLayout {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.view_time_zone_picker_item, parent, false);
 
             ViewHolder holder = new ViewHolder(view);
-
-            holder.highlight = highlight;
 
             return holder;
         }
@@ -163,9 +201,9 @@ public class TimeZonePicker extends LinearLayout {
             holder.timeZoneName = name;
 
             if (name.equals(selectedTimeZoneName))
-                holder.itemView.setBackgroundColor(highlight.toArgb());
+                holder.itemView.setBackgroundColor(colorHighlight.toArgb());
             else
-                holder.itemView.setBackgroundResource(bgColorRedId);
+                holder.itemView.setBackgroundResource(selectableItemBackgroundResourceId);
 
         }
 
@@ -180,9 +218,9 @@ public class TimeZonePicker extends LinearLayout {
 
         public String timeZoneName = null;
         public int timeZoneOffset = 0;
+
         private final TextView timeZoneNameTextView;
         private final TextView timeZoneOffsetTextView;
-        private Color highlight;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -197,7 +235,7 @@ public class TimeZonePicker extends LinearLayout {
 
                 binding.numberEditText.setOffset(selectedTimeZoneOffsetMilliseconds);
 
-                itemView.setBackgroundColor(highlight.toArgb());
+                itemView.setBackgroundColor(colorHighlight.toArgb());
 
                 RecyclerView.Adapter adapter = binding.textSuggestions.getAdapter();
 

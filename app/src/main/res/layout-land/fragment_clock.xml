@@ -24,7 +24,6 @@
                 android:id="@+id/time_picker"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:theme="@style/picker"
                 android:timePickerMode="spinner"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -43,19 +42,20 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <ImageButton
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/use_system_time"
-            style="@style/image_button"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            style="?attr/floatingActionButtonLargeStyle"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
             android:layout_marginStart="24dp"
             android:layout_marginTop="24dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:scaleType="fitXY"
-            android:src="@drawable/current_time"
+            app:fabCustomSize="60dp"
+            android:scaleType="fitCenter"
             android:visibility="invisible"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/current_time"
+            tools:visibility="visible" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

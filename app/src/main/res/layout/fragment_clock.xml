@@ -8,13 +8,13 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ClockFragment">
+        tools:context=".ClockFragment"
+        android:clipChildren="false">
 
         <TimePicker
             android:id="@+id/time_picker"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:theme="@style/picker"
             android:timePickerMode="spinner"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -29,21 +29,23 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/time_picker" />
+            app:layout_constraintTop_toBottomOf="@+id/time_picker"
+            android:clipChildren="false" />
 
-        <ImageButton
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/use_system_time"
-            style="@style/image_button"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            style="?attr/floatingActionButtonLargeStyle"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
             android:layout_marginStart="24dp"
             android:layout_marginTop="24dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
+            app:fabCustomSize="60dp"
             android:scaleType="fitCenter"
-            android:src="@drawable/current_time"
             android:visibility="invisible"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/current_time"
+            tools:visibility="visible" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -25,7 +25,6 @@
 
         <TextView
             android:id="@+id/copyright"
-            style="@style/text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="#FFFFFF"
@@ -33,19 +32,19 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
-        <ImageButton
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/my_location"
-            style="@style/image_button_opaque"
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="32dp"
-            android:padding="13dp"
             android:scaleType="fitCenter"
-            android:src="@drawable/set_as_my_location"
-            app:tint="?attr/colorOnSecondary"
+            android:visibility="visible"
+            app:fabCustomSize="60dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:srcCompat="@drawable/set_as_my_location"
+            style="?attr/floatingActionButtonLargeStyle" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="0dp"
@@ -60,7 +59,6 @@
 
             <TextView
                 android:id="@+id/marker_location"
-                style="@style/text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"

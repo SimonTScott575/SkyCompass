@@ -8,25 +8,36 @@
     <merge
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:parentTag="androidx.appcompat.widget.LinearLayoutCompat">
+        tools:parentTag="androidx.appcompat.widget.LinearLayoutCompat"
+        android:clipChildren="false"
+        android:clipToPadding="false">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="wrap_content"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:layout_marginEnd="15dp"
+            android:clipChildren="false"
+            android:clipToPadding="false">
+
             <ImageButton
                 android:id="@+id/minus"
-                style="@style/image_button"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:background="?attr/selectableItemBackgroundBorderless"
+                android:scaleX="1.25"
+                android:scaleY="1.25"
                 android:scaleType="fitCenter"
                 android:src="@drawable/subtract"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
+                android:background="@drawable/rounded_ripple_small"
+                app:backgroundTint="?attr/colorSecondaryContainer"
+                app:tint="?attr/colorSecondary"
                 app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintDimensionRatio="1:1"
-                app:tint="?attr/colorSecondary" />
+                android:clipChildren="false"
+                android:clipToPadding="false" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <EditText
@@ -37,28 +48,35 @@
             android:ems="3"
             android:inputType="numberSigned"
             android:textAlignment="center"
-            android:textAppearance="@style/text"
-            android:textColor="@null"
             android:textSize="24sp"
             android:layout_weight="1"/>
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="wrap_content"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:layout_marginStart="15dp"
+            android:clipChildren="false"
+            android:clipToPadding="false">
+
             <ImageButton
                 android:id="@+id/plus"
-                style="@style/image_button"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:background="?attr/selectableItemBackgroundBorderless"
+                android:scaleX="1.25"
+                android:scaleY="1.25"
                 android:scaleType="fitCenter"
                 android:src="@drawable/add"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
+                android:background="@drawable/rounded_ripple_small"
+                app:backgroundTint="?attr/colorSecondaryContainer"
+                app:tint="?attr/colorSecondary"
                 app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintDimensionRatio="1:1"
-                app:tint="?attr/colorSecondary" />
+                android:clipChildren="false"
+                android:clipToPadding="false"/>
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </merge>

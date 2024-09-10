@@ -21,7 +21,6 @@
             android:layout_marginBottom="16dp"
             android:calendarViewShown="false"
             android:datePickerMode="spinner"
-            android:theme="@style/picker"
             android:minDate="01/01/1900"
             android:maxDate="12/31/2100"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -29,19 +28,19 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageButton
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/use_system_date"
-            style="@style/image_button"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
             android:layout_marginStart="24dp"
             android:layout_marginTop="24dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:scaleType="fitCenter"
-            android:src="@drawable/current_date"
-            android:visibility="invisible"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:fabCustomSize="60dp"
+            android:scaleType="fitCenter"
+            android:visibility="invisible"
+            app:srcCompat="@drawable/current_date"
+            style="?attr/floatingActionButtonLargeStyle" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

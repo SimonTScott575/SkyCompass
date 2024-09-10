@@ -7,6 +7,7 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 import android.view.View;
 
 import androidx.annotation.Nullable;
@@ -20,13 +21,13 @@ import java.time.LocalTime;
 
 public class CompassView extends View {
 
+    private Color color = Color.valueOf(Color.parseColor("#FF00FF"));
+
     private float offsetHorizontal;
     private float offsetVertical;
     private float innerRadius;
     private float ringThickness;
     private float northRotation;
-
-    private Color color = Color.valueOf(Color.parseColor("#FF00FF"));
 
     private final Background background = new Background(innerRadius);
     private final Foreground foreground = new Foreground(innerRadius, innerRadius + ringThickness);
@@ -52,27 +53,41 @@ public class CompassView extends View {
 
     private void init(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
 
-        TypedArray array = context.getTheme().obtainStyledAttributes(attrs, R.styleable.CompassView, defStyleAttr, 0);
-
-        String attribute = "color";
+        TypedArray attributes = context.getTheme().obtainStyledAttributes(attrs, R.styleable.CompassView, defStyleAttr, 0);
 
         try {
 
-            color = Color.valueOf(array.getColor(
-                R.styleable.CompassView_color,
-                color.toArgb()
-            ));
+            if (attributes.hasValue(R.styleable.CompassView_color)) {
+
+                color = Color.valueOf(attributes.getColor(
+                    R.styleable.CompassView_color,
+                    color.toArgb()
+                ));
+
+            } else {
+
+                TypedValue colorValue = new TypedValue();
+
+                context.getTheme().resolveAttribute(
+                    R.attr.colorOnSurface,
+                    colorValue,
+                    true
+                );
+
+                color = Color.valueOf(colorValue.data);
+
+            }
 
             foreground.setColor(color);
             background.setColor(color);
 
-        } catch (Exception e) {
+        } catch (UnsupportedOperationException e) {
 
-            Debug.warn(String.format("Missing attribute: %s", attribute));
+            Debug.warn("Unsupported attribute value: color");
 
         } finally {
 
-            array.recycle();
+            attributes.recycle();
 
         }
 

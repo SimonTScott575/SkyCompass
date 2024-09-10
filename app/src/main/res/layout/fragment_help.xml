@@ -21,7 +21,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp"
-                style="@style/text"
                 android:textSize="18sp"
                 android:text="@string/help_content_intro" />
 
@@ -30,7 +29,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp"
-                style="@style/text"
                 android:textSize="25sp"
                 android:text="@string/help_heading_date_time_location" />
 
@@ -39,7 +37,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp"
-                style="@style/text"
                 android:textSize="18sp"
                 android:text="@string/help_content_date_time_location" />
 
@@ -48,7 +45,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp"
-                style="@style/text"
                 android:textSize="25sp"
                 android:text="@string/help_heading_compass" />
 
@@ -57,7 +53,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp"
-                style="@style/text"
                 android:textSize="18sp"
                 android:text="@string/help_content_compass" />
 
@@ -66,7 +61,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp"
-                style="@style/text"
                 android:textSize="25sp"
                 android:text="@string/help_heading_night_mode" />
 
@@ -75,7 +69,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp"
-                style="@style/text"
                 android:textSize="18sp"
                 android:text="@string/help_content_night_mode" />
 
@@ -91,7 +84,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp"
-                style="@style/text"
                 android:textSize="18sp"
                 android:text="@string/help_more_info" />
 

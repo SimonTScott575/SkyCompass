@@ -40,16 +40,16 @@
 
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:id="@+id/change_location"
-                style="@style/tap_surface"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:orientation="vertical"
-                android:gravity="center_vertical">
+                android:gravity="center_vertical"
+                android:background="@drawable/rounded_corners_ripple"
+                android:backgroundTint="?attr/colorSurfaceContainer">
 
                 <TextView
                     android:id="@+id/location_text"
-                    style="@style/text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
@@ -60,7 +60,6 @@
 
                 <TextView
                     android:id="@+id/location_address"
-                    style="@style/text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="32dp"
@@ -73,18 +72,18 @@
 
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:id="@+id/change_date"
-                style="@style/tap_surface"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:orientation="vertical"
                 android:gravity="center_vertical"
                 android:layout_marginTop="16dp"
-                android:layout_marginBottom="16dp">
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/rounded_corners_ripple"
+                android:backgroundTint="?attr/colorSurfaceContainer">
 
                 <TextView
                     android:id="@+id/date_text"
-                    style="@style/text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
@@ -95,7 +94,6 @@
 
                 <TextView
                     android:id="@+id/date_subscript"
-                    style="@style/text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="32dp"
@@ -108,16 +106,16 @@
 
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:id="@+id/change_time"
-                style="@style/tap_surface"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:gravity="center_vertical"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:background="@drawable/rounded_corners_ripple"
+                android:backgroundTint="?attr/colorSurfaceContainer">
 
                 <TextView
                     android:id="@+id/time_text"
-                    style="@style/text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
@@ -128,7 +126,6 @@
 
                 <TextView
                     android:id="@+id/time_location"
-                    style="@style/text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="8dp"

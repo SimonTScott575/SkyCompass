@@ -43,18 +43,18 @@
 
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:id="@+id/change_location"
-                style="@style/tap_surface"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:orientation="vertical"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                app:layout_constraintTop_toTopOf="parent"
+                android:background="@drawable/rounded_corners_ripple"
+                android:backgroundTint="?attr/colorSurfaceContainer">
 
                 <TextView
                     android:id="@+id/location_text"
-                    style="@style/text"
                     android:layout_width="wrap_content"
                     android:layout_height="0dp"
                     android:layout_weight="1"
@@ -65,7 +65,6 @@
 
                 <TextView
                     android:id="@+id/location_address"
-                    style="@style/text"
                     android:layout_width="wrap_content"
                     android:layout_height="0dp"
                     android:layout_weight="1"
@@ -78,18 +77,18 @@
 
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:id="@+id/change_date"
-                style="@style/tap_surface"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:orientation="vertical"
                 android:layout_gravity="center"
                 android:layout_marginTop="16dp"
                 android:layout_marginBottom="16dp"
-                android:layout_weight="1">
+                android:layout_weight="1"
+                android:background="@drawable/rounded_corners_ripple"
+                android:backgroundTint="?attr/colorSurfaceContainer">
 
                 <TextView
                     android:id="@+id/date_text"
-                    style="@style/text"
                     android:layout_width="wrap_content"
                     android:layout_height="0dp"
                     android:layout_weight="1"
@@ -100,7 +99,6 @@
 
                 <TextView
                     android:id="@+id/date_subscript"
-                    style="@style/text"
                     android:layout_width="wrap_content"
                     android:layout_height="0dp"
                     android:layout_weight="1"
@@ -113,15 +111,15 @@
 
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:id="@+id/change_time"
-                style="@style/tap_surface"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:background="@drawable/rounded_corners_ripple"
+                android:backgroundTint="?attr/colorSurfaceContainer">
 
                 <TextView
                     android:id="@+id/time_text"
-                    style="@style/text"
                     android:layout_width="wrap_content"
                     android:layout_height="0dp"
                     android:layout_weight="1"
@@ -132,7 +130,6 @@
 
                 <TextView
                     android:id="@+id/time_location"
-                    style="@style/text"
                     android:layout_width="wrap_content"
                     android:layout_height="0dp"
                     android:layout_weight="1"
@@ -144,18 +141,6 @@
             </androidx.appcompat.widget.LinearLayoutCompat>
 
         </androidx.appcompat.widget.LinearLayoutCompat>
-
-        <ImageButton
-            android:id="@+id/view_bodies"
-            style="@style/image_button"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="16dp"
-            android:scaleType="fitCenter"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/fragment_compass"
-            custom:srcCompat="@drawable/view" />
 
         <com.skycompass.views.Panel
             android:id="@+id/map_card_view"
