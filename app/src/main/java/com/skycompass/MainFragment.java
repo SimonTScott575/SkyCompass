@@ -1,6 +1,7 @@
 package com.skycompass;
 
 import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -15,6 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.navigation.NavigationBarView;
 import com.skycompass.databinding.FragmentMainBinding;
 import com.skycompass.util.Debug;
@@ -58,9 +60,20 @@ public class MainFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
 
-        binding.changeLocation.setOnClickListener(v -> binding.mapCardView.show());
-        binding.changeDate.setOnClickListener(v -> binding.calendarCardView.show());
-        binding.changeTime.setOnClickListener(v -> binding.clockCardView.show());
+        BottomSheetBehavior.from(binding.mapBottomSheet).setHideable(true);
+        BottomSheetBehavior.from(binding.calendarBottomSheet).setHideable(true);
+        BottomSheetBehavior.from(binding.clockBottomSheet).setHideable(true);
+
+        BottomSheetBehavior.from(binding.optionsBottomSheet).setState(BottomSheetBehavior.STATE_EXPANDED);
+        BottomSheetBehavior.from(binding.mapBottomSheet).setState(BottomSheetBehavior.STATE_HIDDEN);
+        BottomSheetBehavior.from(binding.calendarBottomSheet).setState(BottomSheetBehavior.STATE_HIDDEN);
+        BottomSheetBehavior.from(binding.clockBottomSheet).setState(BottomSheetBehavior.STATE_HIDDEN);
+
+        BottomSheetBehavior.from(binding.optionsBottomSheet).setPeekHeight(128);
+
+        binding.changeLocation.setOnClickListener(v -> { BottomSheetBehavior.from(binding.mapBottomSheet).setState(BottomSheetBehavior.STATE_EXPANDED); });
+        binding.changeDate.setOnClickListener(v -> { BottomSheetBehavior.from(binding.calendarBottomSheet).setState(BottomSheetBehavior.STATE_EXPANDED); });
+        binding.changeTime.setOnClickListener(v -> { BottomSheetBehavior.from(binding.clockBottomSheet).setState(BottomSheetBehavior.STATE_EXPANDED); });
 
         switch (viewModel.currentFragment) {
             case INFO:
