@@ -20,7 +20,6 @@ public class ClockViewModel extends ViewModel {
 
     private String timeZoneSearchText;
 
-    private boolean useSystemTime;
     private LocalTime time;
     private LocalDate date;
     private ZoneId zoneId;
@@ -37,20 +36,10 @@ public class ClockViewModel extends ViewModel {
 
         timeZoneSearchText = "";
 
-        useSystemTime = true;
-
         time = LocalTime.of(0, 0, 0);
         date = LocalDate.of(2000, 1, 1);
         zoneOffset = ZoneOffset.ofHours(0);
 
-    }
-
-    public boolean isUseSystemTime() {
-        return useSystemTime;
-    }
-
-    public void setUseSystemTime(boolean useSystemTime) {
-        this.useSystemTime = useSystemTime;
     }
 
     public LocalDate getDate() {

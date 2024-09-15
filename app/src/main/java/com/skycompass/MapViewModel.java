@@ -7,49 +7,16 @@ public class MapViewModel extends ViewModel {
     private double latitude;
     private double longitude;
 
-    private boolean hasMyLocation;
-    private double myLatitude;
-    private double myLongitude;
-
-    private boolean useMyLocation;
-
-    public void setLocation(double latitude, double longitude, boolean myLocation) {
-
-        if (myLocation) {
-            myLatitude = latitude;
-            myLongitude = longitude;
-            hasMyLocation = true;
-        }
-
+    public void setLocation(double latitude, double longitude) {
         this.latitude = latitude;
         this.longitude = longitude;
-
     }
 
     public double getLatitude() {
-        if (useMyLocation && hasMyLocation)
-            return myLatitude;
-        else
-            return latitude;
+        return latitude;
     }
 
     public double getLongitude() {
-        if (useMyLocation && hasMyLocation)
-            return myLongitude;
-        else
-            return longitude;
+        return longitude;
     }
-
-    public boolean hasMyLocation() {
-        return hasMyLocation;
-    }
-
-    public boolean useMyLocation() {
-        return useMyLocation;
-    }
-
-    public void setUseMyLocation(boolean autoSetAsMyLocation) {
-        this.useMyLocation = autoSetAsMyLocation;
-    }
-
 }

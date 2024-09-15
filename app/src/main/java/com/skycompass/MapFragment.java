@@ -5,9 +5,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
 
 import androidx.preference.PreferenceManager;
@@ -16,12 +14,10 @@ import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.skycompass.databinding.FragmentMapBinding;
 import com.skycompass.util.Debug;
 import com.skycompass.util.Format;
-import com.skycompass.util.LocationRequester;
 
 import org.osmdroid.config.Configuration;
 import org.osmdroid.views.overlay.Marker;
@@ -30,21 +26,10 @@ public class MapFragment extends Fragment {
 
     private MapViewModel viewModel;
     private FragmentMapBinding binding;
-    private final LocationRequester locationRequester;
-
-    public MapFragment() {
-
-        locationRequester = new LocationRequester(new OnReceivedMyLocationRequester());
-
-        locationRequester.setOnPermissionResult(new OnRequestResult());
-
-    }
 
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-
-        locationRequester.register(this);
 
     }
 
@@ -72,7 +57,6 @@ public class MapFragment extends Fragment {
 
         binding.mapView.setUp();
         binding.mapView.setOnMarkerDragListener(new OnMarkerDragListener());
-        binding.myLocation.setOnClickListener(new OnClickSetToMyLocation());
 
         updateOverlayLocation();
         updateMapViewLocation();
@@ -94,37 +78,28 @@ public class MapFragment extends Fragment {
 
         binding.mapView.onResume();
 
-        locationRequester.resume();
-
     }
 
     @Override
     public void onPause() {
-
-        locationRequester.pause();
 
         binding.mapView.onPause();
 
         super.onPause();
     }
 
-    @Override
-    public void onDetach() {
+    public void setLocation(double latitude, double longitude) {
 
-        locationRequester.unregister();
+        viewModel.setLocation(latitude, longitude);
 
-        super.onDetach();
+        updateOverlayLocation();
+        updateMapViewLocation();
+
     }
 
     private void updateOverlayLocation() {
 
         binding.markerLocation.setText(Format.LatitudeLongitude(viewModel.getLatitude(), viewModel.getLongitude()));
-
-        binding.myLocation.setImageDrawable(
-            ResourcesCompat.getDrawable(
-                getResources(), viewModel.useMyLocation() ? R.drawable.my_location : R.drawable.set_as_my_location, requireActivity().getTheme()
-            )
-        );
 
     }
 
@@ -138,13 +113,11 @@ public class MapFragment extends Fragment {
 
         double latitude = viewModel.getLatitude();
         double longitude = viewModel.getLongitude();
-        String description = viewModel.useMyLocation() && viewModel.hasMyLocation() ? getResources().getString(R.string.using_system_location) : null;
 
         Bundle bundle = new Bundle();
 
         bundle.putDouble("Latitude", latitude);
         bundle.putDouble("Longitude", longitude);
-        bundle.putString("Location", description);
 
         getParentFragmentManager().setFragmentResult("MapFragment/LocationChanged", bundle);
 
@@ -160,8 +133,7 @@ public class MapFragment extends Fragment {
 
             Debug.log(String.format("Marker: %.2f %.2f", latitude, longitude));
 
-            viewModel.setLocation(latitude, longitude, false);
-            viewModel.setUseMyLocation(false);
+            viewModel.setLocation(latitude, longitude);
 
             updateOverlayLocation();
 
@@ -175,117 +147,6 @@ public class MapFragment extends Fragment {
         @Override
         public void onMarkerDragStart(Marker marker) { }
 
-    }
-
-    private class OnClickSetToMyLocation implements View.OnClickListener {
-        @Override
-        public void onClick(View v) {
-
-            LocationRequester.RequestState state = locationRequester.getPermissionState();
-
-            switch (state) {
-                case REQUESTED:
-                    break;
-                case GRANTED:
-
-                    viewModel.setUseMyLocation(true);
-
-                    if (viewModel.hasMyLocation()) {
-
-                        Debug.log(String.format("System: %.2f %.2f", viewModel.getLatitude(), viewModel.getLongitude()));
-
-                        updateOverlayLocation();
-                        updateMapViewLocation();
-
-                        notifyLocationChanged();
-
-                    }
-
-                    break;
-                default:
-                    locationRequester.request(MapFragment.this);
-                    break;
-            }
-
-            if (locationRequester.getEnabledState() == LocationRequester.EnabledState.DISABLED)
-                notifyUserLocationDisabled();
-
-        }
-    }
-
-    private class OnRequestResult implements LocationRequester.OnRequestResult {
-        @Override
-        public void onResult(boolean granted) {
-
-            if (granted) {
-
-                viewModel.setUseMyLocation(true);
-
-                // TODO Remove so updated with latest position - but why doesn't onLocationChanged trigger after request granted?
-                if (viewModel.hasMyLocation()) {
-
-                    Debug.log(String.format("System: %.2f %.2f", viewModel.getLatitude(), viewModel.getLongitude()));
-
-                    updateOverlayLocation();
-                    updateMapViewLocation();
-                    notifyLocationChanged();
-
-                }
-
-            } else {
-
-                binding.myLocation.setImageDrawable(
-                    ResourcesCompat.getDrawable(
-                        getResources(), R.drawable.no_location, requireActivity().getTheme()
-                    )
-                );
-
-                notifyUserLocationPermissionDenied();
-
-            }
-
-            if (locationRequester.getEnabledState() == LocationRequester.EnabledState.DISABLED)
-                notifyUserLocationDisabled();
-
-        }
-    }
-
-    private class OnReceivedMyLocationRequester implements LocationRequester.OnLocationChanged {
-        @Override
-        public void onLocationChanged(double latitude, double longitude) {
-
-            viewModel.setLocation(latitude, longitude, true);
-
-            if (viewModel.useMyLocation()) {
-
-                Debug.log(String.format("System: %.2f %.2f", latitude, longitude));
-
-                updateOverlayLocation();
-                updateMapViewLocation();
-
-                notifyLocationChanged();
-
-            }
-
-        }
-    }
-
-    private void notifyUserLocationPermissionDenied() {
-        try {
-            Toast toast = Toast.makeText(requireContext(), "Location access denied in permission settings", Toast.LENGTH_LONG);
-            toast.show();
-        } catch (IllegalStateException e) {
-            Debug.log("No context associated with MapFragment.");
-        }
-    }
-
-    private void notifyUserLocationDisabled() {
-        try {
-            Toast toast = Toast.makeText(requireContext(), "Location updates disabled in settings", Toast.LENGTH_LONG);
-            toast.show();
-        } catch (IllegalStateException e) {
-            Debug.log("No context associated with MapFragment.");
-        }
     }
 
 }

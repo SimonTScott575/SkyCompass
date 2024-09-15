@@ -8,7 +8,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +15,6 @@ import android.widget.TimePicker;
 
 import com.skycompass.databinding.FragmentClockBinding;
 import com.skycompass.util.Debug;
-import com.skycompass.views.ShowHideAnimation;
 import com.skycompass.views.TimeZonePicker;
 
 import java.time.LocalDate;
@@ -30,20 +28,13 @@ public class ClockFragment extends Fragment implements TimeZonePicker.TimeZoneAd
     private ClockViewModel viewModel;
     private FragmentClockBinding binding;
 
-    private Handler handler;
-    private RetrieveSystemTime retrieveSystemTime;
-
     private final OnTimeChanged onTimeChangedListener;
     private final OnTimeZoneChange onTimeZoneChangedListener;
-    private final OnUseSystemTime onUseSystemTime;
-
-    private ShowHideAnimation showHideUseSystemDateAnimation;
 
     public ClockFragment() {
 
         onTimeChangedListener = new OnTimeChanged();
         onTimeZoneChangedListener = new OnTimeZoneChange();
-        onUseSystemTime = new OnUseSystemTime();
 
     }
 
@@ -67,8 +58,6 @@ public class ClockFragment extends Fragment implements TimeZonePicker.TimeZoneAd
         binding.timePicker.setIs24HourView(true);
         binding.timeZonePicker.setTimeZoneAdapter(this);
 
-        showHideUseSystemDateAnimation = new ShowHideAnimation(binding.useSystemTime);
-
     }
 
     @Override
@@ -77,18 +66,9 @@ public class ClockFragment extends Fragment implements TimeZonePicker.TimeZoneAd
 
         binding.timePicker.setOnTimeChangedListener(onTimeChangedListener);
         binding.timeZonePicker.setOnTimeZoneChangedListener(onTimeZoneChangedListener);
-        binding.useSystemTime.setOnClickListener(onUseSystemTime);
 
-        if (viewModel.isUseSystemTime()) {
-            setTimeAndTimeZoneAsSystemValues(LocalTime.now(), ZoneId.systemDefault());
-        } else {
-            updateTimePicker();
-            updateTimeZonePicker();
-            showHideUseSystemDateAnimation.show();
-            notifyTimeAndTimeZoneChanged();
-        }
-
-        startRetrieveSystemTime();
+        updateTimePicker();
+        updateTimeZonePicker();
 
     }
 
@@ -98,34 +78,47 @@ public class ClockFragment extends Fragment implements TimeZonePicker.TimeZoneAd
         binding.timePicker.setOnTimeChangedListener(null);
         binding.timeZonePicker.setOnTimeZoneChangedListener(null);
 
-        endRetrieveSystemTime();
-
         super.onPause();
     }
 
     public void setDate(LocalDate date) {
 
+        Debug.log(String.format("Date: %s", date.toString()));
+
         viewModel.setDate(date);
 
         updateTimeZonePicker();
 
-        notifyTimeAndTimeZoneChanged();
-
     }
 
-    private void setTimeAndTimeZoneAsSystemValues(LocalTime time, ZoneId timeZone) {
+    public void setTime(LocalTime time) {
+
+        Debug.log(String.format("Time: %s", time.toString()));
 
         viewModel.setTime(time);
-        viewModel.setZoneId(timeZone);
-        viewModel.setUseSystemTime(true);
 
-        Debug.log(String.format("System: %s %s %d", time.toString(), timeZone.toString(), viewModel.getZoneOffset().getTotalSeconds() * 1000));
-
-        showHideUseSystemDateAnimation.hide();
         updateTimePicker();
         updateTimeZonePicker();
 
-        notifyTimeAndTimeZoneChanged();
+    }
+
+    public void setZoneId(ZoneId zoneId) {
+
+        Debug.log(String.format("Zone ID: %s", zoneId.getId()));
+
+        viewModel.setZoneId(zoneId);
+
+        updateTimeZonePicker();
+
+    }
+
+    public void setZoneOffset(ZoneOffset zoneOffset) {
+
+        Debug.log(String.format("Zone offset: %s seconds", zoneOffset.getTotalSeconds()));
+
+        viewModel.setZoneOffset(zoneOffset);
+
+        updateTimeZonePicker();
 
     }
 
@@ -150,13 +143,6 @@ public class ClockFragment extends Fragment implements TimeZonePicker.TimeZoneAd
 
     }
 
-    private class OnUseSystemTime implements View.OnClickListener {
-        @Override
-        public void onClick(View v) {
-            setTimeAndTimeZoneAsSystemValues(LocalTime.now(), ZoneId.systemDefault());
-        }
-    }
-
     private class OnTimeChanged implements TimePicker.OnTimeChangedListener {
 
         public boolean isUserInput = true;
@@ -174,9 +160,7 @@ public class ClockFragment extends Fragment implements TimeZonePicker.TimeZoneAd
             Debug.log(String.format("User: %s", time.toString()));
 
             viewModel.setTime(time);
-            viewModel.setUseSystemTime(false);
 
-            showHideUseSystemDateAnimation.show();
             updateTimeZonePicker();
 
             notifyTimeAndTimeZoneChanged();
@@ -193,10 +177,8 @@ public class ClockFragment extends Fragment implements TimeZonePicker.TimeZoneAd
 
             // TODO handle case where date/time are not compatible with time zone
 
-            if (!isUserInput) {
-                isUserInput = true;
+            if (!isUserInput)
                 return;
-            }
 
             if (id != null)
                 viewModel.setZoneId(ZoneId.of(id));
@@ -207,10 +189,6 @@ public class ClockFragment extends Fragment implements TimeZonePicker.TimeZoneAd
                 viewModel.getZoneId() != null ? viewModel.getZoneId().toString() : null,
                 viewModel.getZoneOffset().getTotalSeconds() * 1000
             ));
-
-            viewModel.setUseSystemTime(false);
-
-            showHideUseSystemDateAnimation.show();
 
             notifyTimeAndTimeZoneChanged();
 
@@ -254,68 +232,6 @@ public class ClockFragment extends Fragment implements TimeZonePicker.TimeZoneAd
         viewModel.setTimeZoneSearch(picker.getSearchText());
 
         return viewModel.getTimeZonesSearch().size();
-    }
-
-    private void startRetrieveSystemTime() {
-
-        retrieveSystemTime = new RetrieveSystemTime();
-
-        handler = new Handler(requireActivity().getMainLooper());
-
-        if (!handler.post(retrieveSystemTime))
-            Debug.warn("Handler failed to post.");
-
-    }
-
-    private void endRetrieveSystemTime() {
-
-        retrieveSystemTime.end();
-
-    }
-
-    private class RetrieveSystemTime implements Runnable {
-
-        private boolean end = false;
-        private boolean firstRun = true;
-        private int prevHour;
-        private int prevMinute;
-        private int prevSecond;
-
-        @Override
-        public void run() {
-
-            if (end)
-                return;
-
-            if (viewModel.isUseSystemTime()) {
-
-                LocalTime time = LocalTime.now();
-                ZoneId timeZone = ZoneId.systemDefault();
-
-                boolean timeChanged = firstRun
-                    || time.getHour() != prevHour
-                    || time.getMinute() != prevMinute
-                    || time.getSecond() != prevSecond;
-
-                if (timeChanged) {
-                    setTimeAndTimeZoneAsSystemValues(time, timeZone);
-                    firstRun = false;
-                    prevHour = time.getHour();
-                    prevMinute = time.getMinute();
-                    prevSecond = time.getSecond();
-                }
-
-            }
-
-            if (!handler.postDelayed(this, 10))
-                Debug.warn("Handler failed to post.");
-
-        }
-
-        public void end() {
-            end = true;
-        }
-
     }
 
 }
