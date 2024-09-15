@@ -1,15 +1,18 @@
 package com.skycompass;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentResultListener;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
 
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -19,6 +22,7 @@ import android.widget.Toast;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.navigation.NavigationBarView;
+import com.google.android.material.sidesheet.SideSheetBehavior;
 import com.skycompass.databinding.FragmentMainBinding;
 import com.skycompass.util.Debug;
 import com.skycompass.util.LocationRequester;
@@ -109,10 +113,17 @@ public class MainFragment extends Fragment {
                 setFragmentCompass();
         }
 
-        binding.bottomNavigation.setOnItemSelectedListener(onItemSelectedListener);
+        if (requireActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
+            binding.bottomNavigation.setOnItemSelectedListener(onItemSelectedListener);
+        else if (requireActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE)
+            binding.viewPager.setAdapter(new ViewPagerAdapter(this));
 
         // Options
-        BottomSheetBehavior.from(binding.optionsBottomSheet).setState(BottomSheetBehavior.STATE_EXPANDED);
+        if (requireActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
+            BottomSheetBehavior.from(binding.optionsBottomSheet).setState(BottomSheetBehavior.STATE_EXPANDED);
+        else if (requireActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            SideSheetBehavior.from(binding.optionsSideSheet).setState(SideSheetBehavior.STATE_EXPANDED);
+        }
 
         binding.optionsNavigationCurrent.setOnClickListener(onClickUseSystemValue);
         binding.optionsNavigationBack.setOnClickListener(v -> {
@@ -429,5 +440,29 @@ public class MainFragment extends Fragment {
     private Fragment getCurrentInfoFragment() {
         return getChildFragmentManager().findFragmentById(R.id.options_fragment_container);
     }
+
+    private class ViewPagerAdapter extends FragmentStateAdapter {
+
+        public ViewPagerAdapter(Fragment fa) {
+            super(fa);
+        }
+
+        @Override
+        public Fragment createFragment(int position) {
+            switch (position) {
+                case 0:
+                    return new CompassFragment();
+                case 1:
+                    return new InfoFragment();
+            }
+            return null;
+        }
+
+        @Override
+        public int getItemCount() {
+            return 2;
+        }
+    }
+
 
 }

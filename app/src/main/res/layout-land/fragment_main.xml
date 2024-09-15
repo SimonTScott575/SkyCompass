@@ -11,203 +11,105 @@
         android:layout_height="match_parent"
         tools:context=".MainActivity">
 
-        <androidx.fragment.app.FragmentContainerView
-            android:id="@+id/fragment_compass"
-            android:name="com.skycompass.CompassFragment"
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/view_pager"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            app:layout_constraintBottom_toTopOf="@id/bottom_navigation"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/constraintLayout"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:layout="@layout/fragment_compass" />
-
-        <androidx.appcompat.widget.LinearLayoutCompat
-            android:id="@+id/constraintLayout"
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="16dp"
-            android:orientation="vertical"
-            android:gravity="center"
-            app:layout_constraintBottom_toTopOf="@id/bottom_navigation"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <androidx.appcompat.widget.LinearLayoutCompat
-                android:id="@+id/change_location"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:gravity="center_vertical"
-                android:background="@drawable/rounded_corners_ripple"
-                android:backgroundTint="?attr/colorSurfaceContainer">
-
-                <TextView
-                    android:id="@+id/location_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginStart="32dp"
-                    android:layout_marginEnd="32dp"
-                    android:text="@string/location"
-                    android:textSize="24sp" />
-
-                <TextView
-                    android:id="@+id/location_address"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="32dp"
-                    android:layout_marginBottom="8dp"
-                    android:layout_marginEnd="32dp"
-                    android:text="@string/location"
-                    android:textSize="12sp" />
-
-            </androidx.appcompat.widget.LinearLayoutCompat>
-
-            <androidx.appcompat.widget.LinearLayoutCompat
-                android:id="@+id/change_date"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:gravity="center_vertical"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="16dp"
-                android:background="@drawable/rounded_corners_ripple"
-                android:backgroundTint="?attr/colorSurfaceContainer">
-
-                <TextView
-                    android:id="@+id/date_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginStart="32dp"
-                    android:layout_marginEnd="32dp"
-                    android:text="@string/date"
-                    android:textSize="24sp" />
-
-                <TextView
-                    android:id="@+id/date_subscript"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="32dp"
-                    android:layout_marginBottom="8dp"
-                    android:layout_marginEnd="32dp"
-                    android:text="@string/date"
-                    android:textSize="12sp" />
-
-            </androidx.appcompat.widget.LinearLayoutCompat>
-
-            <androidx.appcompat.widget.LinearLayoutCompat
-                android:id="@+id/change_time"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:gravity="center_vertical"
-                android:orientation="vertical"
-                android:background="@drawable/rounded_corners_ripple"
-                android:backgroundTint="?attr/colorSurfaceContainer">
-
-                <TextView
-                    android:id="@+id/time_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginStart="32dp"
-                    android:layout_marginEnd="32dp"
-                    android:text="@string/time"
-                    android:textSize="24sp" />
-
-                <TextView
-                    android:id="@+id/time_location"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    android:layout_marginStart="32dp"
-                    android:layout_marginEnd="32dp"
-                    android:text="@string/time"
-                    android:textSize="12sp" />
-
-            </androidx.appcompat.widget.LinearLayoutCompat>
-
-        </androidx.appcompat.widget.LinearLayoutCompat>
-
-        <com.skycompass.views.Panel
-            android:id="@+id/map_card_view"
-            style="@style/panel"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toTopOf="@id/bottom_navigation"
-            app:layout_constraintDimensionRatio="1:1"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            custom:direction="left"
-            tools:visibility="gone">
-
-            <androidx.fragment.app.FragmentContainerView
-                android:id="@+id/map_fragment_container"
-                android:name="com.skycompass.MapFragment"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                tools:layout="@layout/fragment_map" />
-
-        </com.skycompass.views.Panel>
-
-        <com.skycompass.views.Panel
-            android:id="@+id/calendar_card_view"
-            style="@style/panel"
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toTopOf="@id/bottom_navigation"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            custom:direction="left"
-            tools:visibility="gone">
-
-            <androidx.fragment.app.FragmentContainerView
-                android:id="@+id/calendar_fragment_container"
-                android:name="com.skycompass.CalendarFragment"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                tools:layout="@layout/fragment_calendar" />
-
-        </com.skycompass.views.Panel>
-
-        <com.skycompass.views.Panel
-            android:id="@+id/clock_card_view"
-            style="@style/panel"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toTopOf="@id/bottom_navigation"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            custom:direction="left"
-            tools:visibility="gone">
-
-            <androidx.fragment.app.FragmentContainerView
-                android:id="@+id/clock_fragment_container"
-                android:name="com.skycompass.ClockFragment"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                tools:layout="@layout/fragment_clock" />
-
-        </com.skycompass.views.Panel>
-
-        <com.google.android.material.bottomnavigation.BottomNavigationView
-            android:id="@+id/bottom_navigation"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:menu="@menu/main_bottom" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintDimensionRatio="1:1"/>
+
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
+            android:id="@+id/options_coordinator_layout"
+            android:layout_width="400dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/options_side_sheet"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:cardBackgroundColor="?attr/colorSurface"
+                app:cardCornerRadius="0dp"
+                app:layout_behavior="com.google.android.material.sidesheet.SideSheetBehavior"
+                app:behavior_draggable="false"
+                android:layout_gravity="start"
+                app:behavior_peekHeight="48dp"
+                app:behavior_fitToContents="false"
+                app:behavior_halfExpandedRatio="0.5"
+                android:background="@color/red_light">
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:id="@+id/options"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent">
+
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:id="@+id/options_navigation"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0"
+                        android:orientation="horizontal">
+
+                        <ImageButton
+                            android:id="@+id/options_navigation_back"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:layout_gravity="start"
+                            android:layout_weight="0"
+                            android:background="@drawable/circle_ripple"
+                            android:backgroundTint="?attr/colorSurface"
+                            android:padding="8dp"
+                            android:scaleType="fitCenter"
+                            android:src="@drawable/back"
+                            app:tint="?attr/colorOnSurface"
+                            android:visibility="invisible"/>
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="" />
+
+                        <ImageButton
+                            android:id="@+id/options_navigation_current"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:layout_weight="0"
+                            android:background="@drawable/circle_ripple"
+                            android:backgroundTint="?attr/colorSurfaceContainerLow"
+                            android:padding="8dp"
+                            android:scaleType="fitCenter"
+                            android:src="@null"
+                            app:tint="?attr/colorOnSurface"
+                            android:visibility="invisible" />
+
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+
+                    <androidx.fragment.app.FragmentContainerView
+                        android:id="@+id/options_fragment_container"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"
+                        tools:layout="@layout/fragment_options" />
+
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+            </androidx.cardview.widget.CardView>
+
+        </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

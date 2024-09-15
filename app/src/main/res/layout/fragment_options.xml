@@ -41,7 +41,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
                 android:layout_marginStart="32dp"
-                android:layout_marginBottom="8dp"
                 android:layout_weight="1"
                 android:textSize="12sp"
                 tools:text="@string/location" />
@@ -75,7 +74,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
                 android:layout_marginStart="32dp"
-                android:layout_marginBottom="8dp"
                 android:layout_weight="1"
                 android:textSize="12sp"
                 tools:text="@string/date" />
@@ -107,7 +105,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
                 android:layout_marginStart="32dp"
-                android:layout_marginBottom="8dp"
                 android:layout_weight="1"
                 android:textSize="12sp"
                 tools:text="@string/time" />
