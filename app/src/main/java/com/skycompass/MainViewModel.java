@@ -20,17 +20,25 @@ public class MainViewModel extends ViewModel {
         INFO
     }
 
+    public enum OptionsFragment {
+        INFO,
+        MAP,
+        CALENDAR,
+        CLOCK
+    }
+
     public FragmentView currentFragment = FragmentView.NONE;
+    public OptionsFragment currentOption = OptionsFragment.INFO;
 
     private boolean isSystemLocation = false;
-    private boolean isSystemDate = false;
-    private boolean isSystemTime = false;
+    private boolean isSystemDate = true;
+    private boolean isSystemTime = true;
 
     private ZoneId zoneId;
     private ZoneOffset zoneOffset = ZoneOffset.ofHours(0);
 
-    private MutableLiveData<LocalDate> dateLiveData = new MutableLiveData<>(LocalDate.of(2000, 1, 1));
-    private MutableLiveData<LocalTime> timeLiveData = new MutableLiveData<>(LocalTime.of(0, 0, 0));
+    private MutableLiveData<LocalDate> dateLiveData = new MutableLiveData<>(LocalDate.now());
+    private MutableLiveData<LocalTime> timeLiveData = new MutableLiveData<>(LocalTime.now());
     private MutableLiveData<Location> locationLiveData = new MutableLiveData<>(new Location(0, 0));
 
     private boolean useSystemLocation = false;
