@@ -1,7 +1,5 @@
 package com.skycompass;
 
-import android.content.res.Configuration;
-import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -33,6 +31,7 @@ public class CompassFragment extends Fragment {
 
     private FragmentCompassBinding binding;
     private CompassFragmentViewModel viewModel;
+    private SystemViewModel systemViewModel;
 
     private final MenuProvider menuProvider;
     private final OrientationSensor sensor;
@@ -54,8 +53,12 @@ public class CompassFragment extends Fragment {
         ViewGroup container,
         Bundle savedInstanceState
     ) {
+
         binding = FragmentCompassBinding.inflate(inflater);
+
         viewModel = new ViewModelProvider(this).get(CompassFragmentViewModel.class);
+        systemViewModel = new ViewModelProvider(requireActivity()).get(SystemViewModel.class);
+
         return binding.getRoot();
     }
 
@@ -64,36 +67,9 @@ public class CompassFragment extends Fragment {
 
         binding.compassView.setNorthRotation(viewModel.getTargetRotation());
 
-//        int nightMode = (getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK);
-//        if (nightMode == Configuration.UI_MODE_NIGHT_YES) {
-//            binding.compassView.setColor(Color.valueOf(Color.parseColor("#F55353")));
-//        }
-
-        Bundle args = getArguments();
-        if (args != null) {
-
-            // Location
-            double longitude = args.getDouble("Longitude");
-            double latitude = args.getDouble("Latitude");
-
-            setLocation(longitude, latitude);
-
-            // Date
-            LocalDate date = LocalDate.of(args.getInt("Y"), args.getInt("M")+1, args.getInt("D")+1);
-
-            setDate(date);
-
-            // Time
-            LocalTime time = LocalTime.of(args.getInt("HOUR"), args.getInt("MINUTE"), args.getInt("SECOND"));
-            ZoneOffset zoneOffset = ZoneOffset.ofTotalSeconds(args.getInt("OFFSET")/1000);
-
-            setTime(
-                ZonedDateTime.of(date, time, zoneOffset)
-                    .withZoneSameInstant(ZoneOffset.ofHours(0))
-                    .toLocalTime()
-            );
-
-        }
+        systemViewModel.getLocationLiveData().observe(getViewLifecycleOwner(), location -> updateViews());
+        systemViewModel.getDateLiveData().observe(getViewLifecycleOwner(), date -> updateViews());
+        systemViewModel.getTimeLiveData().observe(getViewLifecycleOwner(), time -> updateViews());
 
     }
 
@@ -119,16 +95,21 @@ public class CompassFragment extends Fragment {
         super.onPause();
     }
 
-    public void setLocation(double longitude, double latitude) {
-        binding.compassView.setLocation(latitude, longitude);
-    }
+    private void updateViews() {
 
-    public void setDate(LocalDate date) {
+        SystemViewModel.Location location = systemViewModel.getLocationLiveData().getValue();
+
+        LocalDate date = systemViewModel.getDateLiveData().getValue();
+        LocalTime time = systemViewModel.getTimeLiveData().getValue();
+
+        binding.compassView.setLocation(location.latitude, location.longitude);
         binding.compassView.setDate(date);
-    }
+        binding.compassView.setTime(
+                ZonedDateTime.of(date, time, systemViewModel.getZoneOffset())
+                        .withZoneSameInstant(ZoneOffset.ofHours(0))
+                        .toLocalTime()
+        );
 
-    public void setTime(LocalTime time) {
-        binding.compassView.setTime(time);
     }
 
     public class OnOrientationChanged implements OrientationSensor.OnOrientationChanged {

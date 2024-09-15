@@ -24,7 +24,7 @@ import org.osmdroid.views.overlay.Marker;
 
 public class MapFragment extends Fragment {
 
-    private MapViewModel viewModel;
+    private SystemViewModel systemViewModel;
     private FragmentMapBinding binding;
 
     @Override
@@ -40,7 +40,7 @@ public class MapFragment extends Fragment {
         @Nullable Bundle savedInstanceState
     ) {
 
-        viewModel = new ViewModelProvider(this).get(MapViewModel.class);
+        systemViewModel = new ViewModelProvider(requireActivity()).get(SystemViewModel.class);
 
         binding = FragmentMapBinding.inflate(inflater);
 
@@ -58,10 +58,12 @@ public class MapFragment extends Fragment {
         binding.mapView.setUp();
         binding.mapView.setOnMarkerDragListener(new OnMarkerDragListener());
 
-        updateOverlayLocation();
-        updateMapViewLocation();
+        systemViewModel.getLocationLiveData().observe(getViewLifecycleOwner(), location -> {
 
-        notifyLocationChanged();
+            updateOverlayLocation();
+            updateMapViewLocation();
+
+        });
 
         binding.copyright.setMovementMethod(LinkMovementMethod.getInstance());
         binding.copyright.setClickable(true);
@@ -88,38 +90,19 @@ public class MapFragment extends Fragment {
         super.onPause();
     }
 
-    public void setLocation(double latitude, double longitude) {
-
-        viewModel.setLocation(latitude, longitude);
-
-        updateOverlayLocation();
-        updateMapViewLocation();
-
-    }
-
     private void updateOverlayLocation() {
 
-        binding.markerLocation.setText(Format.LatitudeLongitude(viewModel.getLatitude(), viewModel.getLongitude()));
+        SystemViewModel.Location location = systemViewModel.getLocationLiveData().getValue();
+
+        binding.markerLocation.setText(Format.LatitudeLongitude(location.latitude, location.longitude));
 
     }
 
     private void updateMapViewLocation() {
 
-        binding.mapView.setMarkerLocation(viewModel.getLatitude(), viewModel.getLongitude());
+        SystemViewModel.Location location = systemViewModel.getLocationLiveData().getValue();
 
-    }
-
-    private void notifyLocationChanged() {
-
-        double latitude = viewModel.getLatitude();
-        double longitude = viewModel.getLongitude();
-
-        Bundle bundle = new Bundle();
-
-        bundle.putDouble("Latitude", latitude);
-        bundle.putDouble("Longitude", longitude);
-
-        getParentFragmentManager().setFragmentResult("MapFragment/LocationChanged", bundle);
+        binding.mapView.setMarkerLocation(location.latitude, location.longitude);
 
     }
 
@@ -133,11 +116,9 @@ public class MapFragment extends Fragment {
 
             Debug.log(String.format("Marker: %.2f %.2f", latitude, longitude));
 
-            viewModel.setLocation(latitude, longitude);
+            SystemViewModel.Location location = new SystemViewModel.Location(latitude,longitude);
 
-            updateOverlayLocation();
-
-            notifyLocationChanged();
+            systemViewModel.setLocation(location);
 
         }
 

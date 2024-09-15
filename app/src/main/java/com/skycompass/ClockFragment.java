@@ -17,7 +17,6 @@ import com.skycompass.databinding.FragmentClockBinding;
 import com.skycompass.util.Debug;
 import com.skycompass.views.TimeZonePicker;
 
-import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -26,6 +25,7 @@ import java.time.ZonedDateTime;
 public class ClockFragment extends Fragment implements TimeZonePicker.TimeZoneAdapter {
 
     private ClockViewModel viewModel;
+    private SystemViewModel systemViewModel;
     private FragmentClockBinding binding;
 
     private final OnTimeChanged onTimeChangedListener;
@@ -46,6 +46,7 @@ public class ClockFragment extends Fragment implements TimeZonePicker.TimeZoneAd
     ) {
 
         viewModel = new ViewModelProvider(this).get(ClockViewModel.class);
+        systemViewModel = new ViewModelProvider(requireActivity()).get(SystemViewModel.class);
 
         binding = FragmentClockBinding.inflate(inflater, container, false);
 
@@ -57,6 +58,19 @@ public class ClockFragment extends Fragment implements TimeZonePicker.TimeZoneAd
 
         binding.timePicker.setIs24HourView(true);
         binding.timeZonePicker.setTimeZoneAdapter(this);
+
+        systemViewModel.getDateLiveData().observe(getViewLifecycleOwner(), date -> {
+
+            updateTimeZonePicker();
+
+        });
+
+        systemViewModel.getTimeLiveData().observe(getViewLifecycleOwner(), time -> {
+
+            updateTimePicker();
+            updateTimeZonePicker();
+
+        });
 
     }
 
@@ -81,52 +95,13 @@ public class ClockFragment extends Fragment implements TimeZonePicker.TimeZoneAd
         super.onPause();
     }
 
-    public void setDate(LocalDate date) {
-
-        Debug.log(String.format("Date: %s", date.toString()));
-
-        viewModel.setDate(date);
-
-        updateTimeZonePicker();
-
-    }
-
-    public void setTime(LocalTime time) {
-
-        Debug.log(String.format("Time: %s", time.toString()));
-
-        viewModel.setTime(time);
-
-        updateTimePicker();
-        updateTimeZonePicker();
-
-    }
-
-    public void setZoneId(ZoneId zoneId) {
-
-        Debug.log(String.format("Zone ID: %s", zoneId.getId()));
-
-        viewModel.setZoneId(zoneId);
-
-        updateTimeZonePicker();
-
-    }
-
-    public void setZoneOffset(ZoneOffset zoneOffset) {
-
-        Debug.log(String.format("Zone offset: %s seconds", zoneOffset.getTotalSeconds()));
-
-        viewModel.setZoneOffset(zoneOffset);
-
-        updateTimeZonePicker();
-
-    }
-
     private void updateTimePicker() {
 
+        LocalTime time = systemViewModel.getTimeLiveData().getValue();
+
         onTimeChangedListener.isUserInput = false;
-        binding.timePicker.setHour(viewModel.getTime().getHour());
-        binding.timePicker.setMinute(viewModel.getTime().getMinute());
+        binding.timePicker.setHour(time.getHour());
+        binding.timePicker.setMinute(time.getMinute());
         onTimeChangedListener.isUserInput = true;
 
     }
@@ -135,9 +110,11 @@ public class ClockFragment extends Fragment implements TimeZonePicker.TimeZoneAd
 
         binding.timeZonePicker.notifyDataSetChanged();
 
-        if (viewModel.getZoneId() != null) {
+        ZoneId timeZone = systemViewModel.getZoneId();
+
+        if (timeZone != null) {
             onTimeZoneChangedListener.isUserInput = false;
-            binding.timeZonePicker.setTimeZone(viewModel.getZoneId().getId(), viewModel.getZoneOffset().getTotalSeconds()*1000);
+            binding.timeZonePicker.setTimeZone(timeZone.getId(), systemViewModel.getZoneOffset().getTotalSeconds()*1000);
             onTimeZoneChangedListener.isUserInput = true;
         }
 
@@ -159,11 +136,7 @@ public class ClockFragment extends Fragment implements TimeZonePicker.TimeZoneAd
 
             Debug.log(String.format("User: %s", time.toString()));
 
-            viewModel.setTime(time);
-
-            updateTimeZonePicker();
-
-            notifyTimeAndTimeZoneChanged();
+            systemViewModel.setTime(time);
 
         }
     }
@@ -180,37 +153,20 @@ public class ClockFragment extends Fragment implements TimeZonePicker.TimeZoneAd
             if (!isUserInput)
                 return;
 
-            if (id != null)
-                viewModel.setZoneId(ZoneId.of(id));
-            else
-                viewModel.setZoneOffset(ZoneOffset.ofTotalSeconds(offset/1000));
+            ZoneId zoneId = id != null ? ZoneId.of(id) : null;
+            ZoneOffset zoneOffset = ZoneOffset.ofTotalSeconds(offset/1000);
 
             Debug.log(String.format("User: %s %d",
-                viewModel.getZoneId() != null ? viewModel.getZoneId().toString() : null,
-                viewModel.getZoneOffset().getTotalSeconds() * 1000
+                zoneId != null ? zoneId.toString() : null,
+                zoneOffset.getTotalSeconds() * 1000
             ));
 
-            notifyTimeAndTimeZoneChanged();
+            if (id != null)
+                systemViewModel.setZoneId(zoneId);
+            else
+                systemViewModel.setZoneOffset(zoneOffset);
 
         }
-    }
-
-    private void notifyTimeAndTimeZoneChanged() {
-
-        LocalTime time = viewModel.getTime();
-        int offset = viewModel.getZoneOffset().getTotalSeconds() * 1000;
-        String id = viewModel.getZoneId() != null ? viewModel.getZoneId().getId() : null;
-
-        Bundle bundle = new Bundle();
-
-        bundle.putInt("HOUR", time.getHour());
-        bundle.putInt("MINUTE", time.getMinute());
-        bundle.putInt("SECOND", time.getSecond());
-        bundle.putInt("OFFSET", offset);
-        bundle.putString("LOCATION", id);
-
-        getParentFragmentManager().setFragmentResult("ClockFragment/TimeChanged", bundle);
-
     }
 
     @Override
@@ -220,7 +176,11 @@ public class ClockFragment extends Fragment implements TimeZonePicker.TimeZoneAd
 
         meta.name = viewModel.getTimeZonesSearch().get(position);
 
-        ZonedDateTime timeZone = ZonedDateTime.of(viewModel.getDate(), viewModel.getTime(), ZoneId.of(meta.name));
+        ZonedDateTime timeZone = ZonedDateTime.of(
+            systemViewModel.getDateLiveData().getValue(),
+            systemViewModel.getTimeLiveData().getValue(),
+            ZoneId.of(meta.name)
+        );
 
         meta.offsetMilliseconds = timeZone.getOffset().getTotalSeconds() * 1000;
 

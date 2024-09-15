@@ -12,23 +12,7 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
-public class MainViewModel extends ViewModel {
-
-    public enum FragmentView {
-        NONE,
-        COMPASS,
-        INFO
-    }
-
-    public enum OptionsFragment {
-        INFO,
-        MAP,
-        CALENDAR,
-        CLOCK
-    }
-
-    public FragmentView currentFragment = FragmentView.NONE;
-    public OptionsFragment currentOption = OptionsFragment.INFO;
+public class SystemViewModel extends ViewModel {
 
     private boolean isSystemLocation = false;
     private boolean isSystemDate = true;
@@ -37,22 +21,22 @@ public class MainViewModel extends ViewModel {
     private ZoneId zoneId;
     private ZoneOffset zoneOffset = ZoneOffset.ofHours(0);
 
-    private MutableLiveData<LocalDate> dateLiveData = new MutableLiveData<>(LocalDate.now());
-    private MutableLiveData<LocalTime> timeLiveData = new MutableLiveData<>(LocalTime.now());
-    private MutableLiveData<Location> locationLiveData = new MutableLiveData<>(new Location(0, 0));
+    private final MutableLiveData<LocalDate> dateLiveData = new MutableLiveData<>(LocalDate.now());
+    private final MutableLiveData<LocalTime> timeLiveData = new MutableLiveData<>(LocalTime.now());
+    private final MutableLiveData<SystemViewModel.Location> locationLiveData = new MutableLiveData<>(new SystemViewModel.Location(0, 0));
 
     private boolean useSystemLocation = false;
-    private Location systemLocation = null;
+    private SystemViewModel.Location systemLocation = null;
 
     private RetrieveSystemValues retrieveSystemValues = null;
     private Thread thread = null;
 
-    public void setLocation(Location location) {
+    public void setLocation(SystemViewModel.Location location) {
         isSystemLocation = false;
         locationLiveData.setValue(location);
     }
 
-    public LiveData<Location> getLocationLiveData() {
+    public LiveData<SystemViewModel.Location> getLocationLiveData() {
         return locationLiveData;
     }
 
@@ -75,6 +59,7 @@ public class MainViewModel extends ViewModel {
     }
 
     public void setZoneId(ZoneId zoneId) {
+        isSystemTime = false;
         this.zoneId = zoneId;
         zoneOffset = null;
     }
@@ -84,6 +69,7 @@ public class MainViewModel extends ViewModel {
     }
 
     public void setZoneOffset(ZoneOffset offset) {
+        isSystemTime = false;
         zoneOffset = offset;
         zoneId = null;
     }
@@ -138,7 +124,7 @@ public class MainViewModel extends ViewModel {
 
     }
 
-    public void updateSystemLocation(Location location) {
+    public void updateSystemLocation(SystemViewModel.Location location) {
 
         systemLocation = location;
 
@@ -158,9 +144,6 @@ public class MainViewModel extends ViewModel {
             timeLiveData.postValue(LocalTime.now());
             zoneId = ZoneId.systemDefault();
         }
-
-//        zoneId = ZoneId.systemDefault();
-        // ZonedDateTime.of(dateLiveData.getValue(), LocalTime.now(), ZoneId.systemDefault()).getOffset().getTotalSeconds()
 
     }
 
@@ -210,6 +193,7 @@ public class MainViewModel extends ViewModel {
 
     }
 
+
     public static class Location {
 
         public double latitude;
@@ -221,5 +205,4 @@ public class MainViewModel extends ViewModel {
         }
 
     }
-
 }

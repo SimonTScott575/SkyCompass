@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,15 +36,16 @@ import io.github.cosinekitty.astronomy.Time;
 public class InfoFragment extends Fragment {
 
     private FragmentInfoBinding binding;
-
-    private double latitude, longitude;
-    private LocalDateTime dateTime = LocalDateTime.of(2000,1,1,0,0,0);
-    private ZoneId timeZone = ZoneOffset.ofHours(0); // UTC offset for displaying time
+    private SystemViewModel systemViewModel;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        systemViewModel = new ViewModelProvider(requireActivity()).get(SystemViewModel.class);
+
         binding = FragmentInfoBinding.inflate(inflater, container, false);
+
         return binding.getRoot();
     }
 
@@ -51,57 +53,27 @@ public class InfoFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        Bundle args = getArguments();
-        if (args != null) {
+        systemViewModel.getLocationLiveData().observe(getViewLifecycleOwner(), location -> update());
+        systemViewModel.getDateLiveData().observe(getViewLifecycleOwner(), date -> update());
+        systemViewModel.getTimeLiveData().observe(getViewLifecycleOwner(), time -> update());
 
-            // Location
-            setLocation(args.getDouble("Longitude"), args.getDouble("Latitude"));
-
-            // Date
-            LocalDate date = LocalDate.of(args.getInt("Y"), args.getInt("M")+1, args.getInt("D")+1);
-
-            setDate(date);
-
-            // Time
-            LocalTime time = LocalTime.of(args.getInt("HOUR"), args.getInt("MINUTE"), args.getInt("SECOND"));
-            ZoneOffset zoneOffset = ZoneOffset.ofTotalSeconds(args.getInt("OFFSET")/1000);
-
-            setTime(
-                ZonedDateTime.of(date, time, zoneOffset)
-                    .withZoneSameInstant(ZoneOffset.ofHours(0))
-                    .toLocalTime(),
-                    zoneOffset
-            );
-
-        }
-
-    }
-
-    public void setLocation(double longitude, double latitude) {
-        this.longitude = longitude;
-        this.latitude = latitude;
-        update();
-    }
-
-    public void setDate(LocalDate date) {
-        dateTime = LocalDateTime.of(date, dateTime.toLocalTime());
-        update();
-    }
-
-    public void setTime(LocalTime time, ZoneId zoneId) {
-        dateTime = LocalDateTime.of(dateTime.toLocalDate(), time);
-        this.timeZone = zoneId;
-        update();
     }
 
     private void update() {
+
+        SystemViewModel.Location location = systemViewModel.getLocationLiveData().getValue();
+        LocalDateTime dateTime = LocalDateTime.of(
+            systemViewModel.getDateLiveData().getValue(),
+            systemViewModel.getTimeLiveData().getValue()
+        );
+        ZoneId timeZone = systemViewModel.getZoneId();
 
         ZonedDateTime utcDateTime = ZonedDateTime.of(dateTime.toLocalDate(), LocalTime.of(0,0,0), timeZone)
             .withZoneSameInstant(ZoneOffset.ofHours(0));
         LocalTime utcTime = utcDateTime.toLocalTime();
         LocalDate utcDate = utcDateTime.toLocalDate();
 
-        Observer observer = new Observer(latitude,longitude,0);
+        Observer observer = new Observer(location.latitude,location.longitude,0);
         Time time = new Time(
             utcDate.getYear(), utcDate.getMonthValue(), utcDate.getDayOfMonth(),
             utcTime.getHour(), utcTime.getMinute(), utcTime.getSecond()
@@ -150,7 +122,7 @@ public class InfoFragment extends Fragment {
 
         return Format.Time(
             ZonedDateTime.of(UTCDate, UTCTime, ZoneOffset.ofHours(0))
-                .withZoneSameInstant(timeZone)
+                .withZoneSameInstant(systemViewModel.getZoneOffset())
                 .toLocalTime()
         );
 

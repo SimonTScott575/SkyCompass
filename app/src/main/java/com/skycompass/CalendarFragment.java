@@ -23,7 +23,7 @@ import java.time.LocalDate;
 
 public class CalendarFragment extends Fragment {
 
-    private CalendarViewModel viewModel;
+    private SystemViewModel systemViewModel;
     private FragmentCalendarBinding binding;
 
     private final OnDateChangedListener onDateChangedListener = new OnDateChangedListener();
@@ -35,7 +35,7 @@ public class CalendarFragment extends Fragment {
         Bundle savedInstanceState
     ) {
 
-        viewModel = new ViewModelProvider(this).get(CalendarViewModel.class);
+        systemViewModel = new ViewModelProvider(requireActivity()).get(SystemViewModel.class);
 
         binding = FragmentCalendarBinding.inflate(inflater);
 
@@ -46,11 +46,15 @@ public class CalendarFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
-        LocalDate date = viewModel.getDate();
-
-        binding.datePicker.updateDate(date.getYear(), date.getMonthValue() - 1, date.getDayOfMonth());
-
         binding.datePicker.setOnDateChangedListener(onDateChangedListener);
+
+        systemViewModel.getDateLiveData().observe(getViewLifecycleOwner(), date -> {
+
+            onDateChangedListener.isUserInput = false;
+            binding.datePicker.updateDate(date.getYear(), date.getMonthValue() - 1, date.getDayOfMonth());
+            onDateChangedListener.isUserInput = true;
+
+        });
 
     }
 
@@ -60,16 +64,6 @@ public class CalendarFragment extends Fragment {
         binding.datePicker.setOnDateChangedListener(null);
 
         super.onPause();
-    }
-
-    public void setDate(LocalDate date) {
-
-        viewModel.setDate(date);
-
-        onDateChangedListener.isUserInput = false;
-        binding.datePicker.updateDate(date.getYear(), date.getMonthValue() - 1, date.getDayOfMonth());
-        onDateChangedListener.isUserInput = true;
-
     }
 
     private class OnDateChangedListener implements DatePicker.OnDateChangedListener {
@@ -86,24 +80,9 @@ public class CalendarFragment extends Fragment {
 
             Debug.log(String.format("User input: %s", date.toString()));
 
-            viewModel.setDate(date);
-
-            notifyDateChanged(date);
+            systemViewModel.setDate(date);
 
         }
-    }
-
-    private void notifyDateChanged(@NonNull LocalDate date) {
-
-        Bundle bundle = new Bundle();
-
-        bundle.putInt("Y", date.getYear());
-        bundle.putInt("M", date.getMonthValue() - 1);
-        bundle.putInt("D", date.getDayOfMonth() - 1);
-        bundle.putBoolean("CURRENT DATE", false);
-
-        getParentFragmentManager().setFragmentResult("CalendarFragment/DateChanged", bundle);
-
     }
 
 }

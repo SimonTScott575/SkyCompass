@@ -22,7 +22,7 @@ import java.time.format.DateTimeFormatter;
 
 public class OptionsFragment extends Fragment {
 
-    private OptionsViewModel viewModel;
+    private SystemViewModel systemViewModel;
 
     private FragmentOptionsBinding binding;
 
@@ -32,7 +32,7 @@ public class OptionsFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
 
-        viewModel = new ViewModelProvider(this).get(OptionsViewModel.class);
+        systemViewModel = new ViewModelProvider(requireActivity()).get(SystemViewModel.class);
 
         binding = FragmentOptionsBinding.inflate(inflater);
 
@@ -47,9 +47,36 @@ public class OptionsFragment extends Fragment {
         binding.changeDate.setOnClickListener(onClickChangeOption);
         binding.changeTime.setOnClickListener(onClickChangeOption);
 
-        updateLocation();
-        updateDate();
-        updateTime();
+        systemViewModel.getLocationLiveData().observe(getViewLifecycleOwner(), location -> {
+            boolean isSystemLocation = systemViewModel.isSystemLocation();
+
+            Debug.log(String.format("Location: %.2f %.2f System location: %b", location.latitude, location.longitude, isSystemLocation));
+
+            updateLocation();
+
+        });
+
+        systemViewModel.getDateLiveData().observe(getViewLifecycleOwner(), date -> {
+            boolean isSystemDate = systemViewModel.isSystemDate();
+
+            Debug.log(String.format("Date: %s System date: %b", date.toString(), isSystemDate));
+
+            updateDate();
+
+        });
+
+        systemViewModel.getTimeLiveData().observe(getViewLifecycleOwner(), time -> {
+
+            int offset = systemViewModel.getZoneOffset().getTotalSeconds() * 1000;
+            String location = systemViewModel.getZoneId() != null ? systemViewModel.getZoneId().getId() : null;
+
+            boolean isSystemTime = systemViewModel.isSystemTime();
+
+            Debug.log(String.format("Time: %s Time zone offset: %d Description: %s System time: %b", time.toString(), offset, location, isSystemTime));
+
+            updateTime();
+
+        });
 
     }
 
@@ -79,22 +106,11 @@ public class OptionsFragment extends Fragment {
         }
     }
 
-    public void setDate(LocalDate date, boolean isSystemDate) {
-
-        Debug.log(String.format("Date: %s System date: %b", date.toString(), isSystemDate));
-
-        viewModel.setDate(date);
-        viewModel.setSystemDate(isSystemDate);
-
-        updateDate();
-
-    }
-
     private void updateDate() {
 
-        LocalDate date = viewModel.getDate();
+        LocalDate date = systemViewModel.getDateLiveData().getValue();
 
-        boolean isCurrentDate = viewModel.isSystemDate();
+        boolean isCurrentDate = systemViewModel.isSystemDate();
 
         binding.dateText.setText(date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
 
@@ -105,24 +121,11 @@ public class OptionsFragment extends Fragment {
 
     }
 
-    public void setTime(LocalTime time, int offset, String description, boolean isSystemTime) {
-
-        Debug.log(String.format("Time: %s Time zone offset: %d Description: %s System time: %b", time.toString(), offset, description, isSystemTime));
-
-        viewModel.setTime(time);
-        viewModel.setTimeZoneOffset(offset);
-        viewModel.setTimeDescription(description);
-        viewModel.setSystemTime(isSystemTime);
-
-        updateTime();
-
-    }
-
     private void updateTime() {
 
-        LocalTime time = viewModel.getTime();
-        int offset = viewModel.getTimeZoneOffset();
-        String description = viewModel.getTimeDescription();
+        LocalTime time = systemViewModel.getTimeLiveData().getValue();
+        int offset = systemViewModel.getZoneOffset().getTotalSeconds() * 1000;
+        String description = systemViewModel.getZoneId() != null ? systemViewModel.getZoneId().getId() : null;
 
         String text = Format.Time(time.getHour(), time.getMinute(), time.getSecond());
         text += " (UTC" + Format.TimeZoneOffset(offset) + ")";
@@ -136,24 +139,13 @@ public class OptionsFragment extends Fragment {
 
     }
 
-    public void setLocation(MainViewModel.Location location, boolean isSystemLocation) {
-
-        Debug.log(String.format("Location: %.2f %.2f System location: %b", location.latitude, location.longitude, isSystemLocation));
-
-        viewModel.setLocation(location);
-        viewModel.setSystemLocation(isSystemLocation);
-
-        updateLocation();
-
-    }
-
     private void updateLocation() {
 
-        MainViewModel.Location location = viewModel.getLocation();
+        SystemViewModel.Location location = systemViewModel.getLocationLiveData().getValue();
 
         binding.locationText.setText(Format.LatitudeLongitude(location.latitude, location.longitude));
 
-        if (viewModel.isSystemLocation())
+        if (systemViewModel.isSystemLocation())
             binding.locationAddress.setText(R.string.current_location);
         else
             binding.locationAddress.setText(R.string.tap_to_change_location);
