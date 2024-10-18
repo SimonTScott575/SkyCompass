@@ -3,8 +3,11 @@ package com.skycompass.views;
 import android.content.Context;
 import android.graphics.Rect;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 
 import androidx.annotation.Nullable;
+
+import com.skycompass.util.Debug;
 
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
@@ -37,6 +40,12 @@ public class SelectionMapView extends MapView {
             getController().setZoom(getScreenRect(new Rect()).right / 256d / 2d);
             drawnOnce = true;
         }
+    }
+
+    @Override
+    public boolean onInterceptTouchEvent(MotionEvent ev) {
+        requestDisallowInterceptTouchEvent(true);
+        return true;
     }
 
     public void setUp() {
