@@ -154,8 +154,8 @@ public class CompassView extends View {
         float hh = h - ypad;
 
         int maxLength = (int)Math.min(ww,hh);
-        offsetHorizontal = (w - maxLength)/2f;
-        offsetVertical = (h - maxLength)/2f;
+        offsetHorizontal = getPaddingLeft() + (w - maxLength) / 2f;
+        offsetVertical = getPaddingTop() + (h - maxLength) / 2f;
 
         innerRadius = maxLength * FACE_FRACTION / 2f;
         ringThickness = maxLength/2f - innerRadius;
@@ -171,8 +171,7 @@ public class CompassView extends View {
         super.onDraw(canvas);
 
         canvas.save();
-        canvas.translate(offsetHorizontal, 0);
-        canvas.translate(offsetVertical, 0);
+        canvas.translate(offsetHorizontal, offsetVertical);
 
         drawBackground(canvas);
 

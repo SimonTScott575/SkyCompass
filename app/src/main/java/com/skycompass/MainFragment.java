@@ -8,7 +8,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentResultListener;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -143,6 +142,16 @@ public class MainFragment extends Fragment {
         systemViewModel.getLocationLiveData().observe(getViewLifecycleOwner(), new LocationObserver());
         systemViewModel.getDateLiveData().observe(getViewLifecycleOwner(), new DateObserver());
         systemViewModel.getTimeLiveData().observe(getViewLifecycleOwner(), new TimeObserver());
+
+        //
+        if (requireActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+            binding.optionsBottomSheet.getViewTreeObserver().addOnGlobalLayoutListener(() ->
+                binding.fragmentCompass.setLayoutParams(new ViewGroup.LayoutParams(
+                    binding.fragmentCompass.getMeasuredWidth(), (int)
+                    binding.optionsCoordinatorLayout.getY() + (int) binding.optionsBottomSheet.getY())
+                )
+            );
+        }
 
     }
 
