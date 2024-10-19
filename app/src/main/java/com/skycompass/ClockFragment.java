@@ -15,26 +15,22 @@ import android.widget.TimePicker;
 
 import com.skycompass.databinding.FragmentClockBinding;
 import com.skycompass.util.Debug;
-import com.skycompass.views.TimeZonePicker;
+import com.skycompass.util.Format;
 
 import java.time.LocalTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
+import java.time.format.TextStyle;
+import java.util.Locale;
 
-public class ClockFragment extends Fragment implements TimeZonePicker.TimeZoneAdapter {
+public class ClockFragment extends Fragment {
 
-    private ClockViewModel viewModel;
     private SystemViewModel systemViewModel;
     private FragmentClockBinding binding;
 
     private final OnTimeChanged onTimeChangedListener;
-    private final OnTimeZoneChange onTimeZoneChangedListener;
 
     public ClockFragment() {
 
         onTimeChangedListener = new OnTimeChanged();
-        onTimeZoneChangedListener = new OnTimeZoneChange();
 
     }
 
@@ -45,7 +41,6 @@ public class ClockFragment extends Fragment implements TimeZonePicker.TimeZoneAd
         @Nullable Bundle savedInstanceState
     ) {
 
-        viewModel = new ViewModelProvider(this).get(ClockViewModel.class);
         systemViewModel = new ViewModelProvider(requireActivity()).get(SystemViewModel.class);
 
         binding = FragmentClockBinding.inflate(inflater, container, false);
@@ -57,20 +52,23 @@ public class ClockFragment extends Fragment implements TimeZonePicker.TimeZoneAd
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
 
         binding.timePicker.setIs24HourView(true);
-        binding.timeZonePicker.setTimeZoneAdapter(this);
 
-        systemViewModel.getDateLiveData().observe(getViewLifecycleOwner(), date -> {
-
-            updateTimeZonePicker();
-
+        systemViewModel.getZoneOffsetLiveData().observe(getViewLifecycleOwner(), zoneOffset -> {
+            if (systemViewModel.getZoneId() != null)
+                binding.timeZone.setText(systemViewModel.getZoneId().getDisplayName(TextStyle.FULL, Locale.getDefault()));
+            else
+                binding.timeZone.setText("UTC" + Format.TimeZoneOffset(systemViewModel.getZoneOffsetLiveData().getValue().getTotalSeconds() * 1000));
         });
 
-        systemViewModel.getTimeLiveData().observe(getViewLifecycleOwner(), time -> {
-
-            updateTimePicker();
-            updateTimeZonePicker();
-
+        binding.timeZoneEdit.setOnClickListener(v -> {
+            getParentFragmentManager().beginTransaction()
+                .setReorderingAllowed(true)
+                .addToBackStack(null)
+                .replace(R.id.options_fragment_container, TimeZoneFragment.class, null)
+                .commit();
         });
+
+        systemViewModel.getTimeLiveData().observe(getViewLifecycleOwner(), time -> updateTimePicker());
 
     }
 
@@ -79,10 +77,8 @@ public class ClockFragment extends Fragment implements TimeZonePicker.TimeZoneAd
         super.onResume();
 
         binding.timePicker.setOnTimeChangedListener(onTimeChangedListener);
-        binding.timeZonePicker.setOnTimeZoneChangedListener(onTimeZoneChangedListener);
 
         updateTimePicker();
-        updateTimeZonePicker();
 
     }
 
@@ -90,7 +86,6 @@ public class ClockFragment extends Fragment implements TimeZonePicker.TimeZoneAd
     public void onPause() {
 
         binding.timePicker.setOnTimeChangedListener(null);
-        binding.timeZonePicker.setOnTimeZoneChangedListener(null);
 
         super.onPause();
     }
@@ -103,20 +98,6 @@ public class ClockFragment extends Fragment implements TimeZonePicker.TimeZoneAd
         binding.timePicker.setHour(time.getHour());
         binding.timePicker.setMinute(time.getMinute());
         onTimeChangedListener.isUserInput = true;
-
-    }
-
-    private void updateTimeZonePicker() {
-
-        binding.timeZonePicker.notifyDataSetChanged();
-
-        ZoneId timeZone = systemViewModel.getZoneId();
-
-        if (timeZone != null) {
-            onTimeZoneChangedListener.isUserInput = false;
-            binding.timeZonePicker.setTimeZone(timeZone.getId(), systemViewModel.getZoneOffset().getTotalSeconds()*1000);
-            onTimeZoneChangedListener.isUserInput = true;
-        }
 
     }
 
@@ -139,59 +120,6 @@ public class ClockFragment extends Fragment implements TimeZonePicker.TimeZoneAd
             systemViewModel.setTime(time);
 
         }
-    }
-
-    private class OnTimeZoneChange implements TimeZonePicker.OnTimeZoneChanged {
-
-        public boolean isUserInput = true;
-
-        @Override
-        public void onTimeZoneChanged(TimeZonePicker timeZonePicker, int offset, String id) {
-
-            // TODO handle case where date/time are not compatible with time zone
-
-            if (!isUserInput)
-                return;
-
-            ZoneId zoneId = id != null ? ZoneId.of(id) : null;
-            ZoneOffset zoneOffset = ZoneOffset.ofTotalSeconds(offset/1000);
-
-            Debug.log(String.format("User: %s %d",
-                zoneId != null ? zoneId.toString() : null,
-                zoneOffset.getTotalSeconds() * 1000
-            ));
-
-            if (id != null)
-                systemViewModel.setZoneId(zoneId);
-            else
-                systemViewModel.setZoneOffset(zoneOffset);
-
-        }
-    }
-
-    @Override
-    public void getTimeZone(TimeZonePicker picker, int position, TimeZonePicker.TimeZone meta) {
-
-        viewModel.setTimeZoneSearch(picker.getSearchText());
-
-        meta.name = viewModel.getTimeZonesSearch().get(position);
-
-        ZonedDateTime timeZone = ZonedDateTime.of(
-            systemViewModel.getDateLiveData().getValue(),
-            systemViewModel.getTimeLiveData().getValue(),
-            ZoneId.of(meta.name)
-        );
-
-        meta.offsetMilliseconds = timeZone.getOffset().getTotalSeconds() * 1000;
-
-    }
-
-    @Override
-    public int getTimeZoneCount(TimeZonePicker picker) {
-
-        viewModel.setTimeZoneSearch(picker.getSearchText());
-
-        return viewModel.getTimeZonesSearch().size();
     }
 
 }

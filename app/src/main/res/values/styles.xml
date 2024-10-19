@@ -10,19 +10,20 @@
     </style>
 
     <style name="panel">
-        <item name="android:layout_marginStart">16dp</item>
-        <item name="android:layout_marginEnd">16dp</item>
-        <item name="android:layout_marginBottom">16dp</item>
-        <item name="android:layout_marginTop">16dp</item>
-        <item name="android:clickable">false</item>
-        <item name="android:visibility">invisible</item>
-        <item name="cardBackgroundColor">?attr/colorSurfaceContainer</item>
-        <item name="cardCornerRadius">8dp</item>
-        <item name="cardElevation">8dp</item>
+        <item name="android:background">@drawable/rounded_corners_ripple</item>
+        <item name="android:backgroundTint">?attr/colorSurfaceContainer</item>
     </style>
 
     <style name="image">
         <item name="android:tint">?attr/colorOnSurfaceVariant</item>
+    </style>
+
+    <style name="image_button">
+        <item name="android:background">@drawable/circle_ripple</item>
+        <item name="android:backgroundTint">?attr/colorSurfaceContainerLow</item>
+        <item name="android:padding">8dp</item>
+        <item name="android:scaleType">fitCenter</item>
+        <item name="tint">?attr/colorOnSurface</item>
     </style>
 
 </resources>

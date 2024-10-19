@@ -10,6 +10,7 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -23,6 +24,8 @@ import com.skycompass.R;
 import com.skycompass.databinding.ViewTimeZonePickerBinding;
 import com.skycompass.util.Debug;
 import com.skycompass.util.Format;
+
+import java.time.ZoneId;
 
 public class TimeZonePicker extends LinearLayout {
 
@@ -105,6 +108,12 @@ public class TimeZonePicker extends LinearLayout {
         binding.textSuggestions.addItemDecoration(dividerItemDecoration);
 
         binding.textSearch.addTextChangedListener(new SearchWatcher());
+
+        binding.textSearch.setAdapter(new ArrayAdapter<String>(
+            getContext(),
+            android.R.layout.simple_list_item_1,
+            ZoneId.getAvailableZoneIds().toArray(new String[0])
+        ));
 
         searchText = "";
 

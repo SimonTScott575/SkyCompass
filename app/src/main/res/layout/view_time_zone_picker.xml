@@ -29,12 +29,13 @@
             android:requiresFadingEdge="vertical"
             android:scrollbars="vertical" />
 
-        <EditText
+        <AutoCompleteTextView
             android:id="@+id/text_search"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:hint="@string/text_search_hint"
+            android:completionThreshold="1"
             android:textSize="18sp" />
 
     </merge>

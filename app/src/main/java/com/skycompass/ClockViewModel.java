@@ -1,16 +1,14 @@
 package com.skycompass;
 
-import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
+import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
+import java.util.stream.Collectors;
 
 public class ClockViewModel extends ViewModel {
 
@@ -25,7 +23,13 @@ public class ClockViewModel extends ViewModel {
         timeZones = new ArrayList<>();
         timeZones.addAll(ZoneId.getAvailableZoneIds());
         Collections.sort(timeZones);
-
+/*
+        ZoneId.getAvailableZoneIds().stream()
+                .map(ZoneId::of)
+                .map(id -> id.getDisplayName(TextStyle.FULL, Locale.getDefault()))
+                .distinct()
+                .collect(Collectors.toList());
+*/
         timeZonesSearch = new ArrayList<>();
         timeZonesSearch.addAll(timeZones);
 

@@ -48,6 +48,7 @@
                     android:layout_marginEnd="16dp"
                     android:gravity="center"
                     android:orientation="vertical"
+                    android:clipChildren="false"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent">
@@ -66,16 +67,12 @@
 
                         <ImageButton
                             android:id="@+id/options_navigation_back"
+                            style="@style/image_button"
                             android:layout_width="48dp"
                             android:layout_height="48dp"
                             android:layout_gravity="start"
                             android:layout_weight="0"
-                            android:background="@drawable/circle_ripple"
-                            android:backgroundTint="?attr/colorSurfaceContainerLow"
-                            android:padding="8dp"
-                            android:scaleType="fitCenter"
                             android:src="@drawable/back"
-                            app:tint="?attr/colorOnSurface"
                             android:visibility="invisible"/>
 
                         <TextView
@@ -86,15 +83,11 @@
 
                         <ImageButton
                             android:id="@+id/options_navigation_current"
+                            style="@style/image_button"
                             android:layout_width="48dp"
                             android:layout_height="48dp"
                             android:layout_weight="0"
-                            android:background="@drawable/circle_ripple"
-                            android:backgroundTint="?attr/colorSurfaceContainerLow"
-                            android:padding="8dp"
-                            android:scaleType="fitCenter"
                             android:src="@null"
-                            app:tint="?attr/colorOnSurface"
                             android:visibility="invisible" />
 
                     </androidx.appcompat.widget.LinearLayoutCompat>
@@ -104,6 +97,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
                         android:layout_weight="1"
+                        android:clipChildren="false"
                         tools:layout="@layout/fragment_options" />
 
                 </androidx.appcompat.widget.LinearLayoutCompat>

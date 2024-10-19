@@ -19,11 +19,11 @@ public class SystemViewModel extends ViewModel {
     private boolean isSystemTime = true;
 
     private ZoneId zoneId;
-    private ZoneOffset zoneOffset = ZoneOffset.ofHours(0);
 
     private final MutableLiveData<LocalDate> dateLiveData = new MutableLiveData<>(LocalDate.now());
     private final MutableLiveData<LocalTime> timeLiveData = new MutableLiveData<>(LocalTime.now());
     private final MutableLiveData<SystemViewModel.Location> locationLiveData = new MutableLiveData<>(new SystemViewModel.Location(0, 0));
+    private final MutableLiveData<ZoneOffset> zoneOffsetLiveData = new MutableLiveData<>(ZoneOffset.ofHours(0));
 
     private boolean useSystemLocation = false;
     private SystemViewModel.Location systemLocation = null;
@@ -61,7 +61,7 @@ public class SystemViewModel extends ViewModel {
     public void setZoneId(ZoneId zoneId) {
         isSystemTime = false;
         this.zoneId = zoneId;
-        zoneOffset = null;
+        zoneOffsetLiveData.setValue(null);
     }
 
     public ZoneId getZoneId() {
@@ -70,15 +70,19 @@ public class SystemViewModel extends ViewModel {
 
     public void setZoneOffset(ZoneOffset offset) {
         isSystemTime = false;
-        zoneOffset = offset;
         zoneId = null;
+        zoneOffsetLiveData.setValue(offset);
     }
 
     public ZoneOffset getZoneOffset() {
         if (zoneId != null)
             return ZonedDateTime.of(dateLiveData.getValue(), timeLiveData.getValue(), zoneId).getOffset();
         else
-            return zoneOffset;
+            return zoneOffsetLiveData.getValue();
+    }
+
+    public LiveData<ZoneOffset> getZoneOffsetLiveData() {
+        return zoneOffsetLiveData;
     }
 
     public boolean isSystemLocation() {
@@ -143,6 +147,7 @@ public class SystemViewModel extends ViewModel {
         if (isSystemTime) {
             timeLiveData.postValue(LocalTime.now());
             zoneId = ZoneId.systemDefault();
+            zoneOffsetLiveData.postValue(ZonedDateTime.of(dateLiveData.getValue(), timeLiveData.getValue(), zoneId).getOffset());
         }
 
     }
@@ -161,12 +166,10 @@ public class SystemViewModel extends ViewModel {
     }
 
     public void endRetrieveSystemValues() {
-
         if (retrieveSystemValues != null) {
             retrieveSystemValues.end = true;
             retrieveSystemValues = null;
         }
-
     }
 
     private class RetrieveSystemValues implements Runnable {

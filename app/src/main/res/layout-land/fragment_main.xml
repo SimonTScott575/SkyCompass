@@ -15,9 +15,10 @@
             android:id="@+id/view_pager"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginEnd="8dp"
+            android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/options_coordinator_layout"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintDimensionRatio="1:1"/>
@@ -42,26 +43,27 @@
                 app:behavior_peekHeight="48dp"
                 app:behavior_fitToContents="false"
                 app:behavior_halfExpandedRatio="0.5"
-                android:background="@color/red_light">
+                android:clipChildren="false">
 
                 <androidx.appcompat.widget.LinearLayoutCompat
                     android:id="@+id/options"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
                     android:layout_marginBottom="8dp"
                     android:gravity="center"
-                    android:orientation="vertical"
+                    android:orientation="horizontal"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent">
+                    app:layout_constraintStart_toStartOf="parent"
+                    android:clipChildren="false">
 
                     <androidx.appcompat.widget.LinearLayoutCompat
                         android:id="@+id/options_navigation"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
                         android:layout_weight="0"
-                        android:orientation="horizontal">
+                        android:orientation="vertical">
 
                         <ImageButton
                             android:id="@+id/options_navigation_back"
@@ -78,16 +80,14 @@
                             android:visibility="invisible"/>
 
                         <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="0dp"
                             android:text="" />
 
                         <ImageButton
                             android:id="@+id/options_navigation_current"
                             android:layout_width="48dp"
                             android:layout_height="48dp"
-                            android:layout_weight="0"
                             android:background="@drawable/circle_ripple"
                             android:backgroundTint="?attr/colorSurfaceContainerLow"
                             android:padding="8dp"
@@ -100,9 +100,10 @@
 
                     <androidx.fragment.app.FragmentContainerView
                         android:id="@+id/options_fragment_container"
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
                         android:layout_weight="1"
+                        android:clipChildren="false"
                         tools:layout="@layout/fragment_options" />
 
                 </androidx.appcompat.widget.LinearLayoutCompat>

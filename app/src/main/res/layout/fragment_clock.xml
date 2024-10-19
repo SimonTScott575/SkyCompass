@@ -20,17 +20,41 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <com.skycompass.views.TimeZonePicker
-            android:id="@+id/time_zone_picker"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/time_zone_edit"
+            style="@style/panel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:paddingStart="32dp"
+            android:paddingTop="8dp"
+            android:paddingEnd="32dp"
+            android:paddingBottom="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/time_picker"
-            android:clipChildren="false" />
+            app:layout_constraintTop_toBottomOf="@+id/time_picker">
+
+            <TextView
+                android:id="@+id/time_zone"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/rounded_corners"
+                android:text=""
+                android:textSize="24sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Time Zone"
+                android:textSize="12sp"
+                app:layout_constraintEnd_toEndOf="@+id/time_zone"
+                app:layout_constraintStart_toStartOf="@+id/time_zone"
+                app:layout_constraintTop_toBottomOf="@+id/time_zone" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
