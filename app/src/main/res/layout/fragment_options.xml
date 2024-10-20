@@ -10,101 +10,122 @@
         android:id="@+id/options_info"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="center"
+        android:gravity="bottom"
         android:orientation="vertical"
         tools:context=".OptionsFragment">
 
+
         <androidx.appcompat.widget.LinearLayoutCompat
-            android:id="@+id/change_location"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            style="@style/panel"
-            android:orientation="vertical"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            android:gravity="start">
 
-            <TextView
-                android:id="@+id/location_text"
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:layout_marginStart="32dp"
-                android:layout_marginTop="8dp"
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/change_location"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="32dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
                 android:layout_weight="1"
-                android:text="@string/location"
-                android:textSize="24sp" />
+                android:layout_gravity="start"
+                style="@style/panel"
+                android:orientation="vertical"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
-            <TextView
-                android:id="@+id/location_address"
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:layout_marginStart="32dp"
-                android:layout_weight="1"
-                android:textSize="12sp"
-                tools:text="@string/location" />
+                <TextView
+                    android:id="@+id/location_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/location"
+                    android:textSize="24sp" />
+
+                <TextView
+                    android:id="@+id/location_address"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    tools:text="@string/location" />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
 
         </androidx.appcompat.widget.LinearLayoutCompat>
 
         <androidx.appcompat.widget.LinearLayoutCompat
-            android:id="@+id/change_date"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:layout_gravity="center"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="16dp"
-            style="@style/panel"
-            android:orientation="vertical">
+            android:gravity="center">
 
-            <TextView
-                android:id="@+id/date_text"
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:layout_marginStart="32dp"
-                android:layout_marginTop="8dp"
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/change_date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="32dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
                 android:layout_weight="1"
-                android:text="@string/date"
-                android:textSize="24sp" />
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
+                style="@style/panel"
+                android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/date_subscript"
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:layout_marginStart="32dp"
-                android:layout_weight="1"
-                android:textSize="12sp"
-                tools:text="@string/date" />
+                <TextView
+                    android:id="@+id/date_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:text="@string/date"
+                    android:textSize="24sp" />
+
+                <TextView
+                    android:id="@+id/date_subscript"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:textSize="12sp"
+                    tools:text="@string/date" />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
 
         </androidx.appcompat.widget.LinearLayoutCompat>
 
         <androidx.appcompat.widget.LinearLayoutCompat
-            android:id="@+id/change_time"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:layout_marginBottom="16dp"
-            style="@style/panel"
-            android:orientation="vertical">
+            android:gravity="bottom">
 
-            <TextView
-                android:id="@+id/time_text"
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:layout_marginStart="32dp"
-                android:layout_marginTop="8dp"
-                android:layout_weight="1"
-                android:text="@string/time"
-                android:textSize="24sp" />
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/change_time"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="32dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                style="@style/panel"
+                android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/time_location"
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:layout_marginStart="32dp"
-                android:layout_weight="1"
-                android:textSize="12sp"
-                tools:text="@string/time" />
+                <TextView
+                    android:id="@+id/time_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:text="@string/time"
+                    android:textSize="24sp" />
+
+                <TextView
+                    android:id="@+id/time_location"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:textSize="12sp"
+                    tools:text="@string/time" />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
 
         </androidx.appcompat.widget.LinearLayoutCompat>
 

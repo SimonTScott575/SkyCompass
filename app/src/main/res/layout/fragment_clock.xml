@@ -16,27 +16,28 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:timePickerMode="spinner"
+            app:layout_constraintBottom_toTopOf="@+id/time_zone_edit"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <androidx.appcompat.widget.LinearLayoutCompat
             android:id="@+id/time_zone_edit"
             style="@style/panel"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:orientation="vertical"
             android:paddingStart="32dp"
             android:paddingTop="8dp"
             android:paddingEnd="32dp"
             android:paddingBottom="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/time_picker">
+            app:layout_constraintStart_toStartOf="parent">
 
             <TextView
                 android:id="@+id/time_zone"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/rounded_corners"
                 android:text=""
@@ -46,7 +47,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Time Zone"
                 android:textSize="12sp"
@@ -54,7 +55,7 @@
                 app:layout_constraintStart_toStartOf="@+id/time_zone"
                 app:layout_constraintTop_toBottomOf="@+id/time_zone" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.appcompat.widget.LinearLayoutCompat>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

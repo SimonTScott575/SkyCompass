@@ -16,6 +16,9 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.OvershootInterpolator;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.navigation.NavigationBarView;
@@ -33,6 +36,9 @@ public class MainFragment extends Fragment {
     private final OnBackStackChangedListener onBackStackChangedListener = new OnBackStackChangedListener();
     private final OnItemSelectedListener onItemSelectedListener = new OnItemSelectedListener();
     private final OnClickUseSystemValue onClickUseSystemValue = new OnClickUseSystemValue();
+
+    private Animation hideButton;
+    private Animation showButton;
 
     @Override
     public View onCreateView(
@@ -54,6 +60,22 @@ public class MainFragment extends Fragment {
 
         boolean isPortrait = requireActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
         boolean isLandscape = requireActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
+
+        // Animations
+        showButton = AnimationUtils.loadAnimation(requireContext(), R.anim.button_show);
+        showButton.setInterpolator(new OvershootInterpolator());
+
+        hideButton = AnimationUtils.loadAnimation(requireContext(), R.anim.button_hide);
+        hideButton.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) { }
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                binding.optionsNavigationCurrent.setVisibility(View.INVISIBLE);
+            }
+            @Override
+            public void onAnimationRepeat(Animation animation) { }
+        });
 
         // Bottom navigation
         switch (viewModel.currentFragment) {
@@ -92,9 +114,11 @@ public class MainFragment extends Fragment {
         if (isPortrait) {
             binding.optionsBottomSheet.getViewTreeObserver().addOnGlobalLayoutListener(() ->
                 binding.fragmentCompass.setLayoutParams(new ViewGroup.LayoutParams(
-                    binding.fragmentCompass.getMeasuredWidth(), (int)
-                    binding.optionsCoordinatorLayout.getY() + (int) binding.optionsBottomSheet.getY())
-                )
+                    binding.fragmentCompass.getMeasuredWidth(),
+                    viewModel.currentFragment == MainViewModel.FragmentView.COMPASS
+                        ? (int) binding.optionsCoordinatorLayout.getY() + (int) binding.optionsBottomSheet.getY()
+                        : (int) binding.optionsCoordinatorLayout.getY() + binding.optionsCoordinatorLayout.getMeasuredHeight()
+                ))
             );
         }
 
@@ -168,7 +192,10 @@ public class MainFragment extends Fragment {
 
         if (drawable == 0) {
 
-            binding.optionsNavigationCurrent.setVisibility(View.INVISIBLE);
+            if (binding.optionsNavigationCurrent.getVisibility() == View.VISIBLE
+                && (!hideButton.hasStarted() || hideButton.hasEnded())
+            )
+                binding.optionsNavigationCurrent.startAnimation(hideButton); // Set invisible by animation listener at end
 
         } else {
 
@@ -178,15 +205,24 @@ public class MainFragment extends Fragment {
                 )
             );
 
+            if (binding.optionsNavigationCurrent.getVisibility() == View.INVISIBLE)
+                binding.optionsNavigationCurrent.startAnimation(showButton);
+
             binding.optionsNavigationCurrent.setVisibility(View.VISIBLE);
+
 
         }
 
         if (getChildFragmentManager().getBackStackEntryCount() == 0) {
+
             binding.optionsNavigationBack.setVisibility(View.INVISIBLE);
             binding.optionsNavigationCurrent.setVisibility(View.INVISIBLE);
+
         } else {
+
+
             binding.optionsNavigationBack.setVisibility(View.VISIBLE);
+
         }
 
     }

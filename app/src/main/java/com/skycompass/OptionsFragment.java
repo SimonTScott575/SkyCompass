@@ -1,6 +1,5 @@
 package com.skycompass;
 
-import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.os.Bundle;
@@ -116,8 +115,14 @@ public class OptionsFragment extends Fragment {
 
             getParentFragmentManager().beginTransaction()
                 .setReorderingAllowed(true)
-                .replace(R.id.options_fragment_container, fragmentClass, null, message)
                 .addToBackStack(null)
+                .setCustomAnimations(
+                    R.anim.option_push,
+                    R.anim.option_exit,
+                    R.anim.option_enter,
+                    R.anim.option_pop
+                )
+                .replace(R.id.options_fragment_container, fragmentClass, null, message)
                 .commit();
 
         }

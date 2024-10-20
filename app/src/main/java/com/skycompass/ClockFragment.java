@@ -64,6 +64,12 @@ public class ClockFragment extends Fragment {
             getParentFragmentManager().beginTransaction()
                 .setReorderingAllowed(true)
                 .addToBackStack(null)
+                .setCustomAnimations(
+                    R.anim.option_push,
+                    R.anim.option_exit,
+                    R.anim.option_enter,
+                    R.anim.option_pop
+                )
                 .replace(R.id.options_fragment_container, TimeZoneFragment.class, null, "TIME_ZONE")
                 .commit();
         });
