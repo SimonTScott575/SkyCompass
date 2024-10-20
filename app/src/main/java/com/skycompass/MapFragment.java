@@ -35,7 +35,7 @@ public class MapFragment extends Fragment {
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
 
-        locationRequester.setOnPermissionResult(new OnRequestResult()); // TODO ctor ? static ?
+        locationRequester.setOnPermissionResult(new OnRequestResult());
 
         locationRequester.register(this);
 

@@ -66,9 +66,9 @@ public class InfoFragment extends Fragment {
             systemViewModel.getDateLiveData().getValue(),
             systemViewModel.getTimeLiveData().getValue()
         );
-        ZoneId timeZone = systemViewModel.getZoneId();
+        ZoneOffset zoneOffset = systemViewModel.getZoneOffset();
 
-        ZonedDateTime utcDateTime = ZonedDateTime.of(dateTime.toLocalDate(), LocalTime.of(0,0,0), timeZone)
+        ZonedDateTime utcDateTime = ZonedDateTime.of(dateTime.toLocalDate(), LocalTime.of(0,0,0), zoneOffset)
             .withZoneSameInstant(ZoneOffset.ofHours(0));
         LocalTime utcTime = utcDateTime.toLocalTime();
         LocalDate utcDate = utcDateTime.toLocalDate();
