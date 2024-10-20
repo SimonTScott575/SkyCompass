@@ -1,6 +1,5 @@
 package com.skycompass;
 
-import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Bundle;
 
@@ -9,8 +8,6 @@ import androidx.annotation.Nullable;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentResultListener;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
@@ -19,14 +16,12 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.android.material.sidesheet.SideSheetBehavior;
 import com.skycompass.databinding.FragmentMainBinding;
 import com.skycompass.util.Debug;
-import com.skycompass.util.LocationRequester;
 
 public class MainFragment extends Fragment {
 
@@ -38,24 +33,6 @@ public class MainFragment extends Fragment {
     private final OnBackStackChangedListener onBackStackChangedListener = new OnBackStackChangedListener();
     private final OnItemSelectedListener onItemSelectedListener = new OnItemSelectedListener();
     private final OnClickUseSystemValue onClickUseSystemValue = new OnClickUseSystemValue();
-
-    private final LocationRequester locationRequester;
-
-    public MainFragment() {
-
-        locationRequester = new LocationRequester(new OnReceivedMyLocationRequester());
-
-        locationRequester.setOnPermissionResult(new OnRequestResult());
-
-    }
-
-    @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-
-        locationRequester.register(this);
-
-    }
 
     @Override
     public View onCreateView(
@@ -123,8 +100,6 @@ public class MainFragment extends Fragment {
 
     }
 
-
-
     @Override
     public void onResume() {
         super.onResume();
@@ -133,15 +108,11 @@ public class MainFragment extends Fragment {
 
         systemViewModel.startRetrieveSystemValues();
 
-        locationRequester.resume();
-
     }
 
     @Override
     public void onPause() {
         super.onPause();
-
-        locationRequester.pause();
 
         systemViewModel.endRetrieveSystemValues();
 
@@ -149,19 +120,8 @@ public class MainFragment extends Fragment {
 
     }
 
-    @Override
-    public void onDetach() {
-
-        locationRequester.unregister();
-
-        super.onDetach();
-    }
-
-    private class OnBackStackChangedListener implements FragmentManager.OnBackStackChangedListener {
-        @Override
-        public void onBackStackChanged() {
-            updateOptionView();
-        }
+    private Fragment getOptionFragment() {
+        return getChildFragmentManager().findFragmentById(R.id.options_fragment_container);
     }
 
     private void requestOptionFragment() {
@@ -171,6 +131,20 @@ public class MainFragment extends Fragment {
             .replace(R.id.options_fragment_container, OptionsFragment.class, null, "OPTION")
             .commit();
 
+    }
+
+    private class OnBackStackChangedListener implements FragmentManager.OnBackStackChangedListener {
+        @Override
+        public void onBackStackChanged() {
+            updateOptionView();
+        }
+    }
+
+    private class SystemObserver implements Observer<Object> {
+        @Override
+        public void onChanged(Object o) {
+            updateOptionView();
+        }
     }
 
     private void updateOptionView() {
@@ -217,17 +191,6 @@ public class MainFragment extends Fragment {
 
     }
 
-    private Fragment getOptionFragment() {
-        return getChildFragmentManager().findFragmentById(R.id.options_fragment_container);
-    }
-
-    private class SystemObserver implements Observer<Object> {
-        @Override
-        public void onChanged(Object o) {
-            updateOptionView();
-        }
-    }
-
     private class OnClickUseSystemValue implements View.OnClickListener {
         @Override
         public void onClick(View v) {
@@ -236,92 +199,17 @@ public class MainFragment extends Fragment {
 
             switch (tag) {
                 case "LOCATION":
-
-                    LocationRequester.RequestState state = locationRequester.getPermissionState();
-
-                    switch (state) {
-                        case REQUESTED:
-                            break;
-                        case GRANTED:
-                            systemViewModel.useSystemLocation();
-                            break;
-                        default:
-                            locationRequester.request(MainFragment.this);
-                            break;
-                    }
-
-                    if (locationRequester.getEnabledState() == LocationRequester.EnabledState.DISABLED)
-                        notifyUserLocationDisabled();
-
+                    systemViewModel.useSystemLocation();
                     break;
                 case "DATE":
-
                     systemViewModel.useSystemDate();
-
                     break;
                 case "TIME_ZONE":
                 case "TIME":
-
                     systemViewModel.useSystemTime();
-
                     break;
             }
 
-        }
-    }
-
-    private class OnRequestResult implements LocationRequester.OnRequestResult {
-        @Override
-        public void onResult(boolean granted) {
-
-            if (granted) {
-
-                // TODO ?? Remove so updated with latest position - but why doesn't onLocationChanged trigger after request granted?
-                systemViewModel.useSystemLocation();
-
-            } else {
-
-                String tag = getChildFragmentManager().findFragmentById(R.id.options_fragment_container).getTag();
-
-                if (tag != null && tag.equals("LOCATION"))
-                    binding.optionsNavigationCurrent.setImageDrawable(
-                        ResourcesCompat.getDrawable(
-                            getResources(), R.drawable.no_location, requireActivity().getTheme()
-                        )
-                    );
-
-                notifyUserLocationPermissionDenied();
-
-            }
-
-            if (locationRequester.getEnabledState() == LocationRequester.EnabledState.DISABLED)
-                notifyUserLocationDisabled();
-
-        }
-    }
-
-    private class OnReceivedMyLocationRequester implements LocationRequester.OnLocationChanged {
-        @Override
-        public void onLocationChanged(double latitude, double longitude) {
-            systemViewModel.updateSystemLocation(new SystemViewModel.Location(latitude, longitude));
-        }
-    }
-
-    private void notifyUserLocationPermissionDenied() {
-        try {
-            Toast toast = Toast.makeText(requireContext(), "Location access denied in permission settings", Toast.LENGTH_LONG);
-            toast.show();
-        } catch (IllegalStateException e) {
-            Debug.log("No context associated with MapFragment.");
-        }
-    }
-
-    private void notifyUserLocationDisabled() {
-        try {
-            Toast toast = Toast.makeText(requireContext(), "Location updates disabled in settings", Toast.LENGTH_LONG);
-            toast.show();
-        } catch (IllegalStateException e) {
-            Debug.log("No context associated with MapFragment.");
         }
     }
 

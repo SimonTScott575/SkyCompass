@@ -25,7 +25,7 @@ public class SystemViewModel extends ViewModel {
     private final MutableLiveData<SystemViewModel.Location> locationLiveData = new MutableLiveData<>(new SystemViewModel.Location(0, 0));
     private final MutableLiveData<ZoneOffset> zoneOffsetLiveData = new MutableLiveData<>(ZoneOffset.ofHours(0));
 
-    private boolean useSystemLocation = false;
+    private final MutableLiveData<Boolean> useSystemLocationLiveData = new MutableLiveData<>();
     private SystemViewModel.Location systemLocation = null;
 
     private RetrieveSystemValues retrieveSystemValues = null;
@@ -33,6 +33,7 @@ public class SystemViewModel extends ViewModel {
 
     public void setLocation(SystemViewModel.Location location) {
         isSystemLocation = false;
+        useSystemLocationLiveData.setValue(false);
         locationLiveData.setValue(location);
     }
 
@@ -103,13 +104,17 @@ public class SystemViewModel extends ViewModel {
 
     public void useSystemLocation() {
 
-        useSystemLocation = true;
+        useSystemLocationLiveData.setValue(true);
 
         if (systemLocation != null) {
             isSystemLocation = true;
             locationLiveData.setValue(systemLocation);
         }
 
+    }
+
+    public LiveData<Boolean> useSystemLocationLiveData() {
+        return useSystemLocationLiveData;
     }
 
     public void useSystemTime() {
@@ -132,7 +137,7 @@ public class SystemViewModel extends ViewModel {
 
         systemLocation = location;
 
-        if (useSystemLocation && systemLocation != null) {
+        if (useSystemLocationLiveData.getValue() && systemLocation != null) {
             isSystemLocation = true;
             locationLiveData.postValue(systemLocation);
         }
