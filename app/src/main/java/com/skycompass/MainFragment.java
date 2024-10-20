@@ -28,27 +28,16 @@ import com.skycompass.databinding.FragmentMainBinding;
 import com.skycompass.util.Debug;
 import com.skycompass.util.LocationRequester;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.ZoneOffset;
-
 public class MainFragment extends Fragment {
 
     private FragmentMainBinding binding;
 
-    private OptionsFragment optionsFragment;
-    private MapFragment mapFragment;
-    private CalendarFragment calendarFragment;
-    private ClockFragment clockFragment;
-
-    private final OnItemSelectedListener onItemSelectedListener = new OnItemSelectedListener();
-
-    private final OnChangeOptionsListener onChangeOptionsListener = new OnChangeOptionsListener();
-
-    private final OnClickUseSystemValue onClickUseSystemValue = new OnClickUseSystemValue();
-
-    private MainViewModel2 viewModel;
+    private MainViewModel viewModel;
     private SystemViewModel systemViewModel;
+
+    private final OnBackStackChangedListener onBackStackChangedListener = new OnBackStackChangedListener();
+    private final OnItemSelectedListener onItemSelectedListener = new OnItemSelectedListener();
+    private final OnClickUseSystemValue onClickUseSystemValue = new OnClickUseSystemValue();
 
     private final LocationRequester locationRequester;
 
@@ -75,36 +64,19 @@ public class MainFragment extends Fragment {
         Bundle savedInstanceState
     ) {
 
-        viewModel = new ViewModelProvider(this).get(MainViewModel2.class);
+        viewModel = new ViewModelProvider(this).get(MainViewModel.class);
         systemViewModel = new ViewModelProvider(requireActivity()).get(SystemViewModel.class);
 
         binding = FragmentMainBinding.inflate(inflater, container, false);
-
-        optionsFragment = new OptionsFragment();
-        mapFragment = new MapFragment();
-        calendarFragment = new CalendarFragment();
-        clockFragment = new ClockFragment();
-
-        switch (viewModel.currentOption) {
-            case INFO:
-                setInfo(optionsFragment);
-                break;
-            case MAP:
-                setInfo(mapFragment);
-                break;
-            case CALENDAR:
-                setInfo(calendarFragment);
-                break;
-            case CLOCK:
-                setInfo(clockFragment);
-                break;
-        }
 
         return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+
+        boolean isPortrait = requireActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
+        boolean isLandscape = requireActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
 
         // Bottom navigation
         switch (viewModel.currentFragment) {
@@ -115,41 +87,32 @@ public class MainFragment extends Fragment {
                 setFragmentCompass();
         }
 
-        if (requireActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
+        if (isPortrait)
             binding.bottomNavigation.setOnItemSelectedListener(onItemSelectedListener);
-        else if (requireActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE)
+        else if (isLandscape)
             binding.viewPager.setAdapter(new ViewPagerAdapter(this));
 
         // Options
-        if (requireActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
+        if (isPortrait)
             BottomSheetBehavior.from(binding.optionsBottomSheet).setState(BottomSheetBehavior.STATE_EXPANDED);
-        else if (requireActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        else if (isLandscape)
             SideSheetBehavior.from(binding.optionsSideSheet).setState(SideSheetBehavior.STATE_EXPANDED);
-        }
 
         binding.optionsNavigationCurrent.setOnClickListener(onClickUseSystemValue);
-        binding.optionsNavigationBack.setOnClickListener(v -> {
+        binding.optionsNavigationBack.setOnClickListener(v -> getChildFragmentManager().popBackStack());
 
-            if (getChildFragmentManager().getBackStackEntryCount() == 0)
-                return;
+        if (getChildFragmentManager().findFragmentByTag("OPTION") == null)
+            requestOptionFragment();
 
-            if (getChildFragmentManager().getBackStackEntryCount() == 1) {
-                binding.optionsNavigationBack.setVisibility(View.INVISIBLE);
-                binding.optionsNavigationCurrent.setVisibility(View.INVISIBLE);
-                viewModel.currentOption = MainViewModel2.OptionsFragment.INFO;
-            }
+        SystemObserver observer = new SystemObserver();
 
-            getChildFragmentManager().popBackStack();
-
-        });
-
-        systemViewModel.getLocationLiveData().observe(getViewLifecycleOwner(), new LocationObserver());
-        systemViewModel.getDateLiveData().observe(getViewLifecycleOwner(), new DateObserver());
-        systemViewModel.getTimeLiveData().observe(getViewLifecycleOwner(), new TimeObserver());
-        systemViewModel.getZoneOffsetLiveData().observe(getViewLifecycleOwner(), new ZoneOffsetObserver());
+        systemViewModel.getLocationLiveData().observe(getViewLifecycleOwner(), observer);
+        systemViewModel.getDateLiveData().observe(getViewLifecycleOwner(), observer);
+        systemViewModel.getTimeLiveData().observe(getViewLifecycleOwner(), observer);
+        systemViewModel.getZoneOffsetLiveData().observe(getViewLifecycleOwner(), observer);
 
         //
-        if (requireActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+        if (isPortrait) {
             binding.optionsBottomSheet.getViewTreeObserver().addOnGlobalLayoutListener(() ->
                 binding.fragmentCompass.setLayoutParams(new ViewGroup.LayoutParams(
                     binding.fragmentCompass.getMeasuredWidth(), (int)
@@ -166,21 +129,7 @@ public class MainFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
-        getChildFragmentManager()
-            .setFragmentResultListener("OptionsFragment/ChangeOption", this, onChangeOptionsListener);
-
-        getChildFragmentManager().addOnBackStackChangedListener(() -> {
-
-            if (getChildFragmentManager().getBackStackEntryCount() == 0) {
-
-                binding.optionsNavigationBack.setVisibility(View.INVISIBLE);
-                binding.optionsNavigationCurrent.setVisibility(View.INVISIBLE);
-
-                viewModel.currentOption = MainViewModel2.OptionsFragment.INFO;
-
-            }
-
-        });
+        getChildFragmentManager().addOnBackStackChangedListener(onBackStackChangedListener);
 
         systemViewModel.startRetrieveSystemValues();
 
@@ -196,6 +145,8 @@ public class MainFragment extends Fragment {
 
         systemViewModel.endRetrieveSystemValues();
 
+        getChildFragmentManager().removeOnBackStackChangedListener(onBackStackChangedListener);
+
     }
 
     @Override
@@ -206,97 +157,46 @@ public class MainFragment extends Fragment {
         super.onDetach();
     }
 
-    private class OnItemSelectedListener implements NavigationBarView.OnItemSelectedListener {
+    private class OnBackStackChangedListener implements FragmentManager.OnBackStackChangedListener {
         @Override
-        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-
-            int id = item.getItemId();
-
-            Debug.log(String.format("Selected %d", id));
-
-            // TODO bundle data ?
-
-            if (id == R.id.bottom_item_compass) {
-
-                if (viewModel.currentFragment == MainViewModel2.FragmentView.COMPASS)
-                    return false;
-
-                getChildFragmentManager().beginTransaction()
-                    .setReorderingAllowed(true)
-                    .setCustomAnimations(R.anim.fade_in, R.anim.fade_out)
-                    .replace(R.id.fragment_compass, CompassFragment.class, null)
-                    .commit();
-
-                setFragmentCompass();
-
-                return true;
-
-            }
-
-            if (id == R.id.bottom_item_times) {
-
-                if (viewModel.currentFragment == MainViewModel2.FragmentView.INFO)
-                    return false;
-
-                getChildFragmentManager().beginTransaction()
-                    .setReorderingAllowed(true)
-                    .setCustomAnimations(R.anim.fade_in, R.anim.fade_out)
-                    .replace(R.id.fragment_compass, InfoFragment.class, null)
-                    .commit();
-
-                setFragmentInfo();
-
-                return true;
-
-            }
-
-
-            return false;
+        public void onBackStackChanged() {
+            updateOptionView();
         }
     }
 
-    private void setInfo(Fragment fragment) {
+    private void requestOptionFragment() {
 
-        FragmentTransaction transaction = getChildFragmentManager().beginTransaction()
+        getChildFragmentManager().beginTransaction()
             .setReorderingAllowed(true)
-            .replace(R.id.options_fragment_container, fragment);
+            .replace(R.id.options_fragment_container, OptionsFragment.class, null, "OPTION")
+            .commit();
 
-        if (fragment != optionsFragment)
-            transaction.addToBackStack(null);
+    }
 
-        transaction.commit();
+    private void updateOptionView() {
 
         int drawable = 0;
 
-        if (fragment == mapFragment) {
+        String tag = getOptionFragment().getTag();
 
-            drawable = systemViewModel.isSystemLocation() ? R.drawable.my_location : R.drawable.set_as_my_location;
-
-            binding.optionsNavigationCurrent.setVisibility(systemViewModel.isSystemLocation() ? View.INVISIBLE : View.VISIBLE);
-
-            viewModel.currentOption = MainViewModel2.OptionsFragment.MAP;
-
-        } else if (fragment == calendarFragment) {
-
-            drawable = R.drawable.current_date;
-
-            binding.optionsNavigationCurrent.setVisibility(systemViewModel.isSystemDate() ? View.INVISIBLE : View.VISIBLE);
-
-            viewModel.currentOption = MainViewModel2.OptionsFragment.CALENDAR;
-
-        } else if (fragment == clockFragment) {
-
-            drawable = R.drawable.current_time;
-
-            binding.optionsNavigationCurrent.setVisibility(systemViewModel.isSystemTime() ? View.INVISIBLE : View.VISIBLE);
-
-            viewModel.currentOption = MainViewModel2.OptionsFragment.CLOCK;
-
+        switch (tag) {
+            case "LOCATION":
+                drawable = systemViewModel.isSystemLocation() ? R.drawable.my_location : R.drawable.set_as_my_location;
+                break;
+            case "DATE":
+                drawable = systemViewModel.isSystemDate() ? 0 : R.drawable.current_date;
+                break;
+            case "TIME_ZONE":
+            case "TIME":
+                drawable = systemViewModel.isSystemTime() ? 0 : R.drawable.current_time;
+                break;
         }
 
-        if (fragment != optionsFragment) {
+        if (drawable == 0) {
 
-            binding.optionsNavigationBack.setVisibility(View.VISIBLE);
+            binding.optionsNavigationCurrent.setVisibility(View.INVISIBLE);
+
+        } else {
 
             binding.optionsNavigationCurrent.setImageDrawable(
                 ResourcesCompat.getDrawable(
@@ -304,63 +204,27 @@ public class MainFragment extends Fragment {
                 )
             );
 
+            binding.optionsNavigationCurrent.setVisibility(View.VISIBLE);
+
+        }
+
+        if (getChildFragmentManager().getBackStackEntryCount() == 0) {
+            binding.optionsNavigationBack.setVisibility(View.INVISIBLE);
+            binding.optionsNavigationCurrent.setVisibility(View.INVISIBLE);
+        } else {
+            binding.optionsNavigationBack.setVisibility(View.VISIBLE);
         }
 
     }
 
-    private class OnChangeOptionsListener implements FragmentResultListener {
-        @Override
-        public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
-
-            String message = result.getString("CHANGE", "");
-
-            if (message.equals("LOCATION"))
-                setInfo(mapFragment);
-            else if (message.equals("DATE"))
-                setInfo(calendarFragment);
-            else if (message.equals("TIME"))
-                setInfo(clockFragment);
-
-        }
+    private Fragment getOptionFragment() {
+        return getChildFragmentManager().findFragmentById(R.id.options_fragment_container);
     }
 
-    private class LocationObserver implements Observer<SystemViewModel.Location> {
+    private class SystemObserver implements Observer<Object> {
         @Override
-        public void onChanged(SystemViewModel.Location location) {
-
-            if (getCurrentInfoFragment() == mapFragment)
-                binding.optionsNavigationCurrent.setVisibility(systemViewModel.isSystemLocation() ? View.INVISIBLE : View.VISIBLE);
-
-        }
-    }
-
-    private class DateObserver implements Observer<LocalDate> {
-        @Override
-        public void onChanged(LocalDate date) {
-
-            if (getCurrentInfoFragment() == calendarFragment)
-                binding.optionsNavigationCurrent.setVisibility(systemViewModel.isSystemDate() ? View.INVISIBLE : View.VISIBLE);
-
-        }
-    }
-
-    private class TimeObserver implements Observer<LocalTime> {
-        @Override
-        public void onChanged(LocalTime time) {
-
-            if (getCurrentInfoFragment() == clockFragment)
-                binding.optionsNavigationCurrent.setVisibility(systemViewModel.isSystemTime() ? View.INVISIBLE : View.VISIBLE);
-
-        }
-    }
-
-    private class ZoneOffsetObserver implements Observer<ZoneOffset> {
-        @Override
-        public void onChanged(ZoneOffset zoneOffset) {
-
-            if (getCurrentInfoFragment() == clockFragment || getCurrentInfoFragment() instanceof TimeZoneFragment)
-                binding.optionsNavigationCurrent.setVisibility(systemViewModel.isSystemTime() ? View.INVISIBLE : View.VISIBLE);
-
+        public void onChanged(Object o) {
+            updateOptionView();
         }
     }
 
@@ -368,38 +232,39 @@ public class MainFragment extends Fragment {
         @Override
         public void onClick(View v) {
 
-            Fragment currentFragment = getChildFragmentManager().findFragmentById(R.id.options_fragment_container);
+            String tag = getOptionFragment().getTag();
 
-            if (currentFragment == mapFragment) {
+            switch (tag) {
+                case "LOCATION":
 
-                LocationRequester.RequestState state = locationRequester.getPermissionState();
+                    LocationRequester.RequestState state = locationRequester.getPermissionState();
 
-                switch (state) {
-                    case REQUESTED:
-                        break;
-                    case GRANTED:
-                        systemViewModel.useSystemLocation();
-                        break;
-                    default:
-                        locationRequester.request(MainFragment.this);
-                        break;
-                }
+                    switch (state) {
+                        case REQUESTED:
+                            break;
+                        case GRANTED:
+                            systemViewModel.useSystemLocation();
+                            break;
+                        default:
+                            locationRequester.request(MainFragment.this);
+                            break;
+                    }
 
-                if (locationRequester.getEnabledState() == LocationRequester.EnabledState.DISABLED)
-                    notifyUserLocationDisabled();
+                    if (locationRequester.getEnabledState() == LocationRequester.EnabledState.DISABLED)
+                        notifyUserLocationDisabled();
 
-            } else if (currentFragment == calendarFragment) {
+                    break;
+                case "DATE":
 
-                systemViewModel.useSystemDate();
+                    systemViewModel.useSystemDate();
 
-                binding.optionsNavigationCurrent.setVisibility(View.INVISIBLE);
+                    break;
+                case "TIME_ZONE":
+                case "TIME":
 
-            } else if (currentFragment == clockFragment || currentFragment instanceof TimeZoneFragment) {
+                    systemViewModel.useSystemTime();
 
-                systemViewModel.useSystemTime();
-
-                binding.optionsNavigationCurrent.setVisibility(View.INVISIBLE);
-
+                    break;
             }
 
         }
@@ -410,16 +275,23 @@ public class MainFragment extends Fragment {
         public void onResult(boolean granted) {
 
             if (granted) {
+
                 // TODO ?? Remove so updated with latest position - but why doesn't onLocationChanged trigger after request granted?
                 systemViewModel.useSystemLocation();
+
             } else {
-                if (getChildFragmentManager().findFragmentById(R.id.options_fragment_container) == mapFragment)
+
+                String tag = getChildFragmentManager().findFragmentById(R.id.options_fragment_container).getTag();
+
+                if (tag != null && tag.equals("LOCATION"))
                     binding.optionsNavigationCurrent.setImageDrawable(
                         ResourcesCompat.getDrawable(
                             getResources(), R.drawable.no_location, requireActivity().getTheme()
                         )
                     );
+
                 notifyUserLocationPermissionDenied();
+
             }
 
             if (locationRequester.getEnabledState() == LocationRequester.EnabledState.DISABLED)
@@ -457,7 +329,7 @@ public class MainFragment extends Fragment {
 
         Debug.log("Focus: Compass");
 
-        viewModel.currentFragment = MainViewModel2.FragmentView.COMPASS;
+        viewModel.currentFragment = MainViewModel.FragmentView.COMPASS;
 
     }
 
@@ -465,12 +337,57 @@ public class MainFragment extends Fragment {
 
         Debug.log("Focus: Info");
 
-        viewModel.currentFragment = MainViewModel2.FragmentView.INFO;
+        viewModel.currentFragment = MainViewModel.FragmentView.INFO;
 
     }
 
-    private Fragment getCurrentInfoFragment() {
-        return getChildFragmentManager().findFragmentById(R.id.options_fragment_container);
+    private class OnItemSelectedListener implements NavigationBarView.OnItemSelectedListener {
+        @Override
+        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+
+            int id = item.getItemId();
+
+            Debug.log(String.format("Selected %d", id));
+
+            // TODO bundle data ?
+
+            if (id == R.id.bottom_item_compass) {
+
+                if (viewModel.currentFragment == MainViewModel.FragmentView.COMPASS)
+                    return false;
+
+                getChildFragmentManager().beginTransaction()
+                        .setReorderingAllowed(true)
+                        .setCustomAnimations(R.anim.fade_in, R.anim.fade_out)
+                        .replace(R.id.fragment_compass, CompassFragment.class, null)
+                        .commit();
+
+                setFragmentCompass();
+
+                return true;
+
+            }
+
+            if (id == R.id.bottom_item_times) {
+
+                if (viewModel.currentFragment == MainViewModel.FragmentView.INFO)
+                    return false;
+
+                getChildFragmentManager().beginTransaction()
+                        .setReorderingAllowed(true)
+                        .setCustomAnimations(R.anim.fade_in, R.anim.fade_out)
+                        .replace(R.id.fragment_compass, InfoFragment.class, null)
+                        .commit();
+
+                setFragmentInfo();
+
+                return true;
+
+            }
+
+
+            return false;
+        }
     }
 
     private class ViewPagerAdapter extends FragmentStateAdapter {

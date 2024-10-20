@@ -1,5 +1,6 @@
 package com.skycompass;
 
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.os.Bundle;
@@ -48,15 +49,22 @@ public class OptionsFragment extends Fragment {
         binding.changeTime.setOnClickListener(onClickChangeOption);
 
         systemViewModel.getLocationLiveData().observe(getViewLifecycleOwner(), location -> {
+
             boolean isSystemLocation = systemViewModel.isSystemLocation();
 
-            Debug.log(String.format("Location: %.2f %.2f System location: %b", location.latitude, location.longitude, isSystemLocation));
+            Debug.log(String.format(
+                "Location: %.2f %.2f System location: %b",
+                location.latitude,
+                location.longitude,
+                isSystemLocation
+            ));
 
             updateLocation();
 
         });
 
         systemViewModel.getDateLiveData().observe(getViewLifecycleOwner(), date -> {
+
             boolean isSystemDate = systemViewModel.isSystemDate();
 
             Debug.log(String.format("Date: %s System date: %b", date.toString(), isSystemDate));
@@ -69,10 +77,15 @@ public class OptionsFragment extends Fragment {
 
             int offset = systemViewModel.getZoneOffset().getTotalSeconds() * 1000;
             String location = systemViewModel.getZoneId() != null ? systemViewModel.getZoneId().getId() : null;
-
             boolean isSystemTime = systemViewModel.isSystemTime();
 
-            Debug.log(String.format("Time: %s Time zone offset: %d Description: %s System time: %b", time.toString(), offset, location, isSystemTime));
+            Debug.log(String.format(
+                "Time: %s Time zone offset: %d Description: %s System time: %b",
+                time.toString(),
+                offset,
+                location,
+                isSystemTime
+            ));
 
             updateTime();
 
@@ -84,24 +97,28 @@ public class OptionsFragment extends Fragment {
         @Override
         public void onClick(View view) {
 
-            Bundle bundle = new Bundle();
-
+            Class fragmentClass = null;
             String message = null;
 
-            if (view == binding.changeLocation)
+            if (view == binding.changeLocation) {
+                fragmentClass = MapFragment.class;
                 message = "LOCATION";
-            else if (view == binding.changeDate)
+            } else if (view == binding.changeDate) {
+                fragmentClass = CalendarFragment.class;
                 message = "DATE";
-            else if (view == binding.changeTime)
+            } else if (view == binding.changeTime) {
+                fragmentClass = ClockFragment.class;
                 message = "TIME";
-
-            if (message != null) {
-
-                bundle.putString("CHANGE", message);
-
-                getParentFragmentManager().setFragmentResult("OptionsFragment/ChangeOption", bundle);
-
             }
+
+            if (fragmentClass == null)
+                return;
+
+            getParentFragmentManager().beginTransaction()
+                .setReorderingAllowed(true)
+                .replace(R.id.options_fragment_container, fragmentClass, null, message)
+                .addToBackStack(null)
+                .commit();
 
         }
     }

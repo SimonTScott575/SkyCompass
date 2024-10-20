@@ -64,7 +64,7 @@ public class ClockFragment extends Fragment {
             getParentFragmentManager().beginTransaction()
                 .setReorderingAllowed(true)
                 .addToBackStack(null)
-                .replace(R.id.options_fragment_container, TimeZoneFragment.class, null)
+                .replace(R.id.options_fragment_container, TimeZoneFragment.class, null, "TIME_ZONE")
                 .commit();
         });
 
